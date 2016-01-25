@@ -1,0 +1,5 @@
+# Enlever le dossier de compilation
+EIFGENs/
+
+# Enlever les fichiers rc
+*.rc

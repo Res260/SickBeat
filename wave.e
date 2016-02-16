@@ -1,5 +1,5 @@
 note
-	description: "Summary description for {WAVES}."
+	description: "Summary description for {WAVE}."
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"

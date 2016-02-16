@@ -7,4 +7,9 @@ note
 class
 	HUD_ITEM
 
+inherit
+	DRAWABLE
+
+	PHYSIC_OBJECT
+
 end

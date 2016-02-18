@@ -25,10 +25,6 @@ feature -- Initialization
 
 feature -- Access
 
-	new_1: PHYSICS_ENGINE
-			-- `new_1'
-		attribute check False then end end --| Remove line when `new_1' is initialized in creation procedure.
-
 	sound: SOUND_ENGINE
 			-- `sound'
 		attribute check False then end end --| Remove line when `sound' is initialized in creation procedure.
@@ -53,7 +49,9 @@ feature {NONE} -- Access
 
 feature {NONE} -- Access
 
-	 --| Remove line when `physics' is initialized in creation procedure.
+	physics: PHYSICS_ENGINE
+			-- `physics'
+		attribute check False then end end --| Remove line when `physics' is initialized in creation procedure.
 
 feature {NONE} -- Access
 

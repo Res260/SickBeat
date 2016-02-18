@@ -7,9 +7,6 @@ note
 class
 	SOUND_FACTORY
 
-inherit
-	SOUND
-
 feature -- Access
 
 	 --| Remove line when `new_1' is initialized in creation procedure.

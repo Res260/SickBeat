@@ -7,6 +7,15 @@ note
 class
 	GAME_ENGINE
 
+create
+	make
+
+feature {NONE} -- Initialization
+	make
+		do
+			
+		end
+
 feature -- Initialization
 
 	renderer: RENDER_ENGINE
@@ -16,8 +25,6 @@ feature -- Initialization
 	current_player: PLAYER
 			-- `current_player'
 		attribute check False then end end --| Remove line when `current_player' is initialized in creation procedure.
-
-	 --| Remove line when `sound' is initialized in creation procedure.
 
 	network: NETWORK_ENGINE
 			-- `network'
@@ -41,19 +48,13 @@ feature -- Access
 			-- `hud_items'
 		attribute check False then end end --| Remove line when `hud_items' is initialized in creation procedure.
 
-feature {NONE} -- Access
-
 	current_map: MAP
 			-- `current_map'
 		attribute check False then end end --| Remove line when `current_map' is initialized in creation procedure.
 
-feature {NONE} -- Access
-
 	physics: PHYSICS_ENGINE
 			-- `physics'
 		attribute check False then end end --| Remove line when `physics' is initialized in creation procedure.
-
-feature {NONE} -- Access
 
 	entities: LIST [ENTITY]
 			-- `entities'

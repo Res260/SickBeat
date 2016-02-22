@@ -6,6 +6,10 @@ note
 class
 	APPLICATION
 
+inherit
+	GAME_LIBRARY_SHARED
+	TEXT_LIBRARY_SHARED
+
 create
 	make
 
@@ -20,18 +24,12 @@ feature {NONE} -- Initialization
 	make
 			-- Run application.
 		do
-			--| Add your code here
-			print ("Hello Eiffel World!%N")
+			game_library.enable_video
+			text_library.enable_text
+			create game.make
+			game_library.clear_all_events
+			text_library.quit_library
+			game_library.quit_library
 		end
-
-	allo
-		do
-			if attached liste as la_liste then
-				print(la_liste.item.out)
-			end
-
-		end
-
-	liste:detachable LIST[INTEGER]
 
 end

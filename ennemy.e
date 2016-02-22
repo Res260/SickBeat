@@ -10,6 +10,4 @@ class
 inherit
 	ENTITY
 
-	ENTITY
-
 end

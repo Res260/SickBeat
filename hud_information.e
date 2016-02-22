@@ -10,6 +10,4 @@ class
 inherit
 	HUD_ITEM
 
-	HUD_ITEM
-
 end

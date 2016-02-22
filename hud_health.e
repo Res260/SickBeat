@@ -10,6 +10,4 @@ class
 inherit
 	HUD_INFORMATION
 
-	HUD_INFORMATION
-
 end

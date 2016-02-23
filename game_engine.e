@@ -1,8 +1,8 @@
 note
-	description: "Summary description for {GAME_ENGINE}."
-	author: ""
-	date: "$Date$"
-	revision: "$Revision$"
+	description: "{GAME_ENGINE} is a basic mechanics {ENGINE}."
+	author: "Guillaume Jean"
+	date: "Tue, 23 Fev 2016 09:15:00"
+	revision: "0.1"
 
 class
 	GAME_ENGINE
@@ -13,7 +13,7 @@ create
 feature {NONE} -- Initialization
 	make
 		do
-			
+
 		end
 
 feature -- Initialization

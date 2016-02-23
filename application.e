@@ -1,7 +1,8 @@
 note
-	description : "SickBeat application root class"
-	date        : "$Date$"
-	revision    : "$Revision$"
+	description: "Sickbeat root application class."
+	author: "Guillaume Jean"
+	date: "Tue, 23 Fev 2016 09:00:00"
+	revision: "0.1"
 
 class
 	APPLICATION

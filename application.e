@@ -48,7 +48,7 @@ feature {NONE} -- Initialization
 			l_window_builder.must_renderer_support_texture_target := True
 			l_window_builder.must_renderer_synchronize_update := True
 			l_window_builder.title := "SickBeat"
-			l_window = l_window_builder.generate_window
+			l_window := l_window_builder.generate_window
 			-- TODO: Create resource factories
 			run_game_menu(l_window)
 		end

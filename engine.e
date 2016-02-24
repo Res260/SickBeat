@@ -21,7 +21,7 @@ feature {NONE} -- Initialization
 
 feature -- Access
 	run
-			-- Execute a 'tick' of `Current`
+			-- Execute a 'tick' of `Current'
 		do
 			game_library.quit_signal_actions.extend(agent on_quit_signal)
 			window.expose_actions.extend(agent on_redraw)
@@ -31,7 +31,7 @@ feature -- Access
 		end
 
 	stop
-			-- Stop the execution of `Current`
+			-- Stop the execution of `Current'
 		do
 			game_library.stop
 		end

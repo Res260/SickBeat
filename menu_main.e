@@ -27,4 +27,15 @@ feature {NONE} -- Initialization
 			add_button("Exit")
 		end
 
+feature -- Access
+
+	is_play_clicked: BOOLEAN
+		do
+			Result := clicked_button = 1
+		end
+
+	is_exit_clicked: BOOLEAN
+		do
+			Result := clicked_button = 3
+		end
 end

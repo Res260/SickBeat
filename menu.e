@@ -16,18 +16,9 @@ inherit
 feature {NONE} -- Initialization
 
 	make(a_window: GAME_WINDOW_RENDERED)
-		local
-			l_path: PATH
 		do
 			clicked_button := 0
 			Precursor(a_window)
-			create l_path.make_from_string("ressources")
-			l_path := l_path.extended("font")
-			l_path := l_path.appended_with_extension(".ttf")
-			create font.make(l_path.name, window.height // 10)
-			if font.is_openable then
-				font.open
-			end
 			create {LINKED_LIST[GAME_TEXTURE]} buttons_texture.make
 			update_buttons_dimension
 		end
@@ -77,6 +68,22 @@ feature {NONE} -- Implementation
 		do
 			if a_mouse_state.is_left_button_released and a_nb_clicks = 1 then
 				-- Check mouse collisions
+				from
+					buttons_dimension.start
+				until
+					buttons_dimension.after
+				loop
+					if
+						buttons_dimension.item.x < a_mouse_state.x and
+						buttons_dimension.item.y < a_mouse_state.y and
+						buttons_dimension.item.x + buttons_dimension.item.width > a_mouse_state.x and
+						buttons_dimension.item.y + buttons_dimension.item.height > a_mouse_state.y
+					then
+						clicked_button := buttons_dimension.index
+						stop
+					end
+					buttons_dimension.forth
+				end
 			end
 		end
 
@@ -94,6 +101,19 @@ feature {NONE} -- Implementation
 
 	font: TEXT_FONT
 			-- Font used to generate the images in `Current'
+		local
+			l_path:PATH
+		do
+			create l_path.make_from_string("resources")
+			l_path := l_path.extended("font")
+			l_path := l_path.appended_with_extension("ttf")
+			create Result.make(l_path.name, window.height // 20)
+			if Result.is_openable then
+				Result.open
+			end
+		ensure
+			Is_Open: Result.is_open
+		end
 
 	set_title(a_title: READABLE_STRING_GENERAL)
 			-- Set `Current's title's texture and dimension
@@ -158,6 +178,6 @@ feature {NONE} -- Implementation
 	background_color: GAME_COLOR
 			-- The color used to draw the background. TODO: Change it
 		once
-			create Result.make_rgb(255, 255, 255)
+			create Result.make_rgb(150, 150, 150)
 		end
 end

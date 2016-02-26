@@ -56,11 +56,23 @@ feature {NONE} -- Initialization
 	run_main_menu(a_window: GAME_WINDOW_RENDERED)
 		local
 			l_main_menu: MENU_MAIN
+			l_continue_menu: BOOLEAN
 		do
 			create l_main_menu.make (a_window)
 			if not l_main_menu.has_error then
-				l_main_menu.run
-				-- TODO: Do stuff with it
+				from
+					l_continue_menu := True
+				until
+					l_continue_menu = False
+				loop
+					l_main_menu.run
+					if l_main_menu.is_play_clicked then
+						io.put_string("Play clicked!%N")
+					elseif l_main_menu.is_exit_clicked then
+						io.put_string("Exit clicked!%N")
+						l_continue_menu := False
+					end
+				end
 			else
 				io.error.put_string ("An error occured while loading the main menu.%N")
 			end

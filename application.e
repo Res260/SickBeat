@@ -50,12 +50,20 @@ feature {NONE} -- Initialization
 			l_window_builder.title := "SickBeat"
 			l_window := l_window_builder.generate_window
 			-- TODO: Create resource factories
-			run_game_menu(l_window)
+			run_main_menu(l_window)
 		end
 
-	run_game_menu(a_window: GAME_WINDOW_RENDERED)
+	run_main_menu(a_window: GAME_WINDOW_RENDERED)
+		local
+			l_main_menu: MENU_MAIN
 		do
-
+			create l_main_menu.make (a_window)
+			if not l_main_menu.has_error then
+				l_main_menu.run
+				-- TODO: Do stuff with it
+			else
+				io.error.put_string ("An error occured while loading the main menu.%N")
+			end
 		end
 
 end

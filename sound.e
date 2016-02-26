@@ -9,9 +9,6 @@ class
 
 inherit
 	AUDIO_SOUND
-		rename
-			make as make_with_file
-		end
 
 create
 	make
@@ -21,7 +18,6 @@ feature {NONE}
 	make (a_sound_data : ARRAYED_LIST[INTEGER_16])
 		do
 			sound_data:= a_sound_data
-			make_with_file ()
 		end
 
 feature

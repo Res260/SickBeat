@@ -1,11 +1,14 @@
 note
 	description: "Class that manages sounds/musics for the game."
 	author: "Émilio G!"
-	date: "160222"
+	date: "16-02-22"
 	revision: "0.1"
 
 class
 	SOUND_ENGINE
+
+inherit
+	AUDIO_LIBRARY_SHARED
 
 create
 	make
@@ -16,6 +19,9 @@ feature {NONE} -- Access
 		do
 			sound_on := TRUE
 			sounds := create {ARRAYED_LIST[SOUND]}.make(0)
+			audio_library.enable_sound
+			audio_library.launch_in_thread
+			--audio_library.disable_print_on_error
 		end
 
 	sound_on:BOOLEAN
@@ -39,12 +45,14 @@ feature
 			--called at the end of the program to clear allocated ressources
 		do
 			sounds.wipe_out
+			audio_library.stop_thread
+			audio_library.quit_library
 		end
 
 	add_sound(a_sound: SOUND)
 			--adds a sound to the list of active sounds
 		do
-			sounds.append (a_sound)
+			--sounds.append()
 		end
 
 end

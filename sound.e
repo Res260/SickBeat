@@ -7,8 +7,8 @@ note
 class
 	SOUND
 
-inherit
-	AUDIO_SOUND
+--inherit
+--	AUDIO_SOUND
 
 create
 	make

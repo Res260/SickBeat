@@ -1,11 +1,15 @@
 note
 	description: "Class that manages sounds/musics for the game."
 	author: "Émilio G!"
-	date: "160222"
+	date: "16-02-22"
 	revision: "0.1"
 
 class
 	SOUND_ENGINE
+
+inherit
+	AUDIO_LIBRARY_SHARED
+
 
 create
 	make
@@ -13,13 +17,26 @@ create
 feature {NONE} -- Access
 
 	make
+		local
+			l_line:STRING
 		do
 			sound_on := TRUE
-			sounds := create {ARRAYED_LIST[SOUND]}.make(0)
+			audio_sources := create {ARRAYED_LIST[AUDIO_SOURCE]}.make(0)
+			audio_library.enable_sound
+			audio_library.launch_in_thread
+			run
+			from
+				l_line:=""
+			until
+				l_line.is_equal ("quit")
+			loop
+
+			end
+			--audio_library.disable_print_on_error
 		end
 
 	sound_on:BOOLEAN
-	sounds: LIST [SOUND]
+	audio_sources: LIST [AUDIO_SOURCE]
 
 feature
 
@@ -32,19 +49,21 @@ feature
 	run
 			--do the engine's job
 		do
-
+			io.put_string ("YESS FISTON")
 		end
 
 	clear_ressources
 			--called at the end of the program to clear allocated ressources
 		do
-			sounds.wipe_out
+			audio_sources.wipe_out
+			audio_library.stop_thread
+			audio_library.quit_library
 		end
 
-	add_sound(a_sound: SOUND)
-			--adds a sound to the list of active sounds
+	add_audio_source(a_sound: SOUND)
+			--adds an audio source to the list of active sounds
 		do
-			sounds.append (a_sound)
+			--sounds.append()
 		end
 
 end

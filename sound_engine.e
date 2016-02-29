@@ -23,6 +23,7 @@ feature {NONE} -- Access
 			sound_on := TRUE
 			audio_sources := create {ARRAYED_LIST[AUDIO_SOURCE]}.make(0)
 			audio_library.enable_sound
+			io.put_string ("YEAH2")
 			audio_library.launch_in_thread
 			run
 			from
@@ -32,7 +33,8 @@ feature {NONE} -- Access
 			loop
 
 			end
-			--audio_library.disable_print_on_error
+			audio_library.stop_thread
+			audio_library.disable_print_on_error
 		end
 
 	sound_on:BOOLEAN

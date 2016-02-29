@@ -7,8 +7,8 @@ note
 class
 	SOUND
 
---inherit
---	AUDIO_SOUND
+inherit
+	AUDIO_SOUND
 
 create
 	make
@@ -17,10 +17,84 @@ feature {NONE}
 
 	make (a_sound_data : ARRAYED_LIST[INTEGER_16])
 		do
-			sound_data:= a_sound_data
+			channel_count:= 1
+			frequency:= 44100
+			bits_per_sample:= 16
+			is_signed:= True
+			byte_per_buffer_sample:= channel_count * (bits_per_sample / 8)
+			sound_length:= a_sound_data.count
+			is_open := True
+			create sound_data.make (byte_per_buffer_sample * sound_length)
+			from
+				i := 1
+			until
+				i > sound_length
+			loop
+				sound_data.put_integer_16 (a_sound_data.at (i), (i - 1) * 2)
+				i := i + 1
+			end
 		end
 
 feature
-	sound_data: ARRAYED_LIST[INTEGER_16]
+
+	buffer_index: INTEGER_32 --usefull in fill_buffer
+
+	sound_data: MANAGED_POINTER
+
+	sound_length: INTEGER_32 --length in samples
+
+	channel_count:INTEGER_32
+
+	frequency: INTEGER_32
+
+	bits_per_sample: INTEGER_32
+
+	is_signed: BOOLEAN
+
+	byte_per_buffer_sample: INTEGER_32
+
+	is_seekable: BOOLEAN = False
+
+	fill_buffer(a_buffer: POINTER; a_max_length: INTEGER_32)
+		local
+			l_buffer: ARRAYED_LIST[INTEGER_16]
+			l_max: INTEGER_32
+			l_count: INTEGER_32
+		do
+			if(buffer_index + a_max_length > a_max_length) then
+				a_buffer.memory_copy (sound_data.item.plus (buffer_index), sound_length * byte_per_buffer_sample)
+				buffer_index := 0
+			else
+				a_buffer.memory_copy (sound_data.item.plus (buffer_index), a_max_length)
+				buffer_index := (buffer_index + a_max_length)
+			end
+--			if(buffer_index + a_max_length > sound_length) then
+--				l_max:= buffer_index + a_max_length
+--			else
+--				l_max:= sound_length
+--			end
+
+--			from
+--				l_count := buffer_index
+--			until
+--				l_count >= l_max
+--			loop
+--				l_buffer.append(sound_data[l_count])
+--				l_count := l_count + 1
+--			end
+		--	a_buffer.memory_copy(a_source: POINTER, a_size: INTEGER_32)l_buffer
+		end
+
+	restart
+		do
+
+		end
+
+	is_openable: BOOLEAN = False
+
+	open	--nothing. This is actually useless but necessary.
+		do
+
+		end
 
 end

@@ -10,7 +10,6 @@ class
 inherit
 	AUDIO_LIBRARY_SHARED
 
-
 create
 	make
 

@@ -34,6 +34,11 @@ feature -- Access
 			Result := clicked_button = 1
 		end
 
+	is_option_clicked: BOOLEAN
+		do
+			Result := clicked_button = 2
+		end
+
 	is_exit_clicked: BOOLEAN
 		do
 			Result := clicked_button = 3

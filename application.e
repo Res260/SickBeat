@@ -68,6 +68,8 @@ feature {NONE} -- Initialization
 					l_main_menu.run
 					if l_main_menu.is_play_clicked then
 						io.put_string("Play clicked!%N")
+					elseif l_main_menu.is_option_clicked then
+						io.put_string("Options clicked!%N")
 					elseif l_main_menu.is_exit_clicked then
 						io.put_string("Exit clicked!%N")
 						l_continue_menu := False

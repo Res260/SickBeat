@@ -61,11 +61,22 @@ feature {NONE} -- Initialization
 			l_continue_menu: BOOLEAN
 
 			l_audio_source: AUDIO_SOURCE
+			l_audio_source_2: AUDIO_SOURCE
 			l_sound: SOUND
+			l_sound_2: AUDIO_SOUND_FILE
 		do
 			l_audio_source:= sound_engine.create_audio_source
-			create l_sound.make (sound_factory.create_square_wave(20, 200))
-			l_audio_source.queue_sound_loop (l_sound, 500)
+			l_sound:= sound_factory.create_sound_1
+			l_audio_source.queue_sound (l_sound)
+			l_audio_source.play
+			io.put_boolean (l_audio_source.is_playing)
+
+--			l_audio_source_2:= sound_engine.create_audio_source
+--			create l_sound_2.make (".\ressources\audio\menu.ogg")
+--			l_sound_2.open
+--			l_audio_source_2.queue_sound (l_sound_2)
+--			l_audio_source_2.set_gain (0.1)
+--			l_audio_source_2.play
 
 			create l_main_menu.make (a_window)
 			if not l_main_menu.has_error then

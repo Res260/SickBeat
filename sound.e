@@ -33,8 +33,8 @@ feature {NONE}
 			until
 				i > sound_length
 			loop
-				io.put_string ("%N")
-				io.put_integer_16 (a_sound_data.at (i))
+				--io.put_string ("%N")
+				--io.put_integer_16 (a_sound_data.at (i))
 				sound_data.put_integer_16 (a_sound_data.at (i), (i - 1) * 2)
 				i := i + 1
 			end
@@ -73,21 +73,6 @@ feature
 				a_buffer.memory_copy (sound_data.item.plus (buffer_index), a_max_length)
 				buffer_index := (buffer_index + a_max_length)
 			end
---			if(buffer_index + a_max_length > sound_length) then
---				l_max:= buffer_index + a_max_length
---			else
---				l_max:= sound_length
---			end
-
---			from
---				l_count := buffer_index
---			until
---				l_count >= l_max
---			loop
---				l_buffer.append(sound_data[l_count])
---				l_count := l_count + 1
---			end
-		--	a_buffer.memory_copy(a_source: POINTER, a_size: INTEGER_32)l_buffer
 		end
 
 	restart

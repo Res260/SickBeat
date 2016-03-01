@@ -9,10 +9,6 @@ class
 
 inherit
 	AUDIO_LIBRARY_SHARED
-	AUDIO_LIBRARY_CONTROLLER
-		rename
-			make as make_audio_library_controller
-		end
 
 create
 	make
@@ -23,7 +19,6 @@ feature {NONE} -- Access
 		local
 			l_line:STRING
 		do
-			make_audio_library_controller
 			sound_on := TRUE
 			audio_sources := create {ARRAYED_LIST[AUDIO_SOURCE]}.make(0)
 			audio_library.enable_sound

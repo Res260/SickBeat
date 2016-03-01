@@ -9,6 +9,10 @@ class
 
 inherit
 	AUDIO_LIBRARY_SHARED
+	AUDIO_LIBRARY_CONTROLLER
+		rename
+			make as make_audio_library_controller
+		end
 
 create
 	make
@@ -19,21 +23,13 @@ feature {NONE} -- Access
 		local
 			l_line:STRING
 		do
+			make_audio_library_controller
 			sound_on := TRUE
 			audio_sources := create {ARRAYED_LIST[AUDIO_SOURCE]}.make(0)
 			audio_library.enable_sound
 			io.put_string ("YEAH2")
 			audio_library.launch_in_thread
-			run
-			from
-				l_line:=""
-			until
-				l_line.is_equal ("quit")
-			loop
-
-			end
-			audio_library.stop_thread
-			audio_library.disable_print_on_error
+--			audio_library.disable_print_on_error
 		end
 
 	sound_on:BOOLEAN
@@ -45,6 +41,19 @@ feature
 			--toggle if sound plays or not
 		do
 			sound_on := not sound_on
+		end
+
+	create_audio_source: AUDIO_SOURCE
+		local
+			l_new_audio_source: AUDIO_SOURCE
+		do
+			create l_new_audio_source.make (44100)
+			Result:= l_new_audio_source
+		end
+
+	add_audio_source(a_audio_source: AUDIO_SOURCE)
+		do	--adds an audio source to the list of active sounds
+			audio_sources.extend (a_audio_source)
 		end
 
 	run
@@ -59,12 +68,6 @@ feature
 			audio_sources.wipe_out
 			audio_library.stop_thread
 			audio_library.quit_library
-		end
-
-	add_audio_source(a_sound: SOUND)
-			--adds an audio source to the list of active sounds
-		do
-			--sounds.append()
 		end
 
 end

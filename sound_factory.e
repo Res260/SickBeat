@@ -7,9 +7,6 @@ note
 class
 	SOUND_FACTORY
 
-inherit
-	gobo_math
-
 create
 	make
 
@@ -30,11 +27,37 @@ feature -- Access.
 
 	bits_per_sample:INTEGER_32
 
+	max_amplitude
+		once
+
+		end
+
 	create_square_wave(a_amplitude: REAL_32; a_frequency: INTEGER_32):ARRAYED_LIST[INTEGER_16]
+		-- amplitude is in dB
 		local
 			l_wave: ARRAYED_LIST[INTEGER_16]
+			l_highest_number: INTEGER_16
 			l_length: INTEGER_32
+			i: INTEGER_32
 		do
+			l_length:= sample_rate // a_frequency
+			create l_wave.make (l_length)
+			l_highest_number:= 32767
+			from
+				i:= 0
+			until
+				i >= l_length // 2
+			loop
+				l_wave.extend (l_highest_number)
+			end
+
+			from
+				i := i
+			until
+				i >= l_length
+			loop
+				l_wave.extend (-l_highest_number)
+			end
 			Result:= l_wave
 		end
 

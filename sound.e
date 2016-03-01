@@ -16,12 +16,14 @@ create
 feature {NONE}
 
 	make (a_sound_data : ARRAYED_LIST[INTEGER_16])
+		local
+			i: INTEGER_32
 		do
 			channel_count:= 1
 			frequency:= 44100
 			bits_per_sample:= 16
 			is_signed:= True
-			byte_per_buffer_sample:= channel_count * (bits_per_sample / 8)
+			byte_per_buffer_sample:= channel_count * (bits_per_sample // 8)
 			sound_length:= a_sound_data.count
 			is_open := True
 			create sound_data.make (byte_per_buffer_sample * sound_length)

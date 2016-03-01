@@ -104,7 +104,7 @@ feature {NONE} -- Implementation
 		local
 			l_path:PATH
 		do
-			create l_path.make_from_string("resources")
+			create l_path.make_from_string("ressources")
 			l_path := l_path.extended("font")
 			l_path := l_path.appended_with_extension("ttf")
 			create Result.make(l_path.name, window.height // 20)

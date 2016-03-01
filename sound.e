@@ -19,6 +19,7 @@ feature {NONE}
 		local
 			i: INTEGER_32
 		do
+			io.put_string ("OK")
 			channel_count:= 1
 			frequency:= 44100
 			bits_per_sample:= 16
@@ -32,6 +33,8 @@ feature {NONE}
 			until
 				i > sound_length
 			loop
+				io.put_string ("%N")
+				io.put_integer_16 (a_sound_data.at (i))
 				sound_data.put_integer_16 (a_sound_data.at (i), (i - 1) * 2)
 				i := i + 1
 			end

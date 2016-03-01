@@ -10,6 +10,8 @@ class
 inherit
 	GAME_LIBRARY_SHARED
 	TEXT_LIBRARY_SHARED
+	SOUND_ENGINE_SHARED
+	SOUND_FACTORY_SHARED
 
 create
 	make
@@ -57,7 +59,14 @@ feature {NONE} -- Initialization
 		local
 			l_main_menu: MENU_MAIN
 			l_continue_menu: BOOLEAN
+
+			l_audio_source: AUDIO_SOURCE
+			l_sound: SOUND
 		do
+			l_audio_source:= sound_engine.create_audio_source
+			create l_sound.make (sound_factory.create_square_wave(20, 200))
+			l_audio_source.queue_sound_loop (l_sound, 500)
+
 			create l_main_menu.make (a_window)
 			if not l_main_menu.has_error then
 				from
@@ -68,6 +77,7 @@ feature {NONE} -- Initialization
 					l_main_menu.run
 					if l_main_menu.is_play_clicked then
 						io.put_string("Play clicked!%N")
+						l_audio_source.play
 					elseif l_main_menu.is_option_clicked then
 						io.put_string("Options clicked!%N")
 					elseif l_main_menu.is_exit_clicked then

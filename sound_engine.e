@@ -44,11 +44,10 @@ feature
 		end
 
 	create_audio_source: AUDIO_SOURCE
-		local
-			l_new_audio_source: AUDIO_SOURCE
 		do
-			create l_new_audio_source.make (44100)
-			Result:= l_new_audio_source
+			audio_library.sources_add
+			Result := audio_library.last_source_added
+			Result.set_gain (1)
 		end
 
 	add_audio_source(a_audio_source: AUDIO_SOURCE)

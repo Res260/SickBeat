@@ -32,6 +32,8 @@ feature -- Access.
 
 		end
 
+	
+
 	create_square_wave(a_amplitude: REAL_32; a_frequency: INTEGER_32):ARRAYED_LIST[INTEGER_16]
 		-- amplitude is in dB
 		local
@@ -49,6 +51,7 @@ feature -- Access.
 				i >= l_length // 2
 			loop
 				l_wave.extend (l_highest_number)
+				i := i + 1
 			end
 
 			from
@@ -57,7 +60,9 @@ feature -- Access.
 				i >= l_length
 			loop
 				l_wave.extend (-l_highest_number)
+				i := i + 1
 			end
+
 			Result:= l_wave
 		end
 

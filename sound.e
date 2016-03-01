@@ -24,6 +24,7 @@ feature {NONE}
 			frequency:= 44100
 			bits_per_sample:= 16
 			is_signed:= True
+			buffer_index:= 0
 			byte_per_buffer_sample:= channel_count * (bits_per_sample // 8)
 			sound_length:= a_sound_data.count
 			is_open := True
@@ -66,12 +67,18 @@ feature
 			l_max: INTEGER_32
 			l_count: INTEGER_32
 		do
-			if(buffer_index + a_max_length > a_max_length) then
-				a_buffer.memory_copy (sound_data.item.plus (buffer_index), sound_length * byte_per_buffer_sample)
+			if(buffer_index + a_max_length >= sound_length) then
+				a_buffer.memory_copy (sound_data.item.plus (buffer_index), (sound_length * byte_per_buffer_sample) - byte_per_buffer_sample)
 				buffer_index := 0
 			else
-				a_buffer.memory_copy (sound_data.item.plus (buffer_index), a_max_length)
-				buffer_index := (buffer_index + a_max_length)
+				a_buffer.memory_copy (sound_data.item.plus (buffer_index), a_max_length * byte_per_buffer_sample)
+				buffer_index := (buffer_index + a_max_length * byte_per_buffer_sample)
+				io.put_string ("%N")
+				io.put_integer_32 (buffer_index)
+				io.put_string ("%N")
+				io.put_integer_32 (a_max_length)
+				io.put_string ("%N")
+				io.put_integer_32 (sound_length)
 			end
 		end
 

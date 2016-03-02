@@ -32,20 +32,16 @@ feature -- Access.
 
 		end
 
-	create_sound_1:SOUND
+	create_sound_menu_click:SOUND
 		local
 			l_wave:ARRAYED_LIST[INTEGER_16]
 			l_sound: SOUND
 		do
-			l_wave:= create_square_wave(20, 300)
-			io.put_string ("TEST111")
-			repeat_wave(l_wave, 10)
-			io.put_string ("TEST")
+			l_wave:= create_square_wave(20, 400)
+			repeat_wave(l_wave, 22)
 			create l_sound.make(l_wave)
 			Result:= l_sound
 		end
-
-
 
 	create_square_wave(a_amplitude: REAL_32; a_frequency: INTEGER_32):ARRAYED_LIST[INTEGER_16]
 		-- amplitude is in dB
@@ -84,13 +80,15 @@ feature -- Access.
 			--Side effect on a_sound
 		local
 			i: INTEGER_32
+			l_list:ARRAYED_LIST[INTEGER_16]
 		do
+			l_list := a_sound.twin
 			from
 				i:= 1
 			until
-				i >= a_repetition
+				i > a_repetition
 			loop
-				a_sound.append (a_sound)
+				a_sound.append (l_list)
 				i := i + 1
 			end
 		end

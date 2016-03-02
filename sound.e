@@ -32,9 +32,11 @@ feature {NONE}
 			from
 				i := 1
 			until
-				i > sound_length - 1
+				i > sound_length
 			loop
-				sound_data.put_integer_16 (a_sound_data.at (i), (i - 1) * byte_per_buffer_sample)
+				--io.put_string ("%N")
+				--io.put_integer_16 (a_sound_data.at (i))
+				sound_data.put_integer_16 (a_sound_data.at (i), (i - 1) * 2)
 				i := i + 1
 			end
 		end
@@ -64,29 +66,25 @@ feature
 			l_buffer: ARRAYED_LIST[INTEGER_16]
 			l_max: INTEGER_32
 			l_count: INTEGER_32
-			l_buffer_size: INTEGER_32
-			l_index_max: INTEGER_32
-			l_sound_length_byte: INTEGER_32
 		do
-			l_index_max:= buffer_index + a_max_length
-			l_sound_length_byte:= sound_length * byte_per_buffer_sample
-			if(l_index_max >= l_sound_length_byte) then
-				l_buffer_size:= l_sound_length_byte - buffer_index
+			if(buffer_index + a_max_length >= sound_length) then
+				a_buffer.memory_copy (sound_data.item.plus (buffer_index), (sound_length * byte_per_buffer_sample) - byte_per_buffer_sample)
+				buffer_index := 0
 			else
-				l_buffer_size:= a_max_length
+				a_buffer.memory_copy (sound_data.item.plus (buffer_index), a_max_length * byte_per_buffer_sample)
+				buffer_index := (buffer_index + a_max_length * byte_per_buffer_sample)
+				io.put_string ("%N")
+				io.put_integer_32 (buffer_index)
+				io.put_string ("%N")
+				io.put_integer_32 (a_max_length)
+				io.put_string ("%N")
+				io.put_integer_32 (sound_length)
 			end
-			if(l_buffer_size <= 0) then
-				restart
-			else
-				a_buffer.memory_copy (sound_data.item.plus (buffer_index), l_buffer_size)
-				buffer_index := (buffer_index + l_buffer_size)
-			end
-			last_buffer_size:= l_buffer_size
 		end
 
 	restart
 		do
-			buffer_index := 0
+
 		end
 
 	is_openable: BOOLEAN = False

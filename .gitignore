@@ -3,3 +3,4 @@ EIFGENs/
 
 # Enlever les fichiers rc
 *.rc
+*.log

@@ -1,8 +1,8 @@
 note
-	description: "Summary description for {SOUND_ENGINE_SHARED}."
-	author: ""
-	date: "$Date$"
-	revision: "$Revision$"
+	description: "Class to share SOUND_ENGINE singleton."
+	author: "Émilio G!"
+	date: "16-2-22"
+	revision: "0 16-02-22"
 
 deferred class
 	SOUND_ENGINE_SHARED

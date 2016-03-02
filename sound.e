@@ -1,8 +1,8 @@
 note
-	description: "Class that holds information."
+	description: "Class that holds information for a sound and fills a buffer to play it."
 	author: "Émilio G!"
-	date: "160223"
-	revision: "$Revision$"
+	date: "16-02-23"
+	revision: "1 16-03-01"
 
 class
 	SOUND
@@ -19,7 +19,6 @@ feature {NONE}
 		local
 			i: INTEGER_32
 		do
-			io.put_string ("OK")
 			channel_count:= 1
 			frequency:= 44100
 			bits_per_sample:= 16
@@ -85,6 +84,7 @@ feature
 		end
 
 	restart
+		--sets buffer_index to 0 so the sound plays normally when prompted again
 		do
 			buffer_index := 0
 		end

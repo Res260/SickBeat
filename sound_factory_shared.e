@@ -5,10 +5,10 @@ note
 	revision: "0 16-02-22"
 
 deferred class
-	SOUND_ENGINE_SHARED
+	SOUND_FACTORY_SHARED
 
 feature
-	sound_engine:SOUND_ENGINE
+	sound_factory:SOUND_FACTORY
 		once
 			create Result.make
 		end

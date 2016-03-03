@@ -10,34 +10,19 @@ deferred class
 inherit
 	ENGINE
 		redefine
-			make, run
+			make, run, on_resize, on_size_change, on_restore
 		end
 
 feature {NONE} -- Initialization
 
-	make(a_window: GAME_WINDOW_RENDERED)
+	make(a_window: GAME_WINDOW_RENDERED; a_ressource_factory: RESSOURCE_FACTORY)
 		do
 			clicked_button := 0
-			Precursor(a_window)
+			Precursor(a_window, a_ressource_factory)
+			background_texture := ressource_factory.menu_background
 			create {LINKED_LIST[GAME_TEXTURE]} buttons_texture.make
 			update_buttons_dimension
 		end
-
-feature -- Access
-
-	has_error: BOOLEAN
-		-- Previous action caused an error
-
-	run
-		do
-			clicked_button := 0
-			window.renderer.set_drawing_color(background_color)
-			window.mouse_button_released_actions.extend(agent on_clicked)
-			Precursor
-		end
-
-	clicked_button: INTEGER
-		-- Integer representing the button clicked by the user.
 
 feature {NONE} -- Implementation
 
@@ -45,8 +30,13 @@ feature {NONE} -- Implementation
 		do
 			window.renderer.clear
 
+			if attached background_texture as background then
+				window.renderer.draw_sub_texture_with_scale (background, 0, 0, background.width, background.height,
+																		 0, 0, window.width, window.height)
+			end
+
 			if attached title_texture as la_title and attached title_dimension as la_title_dimension then
-				window.renderer.draw_texture (la_title, la_title_dimension.x, la_title_dimension.y)
+				window.renderer.draw_texture(la_title, la_title_dimension.x, la_title_dimension.y)
 			end
 
 			from
@@ -64,9 +54,9 @@ feature {NONE} -- Implementation
 		end
 
 	on_clicked(a_timestamp: NATURAL_32; a_mouse_state: GAME_MOUSE_BUTTON_RELEASED_STATE; a_nb_clicks: NATURAL_8)
-			-- Whenever a click happens in the `window'
+			-- Whenever a click is released in the `window'
 		do
-			if a_mouse_state.is_left_button_released and a_nb_clicks = 1 then
+			if a_mouse_state.is_left_button_released then
 				-- Check mouse collisions
 				from
 					buttons_dimension.start
@@ -87,11 +77,51 @@ feature {NONE} -- Implementation
 			end
 		end
 
+	on_resize(a_timestamp: NATURAL_32; a_width, a_height: INTEGER_32)
+			-- Whenever the `window' is resized
+		do
+			update_buttons_dimension
+		end
+
+	on_size_change(a_timestamp: NATURAL_32)
+			-- Whenever the `window's size changes
+		do
+			update_buttons_dimension
+		end
+
+	on_restore(a_timestamp: NATURAL_32)
+			-- Whenever the `window' is restored
+		do
+			update_buttons_dimension
+		end
+
+feature -- Access
+
+	has_error: BOOLEAN
+			-- Previous action caused an error
+
+	run
+		do
+			clicked_button := 0
+			window.renderer.set_drawing_color(background_color)
+			window.mouse_button_released_actions.extend(agent on_clicked)
+			Precursor
+		end
+
+	clicked_button: INTEGER
+			-- Integer representing the button clicked by the user.
+
+	background_texture: detachable GAME_TEXTURE
+			-- Image of `Current's background
+
 	title_texture: detachable GAME_TEXTURE
 			-- Image of `Current's title
 
 	title_dimension: detachable TUPLE[x, y, width, height: INTEGER]
 			-- Position and size of `Current's title
+
+	title_font: TEXT_FONT
+			-- Font used to render titles
 
 	buttons_texture: LIST[GAME_TEXTURE]
 			-- List of `Current's buttons' text
@@ -99,28 +129,37 @@ feature {NONE} -- Implementation
 	buttons_dimension: LIST[TUPLE[x, y, width, height: INTEGER]]
 			-- List of `Current's buttons' position and size
 
-	font: TEXT_FONT
-			-- Font used to generate the images in `Current'
-		local
-			l_path:PATH
-		do
-			create l_path.make_from_string("ressources")
-			l_path := l_path.extended("font")
-			l_path := l_path.appended_with_extension("ttf")
-			create Result.make(l_path.name, window.height // 20)
-			if Result.is_openable then
-				Result.open
-			end
-		ensure
-			Is_Open: Result.is_open
-		end
+	button_font: TEXT_FONT
+			-- Font used to render buttons
+
+--	set_background_texture(a_menu_name: READABLE_STRING_GENERAL)
+--			-- Set `Current's background texture
+--		local
+--			l_image: IMG_IMAGE_FILE
+--			l_path: PATH
+--		do
+--			create l_path.make_from_string("ressources")
+--			l_path := l_path.extended("images")
+--			l_path := l_path.extended(a_menu_name)
+--			l_path := l_path.extended("background")
+--			l_path := l_path.appended_with_extension("png")
+--			create l_image.make(l_path.name)
+--			if l_image.is_openable then
+--				l_image.open
+--				if l_image.is_open then
+--					create background_texture.make_from_image (window.renderer, l_image)
+--				end
+--			end
+--		ensure
+--			Background_Has_No_Error: attached background_texture as bg_txt and then not bg_txt.has_error
+--		end
 
 	set_title(a_title: READABLE_STRING_GENERAL)
 			-- Set `Current's title's texture and dimension
 		local
-			l_image: TEXT_SURFACE_SHADED
+			l_image: TEXT_SURFACE_BLENDED
 		do
-			create l_image.make(a_title, font, foreground_color, background_color)
+			create l_image.make(a_title, title_font, text_color)
 			if l_image.is_open then
 				create title_texture.make_from_surface(window.renderer, l_image)
 			else
@@ -132,9 +171,9 @@ feature {NONE} -- Implementation
 	add_button(a_button_name: READABLE_STRING_GENERAL)
 			-- Add a button to `Current's screen with `a_button_name' as text
 		local
-			l_image: TEXT_SURFACE_SHADED
+			l_image: TEXT_SURFACE_BLENDED
 		do
-			create l_image.make(a_button_name, font, foreground_color, background_color)
+			create l_image.make(a_button_name, button_font, text_color)
 			if l_image.is_open then
 				buttons_texture.extend(create {GAME_TEXTURE}.make_from_surface(window.renderer, l_image))
 			else
@@ -152,6 +191,8 @@ feature {NONE} -- Implementation
 			l_left_margin_title: INTEGER
 			l_y: INTEGER
 		do
+			title_font := ressource_factory.menu_font(window.height // 25)
+			button_font := ressource_factory.menu_font(window.height // 30)
 			l_height_between := window.height // 100
 			l_left_margin := window.width // 15
 			l_left_margin_title := window.width // 30
@@ -169,7 +210,7 @@ feature {NONE} -- Implementation
 			end
 		end
 
-	foreground_color: GAME_COLOR
+	text_color: GAME_COLOR
 			-- The color used to draw the foreground (text). TODO: Change it
 		once
 			create Result.make_rgb(0, 0, 0)
@@ -178,6 +219,9 @@ feature {NONE} -- Implementation
 	background_color: GAME_COLOR
 			-- The color used to draw the background. TODO: Change it
 		once
-			create Result.make_rgb(150, 150, 150)
+			create Result.make_rgb(255, 255, 255)
 		end
+
+invariant
+	Buttons_Size_Synced: buttons_dimension.count = buttons_texture.count
 end

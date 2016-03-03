@@ -18,9 +18,10 @@ create
 
 feature {NONE} -- Initialization
 
-	make(a_window: GAME_WINDOW_RENDERED)
+	make(a_window: GAME_WINDOW_RENDERED; a_ressource_factory: RESSOURCE_FACTORY)
 		do
-			Precursor(a_window)
+			Precursor(a_window, a_ressource_factory)
+			--set_background_texture("main_menu")
 			set_title("SickBeat")
 			add_button("Play")
 			add_button("Options")

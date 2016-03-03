@@ -36,7 +36,7 @@ feature {NONE} -- Initialization
 	run_game
 			-- Initialize game stuff and start menus
 		local
-			-- TODO: Add resource factories
+			l_ressource_factory: RESSOURCE_FACTORY
 			l_window_builder: GAME_WINDOW_RENDERED_BUILDER
 			l_window: GAME_WINDOW_RENDERED
 		do
@@ -49,16 +49,22 @@ feature {NONE} -- Initialization
 			l_window_builder.must_renderer_synchronize_update := True
 			l_window_builder.title := "SickBeat"
 			l_window := l_window_builder.generate_window
-			-- TODO: Create resource factories
-			run_main_menu(l_window)
+			create l_ressource_factory.make(l_window.renderer, l_window.pixel_format)
+			if l_ressource_factory.has_error then
+				io.error.put_string("An error occured while loading ressources.%N")
+			else
+				run_main_menu(l_window, l_ressource_factory)
+			end
 		end
 
-	run_main_menu(a_window: GAME_WINDOW_RENDERED)
+	run_main_menu(a_window: GAME_WINDOW_RENDERED; a_ressource_factory: RESSOURCE_FACTORY)
+			-- Show the {MENU_MAIN} and manage it's output.
+			-- Show the menu in `a_window' using ressources from `a_ressource_factory'.
 		local
 			l_main_menu: MENU_MAIN
 			l_continue_menu: BOOLEAN
 		do
-			create l_main_menu.make (a_window)
+			create l_main_menu.make(a_window, a_ressource_factory)
 			if not l_main_menu.has_error then
 				from
 					l_continue_menu := True

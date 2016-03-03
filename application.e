@@ -71,9 +71,6 @@ feature {NONE} -- Initialization
 			l_sound: SOUND
 			l_sound_2: AUDIO_SOUND_FILE
 		do
-<<<<<<< HEAD
-			create l_main_menu.make(a_window, a_ressource_factory)
-=======
 			l_audio_source:= sound_engine.create_audio_source
 			l_sound:= sound_factory.create_sound_menu_click
 
@@ -84,8 +81,7 @@ feature {NONE} -- Initialization
 			l_audio_source_2.set_gain (0.1)
 			l_audio_source_2.play
 
-			create l_main_menu.make (a_window)
->>>>>>> refs/remotes/origin/master
+			create l_main_menu.make (a_window, a_ressource_factory)
 			if not l_main_menu.has_error then
 				from
 					l_continue_menu := True

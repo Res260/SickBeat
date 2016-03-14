@@ -26,6 +26,8 @@ feature {NONE} -- Initialization
 feature -- Access
 	run
 			-- Execute a 'tick' of `Current'
+		require
+			Events_Enabled: game_library.is_events_enable
 		do
 			game_library.quit_signal_actions.extend(agent on_quit_signal)
 			window.expose_actions.extend(agent on_redraw)

@@ -37,6 +37,8 @@ feature {NONE} -- Initialization
 
 	run_game
 			-- Initialize game stuff and start menus
+		require
+			game_library.is_video_enable
 		local
 			l_ressource_factory: RESSOURCE_FACTORY
 			l_window_builder: GAME_WINDOW_RENDERED_BUILDER
@@ -57,11 +59,15 @@ feature {NONE} -- Initialization
 			else
 				run_main_menu(l_window, l_ressource_factory)
 			end
+		ensure
+			Ressource_Factory_Initialized: not l_ressource_factory.has_error
 		end
 
 	run_main_menu(a_window: GAME_WINDOW_RENDERED; a_ressource_factory: RESSOURCE_FACTORY)
 			-- Show the {MENU_MAIN} and manage it's output.
 			-- Show the menu in `a_window' using ressources from `a_ressource_factory'.
+		require
+			Window_Has_No_Error: not a_window.has_error
 		local
 			l_main_menu: MENU_MAIN
 			l_continue_menu: BOOLEAN

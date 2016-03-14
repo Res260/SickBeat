@@ -1,8 +1,8 @@
 note
-	description: "Summary description for {SOUND_FACTORY}."
-	author: ""
-	date: "$Date$"
-	revision: "$Revision$"
+	description: "Class that creates (generates) sounds for the game."
+	author: "Émilio G!"
+	date: "16-2-22"
+	revision: "1 16-03-01"
 
 class
 	SOUND_FACTORY

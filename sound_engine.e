@@ -2,7 +2,7 @@ note
 	description: "Class that manages sounds/musics for the game."
 	author: "Émilio G!"
 	date: "16-02-22"
-	revision: "0.1"
+	revision: "1 16-03-01"
 
 class
 	SOUND_ENGINE
@@ -22,9 +22,8 @@ feature {NONE} -- Access
 			sound_on := TRUE
 			audio_sources := create {ARRAYED_LIST[AUDIO_SOURCE]}.make(0)
 			audio_library.enable_sound
-			io.put_string ("YEAH2")
 			audio_library.launch_in_thread
---			audio_library.disable_print_on_error
+			audio_library.disable_print_on_error
 		end
 
 	sound_on:BOOLEAN
@@ -53,7 +52,7 @@ feature
 	run
 			--do the engine's job
 		do
-			io.put_string ("YESS FISTON")
+
 		end
 
 	clear_ressources

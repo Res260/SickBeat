@@ -1,8 +1,8 @@
 note
 	description: "Abstract class used to make {MENU}s."
 	author: "Guillaume Jean"
-	date: "Fri, 26 Feb 2016 12:20:00"
-	revision: "0.9"
+	date: "Fri, 26 Feb 2016 12:20"
+	revision: "16w06a"
 
 deferred class
 	MENU
@@ -10,7 +10,7 @@ deferred class
 inherit
 	ENGINE
 		redefine
-			make, run, on_resize, on_size_change, on_restore
+			make, run, on_size_change
 		end
 
 feature {NONE} -- Initialization
@@ -18,6 +18,8 @@ feature {NONE} -- Initialization
 	make(a_window: GAME_WINDOW_RENDERED; a_ressource_factory: RESSOURCE_FACTORY)
 		do
 			clicked_button := 0
+			pressed_button := 0
+			released_button := 0
 			Precursor(a_window, a_ressource_factory)
 			background_texture := ressource_factory.menu_background
 			create {LINKED_LIST[GAME_TEXTURE]} buttons_texture.make
@@ -31,8 +33,8 @@ feature {NONE} -- Implementation
 			window.renderer.clear
 
 			if attached background_texture as background then
-				window.renderer.draw_sub_texture_with_scale (background, 0, 0, background.width, background.height,
-																		 0, 0, window.width, window.height)
+				window.renderer.draw_sub_texture_with_scale(background, 0, 0, background.width, background.height,
+																		0, 0, window.width, window.height)
 			end
 
 			if attached title_texture as la_title and attached title_dimension as la_title_dimension then
@@ -43,7 +45,7 @@ feature {NONE} -- Implementation
 				buttons_texture.start
 				buttons_dimension.start
 			until
-				buttons_texture.after OR buttons_dimension.after
+				buttons_texture.exhausted OR buttons_dimension.exhausted
 			loop
 				window.renderer.draw_texture(buttons_texture.item, buttons_dimension.item.x, buttons_dimension.item.y)
 				buttons_texture.forth
@@ -53,47 +55,57 @@ feature {NONE} -- Implementation
 			window.update
 		end
 
-	on_clicked(a_timestamp: NATURAL_32; a_mouse_state: GAME_MOUSE_BUTTON_RELEASED_STATE; a_nb_clicks: NATURAL_8)
-			-- Whenever a click is released in the `window'
-		do
-			if a_mouse_state.is_left_button_released then
-				-- Check mouse collisions
-				from
-					buttons_dimension.start
-				until
-					buttons_dimension.after
-				loop
-					if
-						buttons_dimension.item.x < a_mouse_state.x and
-						buttons_dimension.item.y < a_mouse_state.y and
-						buttons_dimension.item.x + buttons_dimension.item.width > a_mouse_state.x and
-						buttons_dimension.item.y + buttons_dimension.item.height > a_mouse_state.y
-					then
-						clicked_button := buttons_dimension.index
-						stop
-					end
-					buttons_dimension.forth
-				end
-			end
-		end
-
-	on_resize(a_timestamp: NATURAL_32; a_width, a_height: INTEGER_32)
-			-- Whenever the `window' is resized
-		do
-			update_buttons_dimension
-		end
-
 	on_size_change(a_timestamp: NATURAL_32)
 			-- Whenever the `window's size changes
 		do
 			update_buttons_dimension
+			on_redraw(a_timestamp)
 		end
 
-	on_restore(a_timestamp: NATURAL_32)
-			-- Whenever the `window' is restored
+feature {NONE} -- Basic Operations
+
+	check_button_collision(a_mouse_state: GAME_MOUSE_STATE): INTEGER
+			-- Check if the mouse is in a button and returns the button index
 		do
-			update_buttons_dimension
+			from
+				buttons_dimension.start
+			until
+				buttons_dimension.exhausted
+			loop
+				if
+					buttons_dimension.item.x < a_mouse_state.x and
+					buttons_dimension.item.y < a_mouse_state.y and
+					buttons_dimension.item.x + buttons_dimension.item.width > a_mouse_state.x and
+					buttons_dimension.item.y + buttons_dimension.item.height > a_mouse_state.y
+				then
+					Result := buttons_dimension.index
+					stop
+				end
+				buttons_dimension.forth
+			end
 		end
+
+	on_pressed(a_timestamp: NATURAL_32; a_mouse_state: GAME_MOUSE_BUTTON_PRESSED_STATE; a_nb_clicks: NATURAL_8)
+			-- Whenever a click is pressed in the `window'
+		do
+			if a_mouse_state.is_left_button_pressed then
+				pressed_button := check_button_collision(a_mouse_state)
+			end
+		end
+
+	on_released(a_timestamp: NATURAL_32; a_mouse_state: GAME_MOUSE_BUTTON_RELEASED_STATE; a_nb_clicks: NATURAL_8)
+			-- Whenever a click is released in the `window'
+		do
+			if a_mouse_state.is_left_button_released then
+				released_button := check_button_collision(a_mouse_state)
+			end
+			if pressed_button = released_button then
+				clicked_button := released_button
+			end
+		end
+
+	released_button: INTEGER
+			-- Button pressed at the end of the mouse click
 
 feature -- Access
 
@@ -104,12 +116,16 @@ feature -- Access
 		do
 			clicked_button := 0
 			window.renderer.set_drawing_color(background_color)
-			window.mouse_button_released_actions.extend(agent on_clicked)
+			window.mouse_button_pressed_actions.extend(agent on_pressed)
+			window.mouse_button_released_actions.extend(agent on_released)
 			Precursor
 		end
 
+	pressed_button: INTEGER
+			-- Button pressed at the start of the mouse click
+
 	clicked_button: INTEGER
-			-- Integer representing the button clicked by the user.
+			-- Button clicked by the user.
 
 	background_texture: detachable GAME_TEXTURE
 			-- Image of `Current's background
@@ -131,28 +147,6 @@ feature -- Access
 
 	button_font: TEXT_FONT
 			-- Font used to render buttons
-
---	set_background_texture(a_menu_name: READABLE_STRING_GENERAL)
---			-- Set `Current's background texture
---		local
---			l_image: IMG_IMAGE_FILE
---			l_path: PATH
---		do
---			create l_path.make_from_string("ressources")
---			l_path := l_path.extended("images")
---			l_path := l_path.extended(a_menu_name)
---			l_path := l_path.extended("background")
---			l_path := l_path.appended_with_extension("png")
---			create l_image.make(l_path.name)
---			if l_image.is_openable then
---				l_image.open
---				if l_image.is_open then
---					create background_texture.make_from_image (window.renderer, l_image)
---				end
---			end
---		ensure
---			Background_Has_No_Error: attached background_texture as bg_txt and then not bg_txt.has_error
---		end
 
 	set_title(a_title: READABLE_STRING_GENERAL)
 			-- Set `Current's title's texture and dimension

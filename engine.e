@@ -1,8 +1,8 @@
 note
 	description: "{ENGINE} is a basic controller and graphical interface."
 	author: "Guillaume Jean"
-	date: "Tue, 23 Fev 2016 09:20:00"
-	revision: "0.1"
+	date: "Tue, 23 Fev 2016 09:20"
+	revision: "16w06a"
 
 deferred class
 	ENGINE
@@ -30,10 +30,9 @@ feature -- Access
 			Events_Enabled: game_library.is_events_enable
 		do
 			game_library.quit_signal_actions.extend(agent on_quit_signal)
+			window.close_request_actions.extend(agent on_close_request)
 			window.expose_actions.extend(agent on_redraw)
-			window.resize_actions.extend(agent on_resize)
 			window.size_change_actions.extend(agent on_size_change)
-			window.restore_actions.extend(agent on_restore)
 			on_redraw(game_library.time_since_create)
 			game_library.launch
 			game_library.clear_all_events
@@ -59,23 +58,19 @@ feature {NONE} -- Implementation
 			stop
 		end
 
+	on_close_request(a_timestamp: NATURAL_32)
+			-- Method run when the X button is clicked
+		do
+			stop
+		end
+
 	on_redraw(a_timestamp: NATURAL_32)
 			-- Method run when the `window' is redrawn
 		deferred
 		end
 
-	on_resize(a_timestamp: NATURAL_32; a_width, a_height: INTEGER_32)
-			-- Method run when the `window' is resized
-		do
-		end
-
 	on_size_change(a_timestamp: NATURAL_32)
 			-- Method run when the `window's size changes
-		do
-		end
-
-	on_restore(a_timestamp: NATURAL_32)
-			-- Method run when the `window' is restored
 		do
 		end
 end

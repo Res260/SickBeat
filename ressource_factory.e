@@ -1,8 +1,8 @@
 note
 	description: "Class used to store the ressources only once in RAM."
 	author: "Guillaume Jean"
-	date: "Thd, 03 March 2016 12:57:00"
-	revision: "0.6"
+	date: "Thd, 03 March 2016 12:57"
+	revision: "16w06a"
 
 class
 	RESSOURCE_FACTORY

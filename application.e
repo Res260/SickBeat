@@ -1,8 +1,8 @@
 note
 	description: "Sickbeat root application class."
 	author: "Guillaume Jean"
-	date: "Tue, 23 Fev 2016 09:00:00"
-	revision: "0.1"
+	date: "Tue, 23 Fev 2016 09:00"
+	revision: "16w06a"
 
 class
 	APPLICATION
@@ -29,16 +29,17 @@ feature {NONE} -- Initialization
 		do
 			game_library.enable_video
 			text_library.enable_text
-			run_game
+			start_game
 			game_library.clear_all_events
 			text_library.quit_library
 			game_library.quit_library
 		end
 
-	run_game
+	start_game
 			-- Initialize game stuff and start menus
 		require
-			game_library.is_video_enable
+			Video_Is_Enabled: game_library.is_video_enable
+			Text_Is_Enabled: text_library.is_text_enable
 		local
 			l_ressource_factory: RESSOURCE_FACTORY
 			l_window_builder: GAME_WINDOW_RENDERED_BUILDER
@@ -59,8 +60,6 @@ feature {NONE} -- Initialization
 			else
 				run_main_menu(l_window, l_ressource_factory)
 			end
-		ensure
-			Ressource_Factory_Initialized: not l_ressource_factory.has_error
 		end
 
 	run_main_menu(a_window: GAME_WINDOW_RENDERED; a_ressource_factory: RESSOURCE_FACTORY)
@@ -68,6 +67,7 @@ feature {NONE} -- Initialization
 			-- Show the menu in `a_window' using ressources from `a_ressource_factory'.
 		require
 			Window_Has_No_Error: not a_window.has_error
+			Ressource_Factory_Has_No_Error: not a_ressource_factory.has_error
 		local
 			l_main_menu: MENU_MAIN
 			l_continue_menu: BOOLEAN
@@ -110,6 +110,8 @@ feature {NONE} -- Initialization
 			else
 				io.error.put_string ("An error occured while loading the main menu.%N")
 			end
+		ensure
+			Ressource_Factory_No_Error: not a_ressource_factory.has_error
 		end
 
 end

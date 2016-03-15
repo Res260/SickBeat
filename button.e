@@ -1,28 +1,30 @@
 note
-	description: "Summary description for {BUTTON}."
-	author: ""
-	date: "$Date$"
-	revision: "$Revision$"
+	description: "An interface object used to make actions upon clicking it."
+	author: "Guillaume Jean"
+	date: "Tue, 15 March 2016 09:50"
+	revision: "16w07a"
 
 class
 	BUTTON
 
---inherit
---	DRAWABLE
-
-feature
-
-	make
-		do
---			agent_a_executer := agent une_fonction
+inherit
+	DRAWABLE
+		redefine
+			draw
 		end
+
+feature {NONE} -- Initialization
+
+	make(a_x, a_y: INTEGER; a_texture: GAME_TEXTURE; a_window: GAME_WINDOW_RENDERED; a_action: PROCEDURE[ANY, TUPLE[READABLE_STRING_GENERAL]])
+		do
+
+		end
+
+feature -- Implementation
+
+	button_action: PROCEDURE[ANY, TUPLE[READABLE_STRING_GENERAL]]
 
 feature -- Access
 
---	agent_a_executer: PROCEDURE[ANY, TUPLE[INTEGER]]
-
---	une_fonction(a_arg1:INTEGER):INTEGER
---		do
---		end
 
 end

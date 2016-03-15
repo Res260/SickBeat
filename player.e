@@ -7,7 +7,7 @@ note
 class
 	PLAYER
 
-inherit
-	ENTITY
+--inherit
+--	ENTITY
 
 end

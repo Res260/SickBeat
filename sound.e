@@ -2,7 +2,7 @@ note
 	description: "Class that holds information for a sound and fills a buffer to play it."
 	author: "Émilio G!"
 	date: "16-02-23"
-	revision: "1 16-03-01"
+	revision: "16w07a"
 
 class
 	SOUND
@@ -15,7 +15,7 @@ create
 
 feature {NONE}
 
-	make (a_sound_data : ARRAYED_LIST[INTEGER_16])
+	make (a_sound_data : LIST[INTEGER_16])
 		local
 			i: INTEGER_32
 		do
@@ -40,11 +40,14 @@ feature {NONE}
 
 feature
 
-	buffer_index: INTEGER_32 --usefull in fill_buffer
+	buffer_index: INTEGER_32
+		--usefull in fill_buffer
 
 	sound_data: MANAGED_POINTER
+		--data that is readable by the library
 
-	sound_length: INTEGER_32 --length in samples
+	sound_length: INTEGER_32
+		--length in samples
 
 	channel_count:INTEGER_32
 

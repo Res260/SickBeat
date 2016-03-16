@@ -12,16 +12,14 @@ inherit
 
 feature {NONE} -- Initialization
 
-	make(a_window: GAME_WINDOW_RENDERED; a_ressource_factory: RESSOURCE_FACTORY)
+	make(a_context: CONTEXT)
 		require
-			Ressource_Factory_Has_No_Error: not a_ressource_factory.has_error
+			Ressource_Factory_Has_No_Error: not a_context.ressource_factory.has_error
 		do
-			window := a_window
-			ressource_factory := a_ressource_factory
+			context := a_context
 			stop_requested := False
 		ensure
-			window = a_window
-			ressource_factory = a_ressource_factory
+			context = a_context
 		end
 
 feature -- Access
@@ -41,8 +39,8 @@ feature -- Access
 			Events_Enabled: game_library.is_events_enable
 		do
 			game_library.quit_signal_actions.extend(agent on_quit_signal)
-			window.expose_actions.extend(agent on_redraw)
-			window.size_change_actions.extend(agent on_size_change)
+			context.window.expose_actions.extend(agent on_redraw)
+			context.window.size_change_actions.extend(agent on_size_change)
 			on_redraw(game_library.time_since_create)
 			game_library.launch
 			game_library.clear_all_events
@@ -56,11 +54,8 @@ feature -- Access
 
 feature {NONE} -- Implementation
 
-	window: GAME_WINDOW_RENDERED
-			-- The window of the running application
-
-	ressource_factory: RESSOURCE_FACTORY
-			-- Factory used to create ressources
+	context: CONTEXT
+			-- Context of the application
 
 	on_quit_signal(a_timestamp: NATURAL_32)
 			-- Method run when the X button is clicked

@@ -18,9 +18,9 @@ create
 
 feature {NONE} -- Initialization
 
-	make(a_texture: GAME_TEXTURE; a_window: GAME_WINDOW_RENDERED)
+	make(a_texture: GAME_TEXTURE; a_context: CONTEXT)
 		do
-			make_drawable(0, 0, a_texture, a_window)
+			make_drawable(0, 0, a_texture, a_context)
 		end
 
 feature -- Implementation
@@ -29,8 +29,8 @@ feature -- Implementation
 			-- Draws the background by scaling it to the window size
 		do
 			if attached texture as la_texture then
-				renderer.draw_sub_texture_with_scale(la_texture, 0, 0, la_texture.width, la_texture.height,
-															     0, 0, window.width, window.height)
+				context.renderer.draw_sub_texture_with_scale(la_texture, 0, 0, la_texture.width, la_texture.height,
+															     		 0, 0, context.window.width, context.window.height)
 			end
 		end
 end

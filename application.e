@@ -16,12 +16,6 @@ inherit
 create
 	make
 
-feature -- Initialization
-
-	game: GAME_ENGINE
-			-- `game'
-		attribute check False then end end --| Remove line when `game' is initialized in creation procedure.
-
 feature {NONE} -- Initialization
 
 	make
@@ -44,6 +38,7 @@ feature {NONE} -- Initialization
 			l_ressource_factory: RESSOURCE_FACTORY
 			l_window_builder: GAME_WINDOW_RENDERED_BUILDER
 			l_window: GAME_WINDOW_RENDERED
+			l_context: CONTEXT
 		do
 			l_window_builder.is_resizable := True
 			l_window_builder.is_fake_fullscreen := True
@@ -58,16 +53,17 @@ feature {NONE} -- Initialization
 			if l_ressource_factory.has_error then
 				io.error.put_string("An error occured while loading ressources.%N")
 			else
-				run_main_menu(l_window, l_ressource_factory)
+				create l_context.make(l_window, l_ressource_factory)
+				run_main_menu(l_context)
 			end
 		end
 
-	run_main_menu(a_window: GAME_WINDOW_RENDERED; a_ressource_factory: RESSOURCE_FACTORY)
+	run_main_menu(a_context: CONTEXT)
 			-- Show the {MENU_MAIN} and manage it's output.
 			-- Show the menu in `a_window' using ressources from `a_ressource_factory'.
 		require
-			Window_Has_No_Error: not a_window.has_error
-			Ressource_Factory_Has_No_Error: not a_ressource_factory.has_error
+			Window_Has_No_Error: not a_context.window.has_error
+			Ressource_Factory_Has_No_Error: not a_context.ressource_factory.has_error
 		local
 			l_main_menu: MENU_MAIN
 			l_audio_source: AUDIO_SOURCE
@@ -85,7 +81,7 @@ feature {NONE} -- Initialization
 			l_audio_source_2.set_gain (0.1)
 			l_audio_source_2.play
 
-			create l_main_menu.make (a_window, a_ressource_factory)
+			create l_main_menu.make(a_context)
 			if not l_main_menu.has_error then
 				from
 				until
@@ -108,7 +104,7 @@ feature {NONE} -- Initialization
 				io.error.put_string ("An error occured while loading the main menu.%N")
 			end
 		ensure
-			Ressource_Factory_No_Error: not a_ressource_factory.has_error
+			Ressource_Factory_No_Error: not a_context.ressource_factory.has_error
 		end
 
 end

@@ -15,26 +15,42 @@ create
 
 feature {NONE} -- Initialization
 
-	make(a_x, a_y: INTEGER; a_name: READABLE_STRING_GENERAL; a_texture: GAME_TEXTURE; a_window: GAME_WINDOW_RENDERED; a_action: PROCEDURE[ANY, TUPLE[READABLE_STRING_GENERAL]])
+	make(
+			a_text: READABLE_STRING_GENERAL; a_color: GAME_COLOR; a_context: CONTEXT;
+			a_action: PROCEDURE[ANY, TUPLE[READABLE_STRING_GENERAL]]
+		)
 		do
-			make_drawable(a_x, a_y, a_texture, a_window)
+			make_drawable(0, 0, Void, a_context)
 			button_action := a_action
-			name := a_name
+			text := a_text
 		end
 
 feature {NONE} -- Implementation
 
-	name: READABLE_STRING_GENERAL
-			-- Name of the button used for identifying
+	text_color: GAME_COLOR
+			-- Text color for `Current'
+
+	text: READABLE_STRING_GENERAL
+			-- Text of the button used when drawing and identifying
 
 	button_action: PROCEDURE[ANY, TUPLE[READABLE_STRING_GENERAL]]
 			-- Procedure called by the button when a click happens on the button
 
 feature -- Access
 
+	change(a_x, a_y, a_font_size: INTEGER)
+			-- Change `Current's position to specified x and y
+		local
+			l_font: TEXT_FONT
+		do
+			x := a_x
+			y := a_y
+			l_font := context.ressource_factory.menu_font(a_font_size)
+		end
+
 	do_click
 			-- Procedure called when a click happens on the button
 		do
-			button_action(name)
+			button_action(text)
 		end
 end

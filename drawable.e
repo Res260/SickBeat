@@ -9,23 +9,19 @@ deferred class
 
 feature {NONE} -- Initialization
 
-	make_drawable(a_x, a_y: INTEGER; a_texture: GAME_TEXTURE; a_window: GAME_WINDOW_RENDERED)
+	make_drawable(a_x, a_y: INTEGER; a_texture: GAME_TEXTURE; a_context: CONTEXT)
 			-- Initializes drawable with the width and height of the texture
 		do
 			x := a_x
 			y := a_y
 			texture := a_texture
-			window := a_window
-			renderer := a_window.renderer
+			context := a_context
 		end
 
 feature {NONE} -- Implementation
 
-	window: GAME_WINDOW_RENDERED
-			-- Window where `Current' is drawn
-
-	renderer: GAME_RENDERER
-			-- Renderer used to draw `Current' in the window
+	context: CONTEXT
+			-- Current application's context
 
 feature -- Access
 
@@ -39,7 +35,7 @@ feature -- Access
 			-- Draws `Current'
 		do
 			if attached texture as la_texture then
-				renderer.draw_texture(la_texture, x, y)
+				context.renderer.draw_texture(la_texture, x, y)
 			end
 		end
 end

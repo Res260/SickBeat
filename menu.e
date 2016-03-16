@@ -15,14 +15,15 @@ inherit
 
 feature {NONE} -- Initialization
 
-	make(a_window: GAME_WINDOW_RENDERED; a_ressource_factory: RESSOURCE_FACTORY)
+	make(a_context: CONTEXT)
 		do
 			clicked_button := 0
 			pressed_button := 0
 			released_button := 0
-			Precursor(a_window, a_ressource_factory)
-			background_texture := ressource_factory.menu_background
+			Precursor(a_context)
+			background_texture := context.ressource_factory.menu_background
 			create {LINKED_LIST[GAME_TEXTURE]} buttons_texture.make
+			create {LINKED_LIST[BUTTON]} buttons.make
 			update_buttons_dimension
 		end
 
@@ -30,15 +31,15 @@ feature {NONE} -- Implementation
 
 	on_redraw(a_timestamp: NATURAL_32)
 		do
-			window.renderer.clear
+			context.window.renderer.clear
 
 			if attached background_texture as background then
-				window.renderer.draw_sub_texture_with_scale(background, 0, 0, background.width, background.height,
-																		0, 0, window.width, window.height)
+				context.window.renderer.draw_sub_texture_with_scale(background, 0, 0, background.width, background.height,
+																				0, 0, context.window.width, context.window.height)
 			end
 
 			if attached title_texture as la_title and attached title_dimension as la_title_dimension then
-				window.renderer.draw_texture(la_title, la_title_dimension.x, la_title_dimension.y)
+				context.window.renderer.draw_texture(la_title, la_title_dimension.x, la_title_dimension.y)
 			end
 
 			from
@@ -47,12 +48,12 @@ feature {NONE} -- Implementation
 			until
 				buttons_texture.exhausted OR buttons_dimension.exhausted
 			loop
-				window.renderer.draw_texture(buttons_texture.item, buttons_dimension.item.x, buttons_dimension.item.y)
+				context.window.renderer.draw_texture(buttons_texture.item, buttons_dimension.item.x, buttons_dimension.item.y)
 				buttons_texture.forth
 				buttons_dimension.forth
 			end
 
-			window.update
+			context.window.update
 		end
 
 	on_size_change(a_timestamp: NATURAL_32)
@@ -110,9 +111,9 @@ feature -- Access
 	run
 		do
 			clicked_button := 0
-			window.renderer.set_drawing_color(background_color)
-			window.mouse_button_pressed_actions.extend(agent on_pressed)
-			window.mouse_button_released_actions.extend(agent on_released)
+			context.window.renderer.set_drawing_color(background_color)
+			context.window.mouse_button_pressed_actions.extend(agent on_pressed)
+			context.window.mouse_button_released_actions.extend(agent on_released)
 			Precursor
 		end
 
@@ -134,6 +135,9 @@ feature -- Access
 	title_font: TEXT_FONT
 			-- Font used to render titles
 
+	buttons: LIST[BUTTON]
+			-- List of `Current's buttons
+
 	buttons_texture: LIST[GAME_TEXTURE]
 			-- List of `Current's buttons' text
 
@@ -150,7 +154,7 @@ feature -- Access
 		do
 			create l_image.make(a_title, title_font, text_color)
 			if l_image.is_open then
-				create title_texture.make_from_surface(window.renderer, l_image)
+				create title_texture.make_from_surface(context.window.renderer, l_image)
 			else
 				has_error := True
 			end
@@ -161,10 +165,13 @@ feature -- Access
 			-- Add a button to `Current's screen with `a_button_name' as text
 		local
 			l_image: TEXT_SURFACE_BLENDED
+			l_texture: GAME_TEXTURE
+			l_button: BUTTON
 		do
 			create l_image.make(a_button_name, button_font, text_color)
 			if l_image.is_open then
-				buttons_texture.extend(create {GAME_TEXTURE}.make_from_surface(window.renderer, l_image))
+				create l_texture.make_from_surface (context.window.renderer, l_image)
+				--create l_button.make (a_x, a_y: INTEGER_32, a_name: READABLE_STRING_GENERAL, a_texture: GAME_TEXTURE, a_window: GAME_WINDOW_RENDERED, a_action: PROCEDURE [ANY, TUPLE [READABLE_STRING_GENERAL]])
 			else
 				has_error := True
 			end
@@ -180,12 +187,12 @@ feature -- Access
 			l_left_margin_title: INTEGER
 			l_y: INTEGER
 		do
-			title_font := ressource_factory.menu_font(window.height // 25)
-			button_font := ressource_factory.menu_font(window.height // 30)
-			l_height_between := window.height // 100
-			l_left_margin := window.width // 15
-			l_left_margin_title := window.width // 30
-			l_y := window.height // 2
+			title_font := context.ressource_factory.menu_font(context.window.height // 15)
+			button_font := context.ressource_factory.menu_font(context.window.height // 30)
+			l_height_between := context.window.height // 100
+			l_left_margin := context.window.width // 15
+			l_left_margin_title := context.window.width // 30
+			l_y := context.window.height // 2
 
 			create {ARRAYED_LIST[TUPLE[x, y, width, height: INTEGER]]}buttons_dimension.make(0)
 

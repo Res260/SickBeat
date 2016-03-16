@@ -18,9 +18,9 @@ create
 
 feature {NONE} -- Initialization
 
-	make(a_window: GAME_WINDOW_RENDERED; a_ressource_factory: RESSOURCE_FACTORY)
+	make(a_context: CONTEXT)
 		do
-			Precursor(a_window, a_ressource_factory)
+			Precursor(a_context)
 			set_title("SickBeat")
 			add_button("Play")
 			add_button("Options")

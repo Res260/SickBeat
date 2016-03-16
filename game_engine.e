@@ -1,5 +1,5 @@
 note
-	description: "{GAME_ENGINE} is a basic mechanics {ENGINE}."
+	description: "{GAME_ENGINE} is an {ENGINE} implemented with game specific mechanics."
 	author: "Guillaume Jean"
 	date: "Tue, 23 Fev 2016 09:15:00"
 	revision: "0.1"

@@ -70,8 +70,6 @@ feature {NONE} -- Initialization
 			Ressource_Factory_Has_No_Error: not a_ressource_factory.has_error
 		local
 			l_main_menu: MENU_MAIN
-			l_continue_menu: BOOLEAN
-
 			l_audio_source: AUDIO_SOURCE
 			l_audio_source_2: AUDIO_SOURCE
 			l_sound: SOUND
@@ -90,9 +88,8 @@ feature {NONE} -- Initialization
 			create l_main_menu.make (a_window, a_ressource_factory)
 			if not l_main_menu.has_error then
 				from
-					l_continue_menu := True
 				until
-					l_continue_menu = False
+					l_main_menu.stop_requested
 				loop
 					l_main_menu.run
 					if l_main_menu.is_play_clicked then
@@ -104,7 +101,7 @@ feature {NONE} -- Initialization
 					elseif l_main_menu.is_exit_clicked then
 						l_audio_source.queue_sound (l_sound)
 						l_audio_source.play
-						l_continue_menu := False
+						l_main_menu.request_stop
 					end
 				end
 			else

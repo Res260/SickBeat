@@ -18,19 +18,29 @@ feature {NONE} -- Initialization
 		do
 			window := a_window
 			ressource_factory := a_ressource_factory
+			stop_requested := False
 		ensure
 			window = a_window
 			ressource_factory = a_ressource_factory
 		end
 
 feature -- Access
+
+	stop_requested: BOOLEAN
+			-- Whether or not `Current' has been requested to stop
+
+	request_stop
+			-- Request `Current' to stop
+		do
+			stop_requested := True
+		end
+
 	run
 			-- Execute a 'tick' of `Current'
 		require
 			Events_Enabled: game_library.is_events_enable
 		do
 			game_library.quit_signal_actions.extend(agent on_quit_signal)
-			window.close_request_actions.extend(agent on_close_request)
 			window.expose_actions.extend(agent on_redraw)
 			window.size_change_actions.extend(agent on_size_change)
 			on_redraw(game_library.time_since_create)
@@ -55,12 +65,7 @@ feature {NONE} -- Implementation
 	on_quit_signal(a_timestamp: NATURAL_32)
 			-- Method run when the X button is clicked
 		do
-			stop
-		end
-
-	on_close_request(a_timestamp: NATURAL_32)
-			-- Method run when the X button is clicked
-		do
+			request_stop
 			stop
 		end
 

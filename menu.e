@@ -67,21 +67,16 @@ feature {NONE} -- Basic Operations
 	check_button_collision(a_mouse_state: GAME_MOUSE_STATE): INTEGER
 			-- Check if the mouse is in a button and returns the button index
 		do
-			from
-				buttons_dimension.start
-			until
-				buttons_dimension.exhausted
-			loop
+			across buttons_dimension as la_buttons_dimension loop
 				if
-					buttons_dimension.item.x < a_mouse_state.x and
-					buttons_dimension.item.y < a_mouse_state.y and
-					buttons_dimension.item.x + buttons_dimension.item.width > a_mouse_state.x and
-					buttons_dimension.item.y + buttons_dimension.item.height > a_mouse_state.y
+					la_buttons_dimension.item.x < a_mouse_state.x and
+					la_buttons_dimension.item.y < a_mouse_state.y and
+					la_buttons_dimension.item.x + la_buttons_dimension.item.width > a_mouse_state.x and
+					la_buttons_dimension.item.y + la_buttons_dimension.item.height > a_mouse_state.y
 				then
-					Result := buttons_dimension.index
+					Result := la_buttons_dimension.cursor_index
 					stop
 				end
-				buttons_dimension.forth
 			end
 		end
 

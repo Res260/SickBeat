@@ -28,13 +28,13 @@ feature -- Access
 	sound_on:BOOLEAN
 
 	toggle_sound
-			--toggle if sound plays or not
+		--toggle if sound plays or not
 		do
 			sound_on := not sound_on
 		end
 
 	create_audio_source
-		--creates and adds a ?????????
+		--creates and adds an audio source in audio_library
 		do
 			audio_library.sources_add
 		end

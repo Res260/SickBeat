@@ -22,9 +22,29 @@ feature {NONE} -- Initialization
 		do
 			Precursor(a_context)
 			set_title("SickBeat")
-			add_button("Play")
-			add_button("Options")
-			add_button("Exit")
+			add_button("Play", agent play_action)
+			add_button("Options", agent options_action)
+			add_button("Exit", agent exit_action)
+		end
+
+feature {NONE} -- Implementation
+
+	play_action(a_string: READABLE_STRING_GENERAL)
+			-- Action played when the user clicks the Play button
+		do
+			io.put_string("Play clicked!%N")
+		end
+
+	options_action(a_string: READABLE_STRING_GENERAL)
+			-- Action played when the user clicks the Options button
+		do
+			io.put_string("Options clicked!%N")
+		end
+
+	exit_action(a_string: READABLE_STRING_GENERAL)
+			-- Action played when the user clicks the Exit button
+		do
+			io.put_string("Exit clicked!%N")
 		end
 
 feature -- Access

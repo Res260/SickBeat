@@ -22,7 +22,6 @@ feature {NONE} -- Initialization
 			released_button := 0
 			Precursor(a_context)
 			background_texture := context.ressource_factory.menu_background
-			create {LINKED_LIST[GAME_TEXTURE]} buttons_texture.make
 			create {LINKED_LIST[BUTTON]} buttons.make
 			update_buttons_dimension
 		end
@@ -42,15 +41,8 @@ feature {NONE} -- Implementation
 				context.window.renderer.draw_texture(la_title, la_title_dimension.x, la_title_dimension.y)
 			end
 
-			from
-				buttons_texture.start
-				buttons_dimension.start
-			until
-				buttons_texture.exhausted OR buttons_dimension.exhausted
-			loop
-				context.window.renderer.draw_texture(buttons_texture.item, buttons_dimension.item.x, buttons_dimension.item.y)
-				buttons_texture.forth
-				buttons_dimension.forth
+			across buttons as la_buttons loop
+				la_buttons.item.draw
 			end
 
 			context.window.update
@@ -68,15 +60,17 @@ feature {NONE} -- Basic Operations
 	check_button_collision(a_mouse_state: GAME_MOUSE_STATE): INTEGER
 			-- Check if the mouse is in a button and returns the button index
 		do
-			across buttons_dimension as la_buttons_dimension loop
-				if
-					la_buttons_dimension.item.x < a_mouse_state.x and
-					la_buttons_dimension.item.y < a_mouse_state.y and
-					la_buttons_dimension.item.x + la_buttons_dimension.item.width > a_mouse_state.x and
-					la_buttons_dimension.item.y + la_buttons_dimension.item.height > a_mouse_state.y
-				then
-					Result := la_buttons_dimension.cursor_index
-					stop
+			across buttons as la_buttons loop
+				if attached la_buttons.item.texture as la_texture then
+					if
+						la_buttons.item.x < a_mouse_state.x and
+						la_buttons.item.y < a_mouse_state.y and
+						la_buttons.item.x + la_texture.width > a_mouse_state.x and
+						la_buttons.item.y + la_texture.height > a_mouse_state.y
+					then
+						Result := la_buttons.cursor_index
+						stop
+					end
 				end
 			end
 		end
@@ -98,7 +92,13 @@ feature {NONE} -- Basic Operations
 			if pressed_button = released_button then
 				clicked_button := released_button
 			end
+			if clicked_button > 0 then
+				buttons.at(clicked_button).do_click
+			end
 		end
+
+	pressed_button: INTEGER
+			-- Button pressed at the start of the mouse click
 
 	released_button: INTEGER
 			-- Button pressed at the end of the mouse click
@@ -116,9 +116,6 @@ feature -- Access
 			context.window.mouse_button_released_actions.extend(agent on_released)
 			Precursor
 		end
-
-	pressed_button: INTEGER
-			-- Button pressed at the start of the mouse click
 
 	clicked_button: INTEGER
 			-- Button clicked by the user.
@@ -138,15 +135,6 @@ feature -- Access
 	buttons: LIST[BUTTON]
 			-- List of `Current's buttons
 
-	buttons_texture: LIST[GAME_TEXTURE]
-			-- List of `Current's buttons' text
-
-	buttons_dimension: LIST[TUPLE[x, y, width, height: INTEGER]]
-			-- List of `Current's buttons' position and size
-
-	button_font: TEXT_FONT
-			-- Font used to render buttons
-
 	set_title(a_title: READABLE_STRING_GENERAL)
 			-- Set `Current's title's texture and dimension
 		local
@@ -161,48 +149,42 @@ feature -- Access
 			update_buttons_dimension
 		end
 
-	add_button(a_button_name: READABLE_STRING_GENERAL)
+	add_button(a_button_name: READABLE_STRING_GENERAL; a_action: PROCEDURE[ANY, TUPLE[READABLE_STRING_GENERAL]])
 			-- Add a button to `Current's screen with `a_button_name' as text
 		local
-			l_image: TEXT_SURFACE_BLENDED
-			l_texture: GAME_TEXTURE
 			l_button: BUTTON
 		do
-			create l_image.make(a_button_name, button_font, text_color)
-			if l_image.is_open then
-				create l_texture.make_from_surface (context.window.renderer, l_image)
-				--create l_button.make (a_x, a_y: INTEGER_32, a_name: READABLE_STRING_GENERAL, a_texture: GAME_TEXTURE, a_window: GAME_WINDOW_RENDERED, a_action: PROCEDURE [ANY, TUPLE [READABLE_STRING_GENERAL]])
-			else
-				has_error := True
-			end
+			create l_button.make(a_button_name, text_color, context, a_action)
+			buttons.extend(l_button)
 			update_buttons_dimension
 		end
 
 	update_buttons_dimension
-			-- Modify the `buttons_dimension' and `title_dimension' to adjust their positions
-			-- by following the size of the `buttons_texture' and `title_texture'
+			-- Modify the `buttons' position and `title_dimension' to adjust their positions
+			-- by following the size of the `buttons' texture and `title_texture'
 		local
 			l_height_between: INTEGER
 			l_left_margin: INTEGER
 			l_left_margin_title: INTEGER
 			l_y: INTEGER
+			l_button_font_size: INTEGER
 		do
 			title_font := context.ressource_factory.menu_font(context.window.height // 15)
-			button_font := context.ressource_factory.menu_font(context.window.height // 30)
+			l_button_font_size := context.window.height // 30
 			l_height_between := context.window.height // 100
 			l_left_margin := context.window.width // 15
 			l_left_margin_title := context.window.width // 30
 			l_y := context.window.height // 2
 
-			create {ARRAYED_LIST[TUPLE[x, y, width, height: INTEGER]]}buttons_dimension.make(0)
-
 			if attached title_texture as la_title then
 				title_dimension := [l_left_margin_title, l_y - la_title.height - l_height_between, la_title.width, la_title.height]
 			end
 
-			across buttons_texture as la_buttons loop
-				buttons_dimension.extend([l_left_margin, l_y, la_buttons.item.width, la_buttons.item.height])
-				l_y := l_y + la_buttons.item.height + l_height_between
+			across buttons as la_buttons loop
+				la_buttons.item.change(l_left_margin, l_y, l_button_font_size)
+				if attached la_buttons.item.texture as la_texture then
+					l_y := l_y + la_texture.height + l_height_between
+				end
 			end
 		end
 
@@ -217,7 +199,4 @@ feature -- Access
 		once
 			create Result.make_rgb(255, 255, 255)
 		end
-
-invariant
-	Buttons_Size_Synced: buttons_dimension.count = buttons_texture.count
 end

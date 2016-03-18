@@ -23,6 +23,7 @@ feature {NONE} -- Initialization
 			make_drawable(0, 0, Void, a_context)
 			button_action := a_action
 			text := a_text
+			text_color := a_color
 		end
 
 feature {NONE} -- Implementation
@@ -42,10 +43,17 @@ feature -- Access
 			-- Change `Current's position to specified x and y
 		local
 			l_font: TEXT_FONT
+			l_text_surface: TEXT_SURFACE_BLENDED
 		do
 			x := a_x
 			y := a_y
 			l_font := context.ressource_factory.menu_font(a_font_size)
+			create l_text_surface.make(text, l_font, text_color)
+			if l_text_surface.is_open then
+				create texture.make_from_surface(context.renderer, l_text_surface)
+			else
+				has_error := True
+			end
 		end
 
 	do_click

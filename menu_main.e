@@ -1,8 +1,8 @@
 note
-	description: "Class implementing the {MENU_MAIN}."
+	description: "{MENU} implemented for the user to decide whether he's playing or configuring the game."
 	author: "Guillaume Jean"
-	date: "Mon, 21 Mar 2016 13:39"
-	revision: "16w08a"
+	date: "Mon, 21 Mar 2016 13:45"
+	revision: "16w08b"
 
 class
 	MENU_MAIN
@@ -33,6 +33,8 @@ feature {NONE} -- Implementation
 			-- Action played when the user clicks the Play button
 		do
 			io.put_string("Play clicked!%N")
+			create {MENU_PLAY} next_menu.make(context)
+			game_library.stop
 		end
 
 	options_action(a_string: READABLE_STRING_GENERAL)
@@ -46,22 +48,5 @@ feature {NONE} -- Implementation
 		do
 			io.put_string("Exit clicked!%N")
 			request_exit
-		end
-
-feature -- Access
-
-	is_play_clicked: BOOLEAN
-		do
-			Result := clicked_button = 1
-		end
-
-	is_option_clicked: BOOLEAN
-		do
-			Result := clicked_button = 2
-		end
-
-	is_exit_clicked: BOOLEAN
-		do
-			Result := clicked_button = 3
 		end
 end

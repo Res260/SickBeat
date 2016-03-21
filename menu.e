@@ -21,7 +21,7 @@ feature {NONE} -- Initialization
 			released_button := 0
 			context := a_context
 			exit_requested := False
-			background_texture := context.ressource_factory.menu_background
+			create background.make(context.ressource_factory.menu_background, context)
 			create {LINKED_LIST[BUTTON]} buttons.make
 			update_buttons_dimension
 		ensure
@@ -54,10 +54,7 @@ feature {NONE} -- Implementation
 		do
 			context.window.renderer.clear
 
-			if attached background_texture as background then
-				context.window.renderer.draw_sub_texture_with_scale(background, 0, 0, background.width, background.height,
-																				0, 0, context.window.width, context.window.height)
-			end
+			background.draw
 
 			if attached title_texture as la_title and attached title_dimension as la_title_dimension then
 				context.window.renderer.draw_texture(la_title, la_title_dimension.x, la_title_dimension.y)
@@ -139,8 +136,8 @@ feature -- Access
 	clicked_button: INTEGER
 			-- Button clicked by the user.
 
-	background_texture: detachable GAME_TEXTURE
-			-- Image of `Current's background
+	background: BACKGROUND
+			-- `Current's background
 
 	title_texture: detachable GAME_TEXTURE
 			-- Image of `Current's title

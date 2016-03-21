@@ -39,6 +39,7 @@ feature {NONE} -- Initialization
 			l_window_builder: GAME_WINDOW_RENDERED_BUILDER
 			l_window: GAME_WINDOW_RENDERED
 			l_context: CONTEXT
+			l_main_menu: MENU
 		do
 			l_window_builder.is_resizable := True
 			l_window_builder.is_fake_fullscreen := True
@@ -54,41 +55,34 @@ feature {NONE} -- Initialization
 				io.error.put_string("An error occured while loading ressources.%N")
 			else
 				create l_context.make(l_window, l_ressource_factory)
-				run_main_menu(l_context)
-			end
-		end
-
-	run_main_menu(a_context: CONTEXT)
-			-- Show the {MENU_MAIN} and manage it's output.
-			-- Show the menu in `a_window' using ressources from `a_ressource_factory'.
-		require
-			Window_Has_No_Error: not a_context.window.has_error
-			Ressource_Factory_Has_No_Error: not a_context.ressource_factory.has_error
-		local
-			l_main_menu: MENU_MAIN
-			l_audio_source: AUDIO_SOURCE
-			l_audio_source_2: AUDIO_SOURCE
-			l_sound: SOUND
-			l_sound_2: AUDIO_SOUND_FILE
-		do
-			l_audio_source:= sound_engine.create_audio_source
-			l_sound:= sound_factory.create_sound_menu_click
-
-			l_audio_source_2:= sound_engine.create_audio_source
-			create l_sound_2.make (".\ressources\audio\menu.ogg")
-			l_sound_2.open
-			l_audio_source_2.queue_sound (l_sound_2)
-			l_audio_source_2.set_gain (0.1)
-			l_audio_source_2.play
-
-			create l_main_menu.make(a_context)
-			if not l_main_menu.has_error then
+				create {MENU_MAIN} l_main_menu.make(l_context)
 				l_main_menu.start
-			else
-				io.error.put_string ("An error occured while loading the main menu.%N")
 			end
-		ensure
-			Ressource_Factory_No_Error: not a_context.ressource_factory.has_error
 		end
 
+--	run_main_menu(a_context: CONTEXT)
+--			-- Show the {MENU_MAIN} and manage it's output.
+--			-- Show the menu in `a_window' using ressources from `a_ressource_factory'.
+--		require
+--			Window_Has_No_Error: not a_context.window.has_error
+--			Ressource_Factory_Has_No_Error: not a_context.ressource_factory.has_error
+--		local
+--			l_main_menu: MENU_MAIN
+--			l_audio_source: AUDIO_SOURCE
+--			l_audio_source_2: AUDIO_SOURCE
+--			l_sound: SOUND
+--			l_sound_2: AUDIO_SOUND_FILE
+--		do
+--			l_audio_source:= sound_engine.create_audio_source
+--			l_sound:= sound_factory.create_sound_menu_click
+
+--			l_audio_source_2:= sound_engine.create_audio_source
+--			create l_sound_2.make (".\ressources\audio\menu.ogg")
+--			l_sound_2.open
+--			l_audio_source_2.queue_sound (l_sound_2)
+--			l_audio_source_2.set_gain (0.1)
+--			l_audio_source_2.play
+--		ensure
+--			Ressource_Factory_No_Error: not a_context.ressource_factory.has_error
+--		end
 end

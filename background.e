@@ -18,7 +18,7 @@ create
 
 feature {NONE} -- Initialization
 
-	make(a_texture: GAME_TEXTURE; a_context: CONTEXT)
+	make(a_texture: detachable GAME_TEXTURE; a_context: CONTEXT)
 		do
 			make_drawable(0, 0, a_texture, a_context)
 		end

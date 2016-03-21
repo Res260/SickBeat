@@ -45,6 +45,7 @@ feature {NONE} -- Implementation
 			-- Action played when the user clicks the Exit button
 		do
 			io.put_string("Exit clicked!%N")
+			request_exit
 		end
 
 feature -- Access

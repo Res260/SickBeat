@@ -83,23 +83,7 @@ feature {NONE} -- Initialization
 
 			create l_main_menu.make(a_context)
 			if not l_main_menu.has_error then
-				from
-				until
-					l_main_menu.stop_requested
-				loop
-					l_main_menu.run
-					if l_main_menu.is_play_clicked then
-						l_audio_source.queue_sound (l_sound)
-						l_audio_source.play
-					elseif l_main_menu.is_option_clicked then
-						l_audio_source.queue_sound (l_sound)
-						l_audio_source.play
-					elseif l_main_menu.is_exit_clicked then
-						l_audio_source.queue_sound (l_sound)
-						l_audio_source.play
-						l_main_menu.request_stop
-					end
-				end
+				l_main_menu.start
 			else
 				io.error.put_string ("An error occured while loading the main menu.%N")
 			end

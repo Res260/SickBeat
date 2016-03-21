@@ -8,25 +8,47 @@ deferred class
 	MENU
 
 inherit
-	ENGINE
-		redefine
-			make, run, on_size_change
-		end
+	GAME_LIBRARY_SHARED
 
 feature {NONE} -- Initialization
 
 	make(a_context: CONTEXT)
+		require
+			Ressource_Factory_Has_No_Error: not a_context.ressource_factory.has_error
 		do
 			clicked_button := 0
 			pressed_button := 0
 			released_button := 0
-			Precursor(a_context)
+			context := a_context
+			exit_requested := False
 			background_texture := context.ressource_factory.menu_background
 			create {LINKED_LIST[BUTTON]} buttons.make
 			update_buttons_dimension
+		ensure
+			context = a_context
 		end
 
 feature {NONE} -- Implementation
+
+	context: CONTEXT
+			-- Context of the application
+
+	set_events
+			-- Set the event handlers for `Current'
+		do
+			game_library.quit_signal_actions.extend(agent on_quit_signal)
+			context.window.expose_actions.extend(agent on_redraw)
+			context.window.size_change_actions.extend(agent on_size_change)
+			context.window.mouse_button_pressed_actions.extend(agent on_pressed)
+			context.window.mouse_button_released_actions.extend(agent on_released)
+		end
+
+	on_quit_signal(a_timestamp: NATURAL_32)
+			-- Method run when the X button is clicked
+		do
+			request_exit
+			stop
+		end
 
 	on_redraw(a_timestamp: NATURAL_32)
 		do
@@ -56,6 +78,12 @@ feature {NONE} -- Implementation
 		end
 
 feature {NONE} -- Basic Operations
+
+	pressed_button: INTEGER
+			-- Button pressed at the start of the mouse click
+
+	released_button: INTEGER
+			-- Button pressed at the end of the mouse click
 
 	check_button_collision(a_mouse_state: GAME_MOUSE_STATE): INTEGER
 			-- Check if the mouse is in a button and returns the button index
@@ -97,25 +125,16 @@ feature {NONE} -- Basic Operations
 			end
 		end
 
-	pressed_button: INTEGER
-			-- Button pressed at the start of the mouse click
-
-	released_button: INTEGER
-			-- Button pressed at the end of the mouse click
-
 feature -- Access
+
+	exit_requested: BOOLEAN
+			-- Whether or not the program has been requested to stop
+
+	stop_menu: BOOLEAN
+			-- Whether or not the current menu needs to stop and return to the previous one
 
 	has_error: BOOLEAN
 			-- Previous action caused an error
-
-	run
-		do
-			clicked_button := 0
-			context.window.renderer.set_drawing_color(background_color)
-			context.window.mouse_button_pressed_actions.extend(agent on_pressed)
-			context.window.mouse_button_released_actions.extend(agent on_released)
-			Precursor
-		end
 
 	clicked_button: INTEGER
 			-- Button clicked by the user.
@@ -134,6 +153,41 @@ feature -- Access
 
 	buttons: LIST[BUTTON]
 			-- List of `Current's buttons
+
+	next_menu: detachable MENU
+			-- Menu ran when `Current' stops
+
+	start
+			-- Start the execution of `Current's loop
+		do
+			from
+				clicked_button := 0
+			until
+				stop_menu
+			loop
+				context.window.renderer.set_drawing_color(background_color)
+				set_events
+				on_redraw(game_library.time_since_create)
+				game_library.launch
+				game_library.clear_all_events
+				if attached next_menu as la_menu then
+					la_menu.start
+				end
+			end
+		end
+
+	stop
+			-- Stop the execution of `Current'
+		do
+			game_library.stop
+		end
+
+	request_exit
+			-- Request `Current' to stop
+		do
+			exit_requested := True
+			stop_menu := True
+		end
 
 	set_title(a_title: READABLE_STRING_GENERAL)
 			-- Set `Current's title's texture and dimension

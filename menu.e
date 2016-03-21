@@ -1,8 +1,8 @@
 note
 	description: "Abstract class used to make {MENU}s."
 	author: "Guillaume Jean"
-	date: "Fri, 26 Feb 2016 12:20"
-	revision: "16w06a"
+	date: "Mon, 21 Mar 2016 13:39"
+	revision: "16w08a"
 
 deferred class
 	MENU
@@ -94,7 +94,6 @@ feature {NONE} -- Basic Operations
 						la_buttons.item.y + la_texture.height > a_mouse_state.y
 					then
 						Result := la_buttons.cursor_index
-						stop
 					end
 				end
 			end
@@ -176,6 +175,7 @@ feature -- Access
 	stop
 			-- Stop the execution of `Current'
 		do
+			stop_menu := True
 			game_library.stop
 		end
 
@@ -183,7 +183,7 @@ feature -- Access
 			-- Request `Current' to stop
 		do
 			exit_requested := True
-			stop_menu := True
+			stop
 		end
 
 	set_title(a_title: READABLE_STRING_GENERAL)

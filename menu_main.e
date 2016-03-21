@@ -1,8 +1,8 @@
 note
 	description: "Class implementing the {MENU_MAIN}."
 	author: "Guillaume Jean"
-	date: "Fri, 26 Feb 2016 12:34:56"
-	revision: "16w06a"
+	date: "Mon, 21 Mar 2016 13:39"
+	revision: "16w08a"
 
 class
 	MENU_MAIN

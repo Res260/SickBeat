@@ -8,8 +8,8 @@
 		<setting name="console_application" value="true"/>
 		<setting name="concurrency" value="thread"/>
 		<precompile name="base_pre" location="$ISE_PRECOMP\base-mt-safe.ecf"/>
-		<library name="audio" location="C:\Program Files\Eiffel Software\EiffelStudio 15.08 GPL\contrib\library\game2\audio\audio-safe.ecf"/>
-		<library name="audio_sound_file" location="C:\Program Files\Eiffel Software\EiffelStudio 15.08 GPL\contrib\library\game2\audio_sound_file\audio_sound_file-safe.ecf"/>
+		<library name="audio" location="$ISE_LIBRARY\contrib\library\game2\audio\audio-safe.ecf"/>
+		<library name="audio_sound_file" location="$ISE_LIBRARY\contrib\library\game2\audio_sound_file\audio_sound_file-safe.ecf"/>
 		<library name="base" location="$ISE_LIBRARY\library\base\base-safe.ecf"/>
 		<library name="game_core" location="$ISE_LIBRARY\contrib\library\game2\game_core\game_core-safe.ecf"/>
 		<library name="game_image_file" location="$ISE_LIBRARY\contrib\library\game2\game_image_file\game_image_file-safe.ecf"/>
@@ -18,8 +18,8 @@
 		<cluster name="sickbeat" location=".\" recursive="true">
 			<file_rule>
 				<exclude>/EIFGENs$</exclude>
-				<exclude>/CVS$</exclude>
-				<exclude>/.svn$</exclude>
+				<exclude>/ressources$</exclude>
+				<exclude>/.git$</exclude>
 			</file_rule>
 		</cluster>
 	</target>

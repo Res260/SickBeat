@@ -21,6 +21,8 @@ feature{NONE} --Initialization
 			max_frequency := sample_rate // 2
 			max_integer_16 := max_integer_16.Max_value
 			min_integer_16 := max_integer_16.Min_value
+			max_integer_32 := max_integer_32.Max_value
+			min_integer_32 := max_integer_32.Min_value
 		end
 
 feature -- Access.
@@ -43,6 +45,9 @@ feature -- Access.
 	max_integer_16: INTEGER_16
 	min_integer_16: INTEGER_16
 
+	max_integer_32: INTEGER_32
+	min_integer_32: INTEGER_32
+
 	create_sound_menu_click:SOUND
 		--Method that creates a sound for a menu button click.
 		local
@@ -52,12 +57,12 @@ feature -- Access.
 			l_1:INTEGER_16
 			l_2:INTEGER_16
 		do
-			l_wave:= create_sine_wave(80, 415)
+			l_wave:= create_sine_wave(0, 415)
 --			l_wave2 := create_triangle_wave(60, 256)
 --			mix(l_wave2, l_wave)
-			repeat_wave_from_duration(l_wave, 0.1)
+			repeat_wave_from_duration(l_wave, 1)
+			add_noise(l_wave, 90)
 			create l_sound.make(l_wave)
-			print_wave(l_wave)
 			Result:= l_sound
 		end
 
@@ -232,15 +237,22 @@ feature{NONE} --Implementation
 				i >= a_sound1.count
 			loop
 				io.put_new_line
-				l_mix_result := a_sound1[i] + a_sound2[i]
-				if(l_mix_result > max_integer_16) then
-					l_mix_result := max_integer_16
-				elseif(a_sound1[i] + a_sound2[i] < min_integer_16) then
-					l_mix_result := min_integer_16
-				end
-				a_sound1[i] := l_mix_result.to_integer_16
+				a_sound1[i] := add_up(a_sound1[i], a_sound2[i])
 				i := i + 1
 			end
+		end
+
+	add_up(a_sample1: INTEGER_16; a_sample2: INTEGER_16): INTEGER_16
+		local
+			l_mix_result: INTEGER_32
+		do
+			l_mix_result := a_sample1 + a_sample2
+			if(l_mix_result > max_integer_16) then
+				l_mix_result := max_integer_16
+			elseif(l_mix_result < min_integer_16) then
+				l_mix_result := min_integer_16
+			end
+			Result := l_mix_result.to_integer_16
 		end
 
 	repeat_wave_from_repetitions(a_sound: LIST[INTEGER_16]; a_repetition: INTEGER_32)
@@ -292,6 +304,30 @@ feature{NONE} --Implementation
 			Repetition_Valid: a_sound.count =get_number_of_samples_from_duration(a_seconds)
 		end
 
+	add_noise(a_sound:LIST[INTEGER_16]; a_amplitude:INTEGER_32)
+		--adds random numbers to a_sound
+		--side effect on a_sound
+		require
+			a_amplitude >= 0
+		local
+			l_max_number: INTEGER_16
+			l_random_number: RANDOM
+			i: INTEGER_32
+		do
+			l_max_number := get_max_number_from_amplitude(a_amplitude)
+			create l_random_number.make
+			from
+				i := 1
+			until
+				i > a_sound.count
+			loop
+				a_sound[i] := add_up(a_sound[i], ((l_random_number.double_item - 0.5)* l_max_number).rounded.to_integer_16)
+				l_random_number.forth
+				i := i + 1
+			end
+
+		end
+
 	add_silence_from_seconds(a_sound: LIST[INTEGER_16]; a_seconds: REAL_64)
 		-- Adds a silence (zeros) of a_seconds seconds to a_sound.
 		-- Of course, it has a side effect on a_sound.
@@ -338,6 +374,10 @@ feature --debug
 			format_integer:FORMAT_INTEGER
 		do
 			create format_integer.make (6)
+			print("%N-------------------------------------------%N")
+			print(a_wave.count)
+			print(" samples vvvvvvvvvvvvvvvvvvvvv")
+			print("%N-------------------------------------------%N")
 			from
 				i:= 1
 			until
@@ -346,7 +386,7 @@ feature --debug
 				from
 					j := 1
 				until
-					j >= 14
+					j >= 8
 				loop
 					if(i <= a_wave.count) then
 						format_integer.left_justify
@@ -357,5 +397,9 @@ feature --debug
 				end
 				io.put_new_line
 			end
+			print("%N-------------------------------------------%N")
+			print(a_wave.count)
+			print(" samples ^^^^^^^^^^^^^^^^^^^^")
+			print("%N-------------------------------------------%N")
 		end
 end

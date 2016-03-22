@@ -65,8 +65,8 @@ feature {NONE} -- Initialization
 			l_sound: SOUND
 --			l_sound_2: AUDIO_SOUND_FILE
 		do
-			sound_engine.create_audio_source
-			l_audio_source:= sound_engine.last_audio_source
+			sound_manager.create_audio_source
+			l_audio_source:= sound_manager.last_audio_source
 			l_sound:= sound_factory.create_sound_menu_click
 
 --			l_audio_source_2:= sound_engine.create_audio_source

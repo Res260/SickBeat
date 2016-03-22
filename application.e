@@ -1,7 +1,7 @@
 note
 	description: "Sickbeat root application class."
 	author: "Guillaume Jean"
-	date: "21 Mar 2016"
+	date: "21 March 2016"
 	revision: "16w08a"
 
 class

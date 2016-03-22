@@ -1,7 +1,7 @@
 note
 	description: "{MENU} implemented for the user to decide whether he's playing or configuring the game."
 	author: "Guillaume Jean"
-	date: "21 Mar 2016"
+	date: "21 March 2016"
 	revision: "16w08b"
 
 class

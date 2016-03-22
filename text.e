@@ -1,5 +1,5 @@
 note
-	description: "Summary description for {TITLE}."
+	description: "Implementation of {DRAWABLE} for drawing text."
 	author: "Guillaume Jean"
 	date: "22 March 2016"
 	revision: "16w08a"

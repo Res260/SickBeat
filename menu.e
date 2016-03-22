@@ -1,7 +1,7 @@
 note
 	description: "Abstract class used to make {MENU}s."
 	author: "Guillaume Jean"
-	date: "21 Mar 2016"
+	date: "21 March 2016"
 	revision: "16w08a"
 
 deferred class

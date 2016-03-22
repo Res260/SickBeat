@@ -1,7 +1,7 @@
 note
 	description: "Class used to store the ressources only once in RAM."
 	author: "Guillaume Jean"
-	date: "Thd, 03 March 2016 12:57"
+	date: "03 March 2016"
 	revision: "16w06a"
 
 class

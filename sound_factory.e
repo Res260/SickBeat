@@ -57,7 +57,7 @@ feature -- Access.
 --			mix(l_wave2, l_wave)
 			repeat_wave_from_duration(l_wave, 0.1)
 			create l_sound.make(l_wave)
-			print_wave(l_wave)
+--			print_wave(l_wave)
 			Result:= l_sound
 		end
 

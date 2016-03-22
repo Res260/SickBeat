@@ -9,6 +9,8 @@ deferred class
 
 inherit
 	GAME_LIBRARY_SHARED
+	SOUND_MANAGER_SHARED
+	SOUND_FACTORY_SHARED
 
 feature {NONE} -- Initialization
 
@@ -24,11 +26,20 @@ feature {NONE} -- Initialization
 			create background.make(context.ressource_factory.menu_background, context)
 			create {LINKED_LIST[BUTTON]} buttons.make
 			update_buttons_dimension
+			sound_engine.create_audio_source
+			menu_audio_source := sound_engine.last_audio_source
+			menu_sound := sound_factory.create_sound_menu_click
 		ensure
 			context = a_context
 		end
 
 feature {NONE} -- Implementation
+
+	menu_audio_source: AUDIO_SOURCE
+			-- Source for the audio sounds
+
+	menu_sound: SOUND
+			-- Sound to be played in the menu
 
 	context: CONTEXT
 			-- Context of the application

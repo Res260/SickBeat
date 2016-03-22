@@ -32,7 +32,7 @@ feature -- Initialization
 
 feature -- Access
 
-	sound: SOUND_ENGINE
+	sound: SOUND_MANAGER
 			-- `sound'
 		attribute check False then end end --| Remove line when `sound' is initialized in creation procedure.
 

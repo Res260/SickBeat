@@ -2,7 +2,7 @@ note
 	description: "Class that holds information for a sound and fills a buffer to play it."
 	author: "Émilio G!"
 	date: "16-02-23"
-	revision: "1 16-03-01"
+	revision: "16w07b"
 
 class
 	SOUND
@@ -15,7 +15,9 @@ create
 
 feature {NONE}
 
-	make (a_sound_data : ARRAYED_LIST[INTEGER_16])
+	make (a_sound_data : LIST[INTEGER_16])
+		-- Initialization for `Current'.
+		-- Sets sound data and initializes features.
 		local
 			i: INTEGER_32
 		do
@@ -40,25 +42,50 @@ feature {NONE}
 
 feature
 
-	buffer_index: INTEGER_32 --usefull in fill_buffer
+	buffer_index: INTEGER_32
+		--usefull in fill_buffer
 
 	sound_data: MANAGED_POINTER
+		--data that is readable by the library
 
-	sound_length: INTEGER_32 --length in samples
+	sound_length: INTEGER_32
+		--length in samples
 
 	channel_count:INTEGER_32
 
 	frequency: INTEGER_32
+		-- in samples per second
 
 	bits_per_sample: INTEGER_32
 
 	is_signed: BOOLEAN
+		-- is sound_data signed
 
 	byte_per_buffer_sample: INTEGER_32
+		-- equals to number_of_channels * (bits_per_sample // 8)
 
 	is_seekable: BOOLEAN = False
+		-- Useless in this class, but needed to inherit from AUDIO_SOUND
+
+	restart
+		--sets buffer_index to 0 so the sound plays normally when prompted again
+		do
+			buffer_index := 0
+		end
+
+	is_openable: BOOLEAN = False
+
+	open
+		--nothing. This is actually useless but necessary to inherit from AUDIO_SOUND.
+		do
+
+		end
+
+feature {AUDIO_LIBRARY_CONTROLLER}
 
 	fill_buffer(a_buffer: POINTER; a_max_length: INTEGER_32)
+		--This method should only be called by AUDIO_LIBRARY_CONTROLLER.
+		--Side effect on a_buffer.
 		local
 			l_buffer: ARRAYED_LIST[INTEGER_16]
 			l_max: INTEGER_32
@@ -81,19 +108,6 @@ feature
 				buffer_index := (buffer_index + l_buffer_size)
 			end
 			last_buffer_size:= l_buffer_size
-		end
-
-	restart
-		--sets buffer_index to 0 so the sound plays normally when prompted again
-		do
-			buffer_index := 0
-		end
-
-	is_openable: BOOLEAN = False
-
-	open	--nothing. This is actually useless but necessary.
-		do
-
 		end
 
 end

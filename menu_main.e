@@ -1,8 +1,8 @@
 note
-	description: "Class implementing the {MENU_MAIN}."
+	description: "{MENU} implemented for the user to decide whether he's playing or configuring the game."
 	author: "Guillaume Jean"
-	date: "Fri, 26 Feb 2016 12:34:56"
-	revision: "1.0"
+	date: "21 Mar 2016"
+	revision: "16w08b"
 
 class
 	MENU_MAIN
@@ -18,29 +18,37 @@ create
 
 feature {NONE} -- Initialization
 
-	make(a_window: GAME_WINDOW_RENDERED)
+	make(a_context: CONTEXT)
 		do
-			Precursor(a_window)
+			Precursor(a_context)
 			set_title("SickBeat")
-			add_button("Play")
-			add_button("Options")
-			add_button("Exit")
+			add_button("Play", agent play_action)
+			add_button("Options", agent options_action)
+			add_button("Exit", agent exit_action)
 		end
 
-feature -- Access
+feature {NONE} -- Implementation
 
-	is_play_clicked: BOOLEAN
+	play_action(a_string: READABLE_STRING_GENERAL)
+			-- Action played when the user clicks the Play button
 		do
-			Result := clicked_button = 1
+			io.put_string("Play clicked!%N")
+			create {MENU_PLAY} next_menu.make(context)
+			continue_to_next
 		end
 
-	is_option_clicked: BOOLEAN
+	options_action(a_string: READABLE_STRING_GENERAL)
+			-- Action played when the user clicks the Options button
 		do
-			Result := clicked_button = 2
+			io.put_string("Options clicked!%N")
+--			menu_audio_source.queue_sound(menu_sound)
+--			menu_audio_source.play
 		end
 
-	is_exit_clicked: BOOLEAN
+	exit_action(a_string: READABLE_STRING_GENERAL)
+			-- Action played when the user clicks the Exit button
 		do
-			Result := clicked_button = 3
+			io.put_string("Exit clicked!%N")
+			close_program
 		end
 end

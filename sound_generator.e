@@ -1,11 +1,11 @@
 note
-	description: "Class that creates (generates) sounds for the game."
-	author: "Émilio G!"
-	date: "16-3-21"
-	revision: "16w08a"
+	description: "Class that generates sound using lists of INTEGER_16"
+	author: "Émilio Gonzalez"
+	date: "2016-03-22"
+	revision: "1"
 
 class
-	SOUND_FACTORY
+	SOUND_GENERATOR
 
 inherit
 	DOUBLE_MATH
@@ -14,8 +14,7 @@ inherit
 create
 	make
 
-feature{NONE} --Initialization
-
+feature --Initialization
 	make
 		do
 			max_frequency := sample_rate // 2
@@ -25,7 +24,7 @@ feature{NONE} --Initialization
 			min_integer_32 := max_integer_32.Min_value
 		end
 
-feature -- Access.
+feature --Access
 
 	sample_rate:INTEGER_32 = 44100
 
@@ -47,6 +46,7 @@ feature -- Access.
 
 	max_integer_32: INTEGER_32
 	min_integer_32: INTEGER_32
+<<<<<<< HEAD:sound_factory.e
 
 	create_sound_menu_click:SOUND
 		--Method that creates a sound for a menu button click.
@@ -65,8 +65,11 @@ feature -- Access.
 			create l_sound.make(l_wave)
 			Result:= l_sound
 		end
+=======
+>>>>>>> master:sound_generator.e
 
-feature{NONE} --Implementation
+	FADE_IN: INTEGER_8 =  0
+	FADE_OUT: INTEGER_8 = 1
 
 	create_square_wave(a_amplitude: REAL_32; a_frequency: INTEGER_32):LIST[INTEGER_16]
 		--Method that creates a single square wave and returns it as a list of INTEGER_16
@@ -179,43 +182,35 @@ feature{NONE} --Implementation
 			Result := l_wave
 		end
 
-	get_max_number_from_amplitude(a_amplitude: REAL_32): INTEGER_16
-		--calculates the highest possible number for a given amplitude.
+	amplify(a_sound: LIST[INTEGER_16]; a_amp_value: REAL_64)
+		--amplifies a_sound by multiplicating a_sound[i] with a_amp_value
+		--side effect on a_sound
 		require
-			a_amplitude <= max_amplitude
-			a_amplitude >= 0
+			a_amp_value >= 0
+		local
+			l_sound_length: INTEGER_32
+			i: INTEGER_32
 		do
-			Result := (10^(a_amplitude / 20)).rounded.to_integer_16
+			from
+				i := 1
+			until
+				i > l_sound_length
+			loop
+				a_sound[i] := amplify_sample(a_sound[i], a_amp_value)
+			end
 		end
 
-	get_wave_length_from_frequency(a_frequency: INTEGER_32): INTEGER_32
-		--calculates the wave's length (in samples) for a given frequency.
-		require
-			a_frequency <= max_frequency
-			a_frequency >= min_frequency
+	amplify_sample(a_sample: INTEGER_16; a_amp_value: REAL_64): INTEGER_16
+		local
+			l_amp_result: REAL_64
 		do
-
-			Result := (sample_rate // a_frequency) * number_of_channels
-		end
-
-	get_number_of_samples_from_duration(a_seconds:REAL_64): INTEGER_32
-		-- calculates the number of samples during a_seconds seconds.s
-		require
-			a_seconds >= 0
-		do
-			Result := (a_seconds * sample_rate).rounded
-		ensure
-			Result >= 0
-		end
-
-	get_duration_from_number_of_samples(a_samples: INTEGER_32):REAL_64
-		-- calculates the duration a_samples samples takes to play.
-		require
-			Samples_Valid: a_samples >= 0
-		do
-			Result := a_samples / sample_rate
-		ensure
-			Result >= 0
+			l_amp_result := a_sample * a_amp_value
+			if(l_amp_result > max_integer_16) then
+				l_amp_result := max_integer_16
+			elseif(l_amp_result < min_integer_16) then
+				l_amp_result := min_integer_16
+			end
+			Result := l_amp_result.rounded.to_integer_16
 		end
 
 	mix(a_sound1: LIST[INTEGER_16]; a_sound2: LIST[INTEGER_16])
@@ -236,7 +231,10 @@ feature{NONE} --Implementation
 			until
 				i >= a_sound1.count
 			loop
+<<<<<<< HEAD:sound_factory.e
 				io.put_new_line
+=======
+>>>>>>> master:sound_generator.e
 				a_sound1[i] := add_up(a_sound1[i], a_sound2[i])
 				i := i + 1
 			end
@@ -255,6 +253,78 @@ feature{NONE} --Implementation
 			Result := l_mix_result.to_integer_16
 		end
 
+<<<<<<< HEAD:sound_factory.e
+=======
+	fade(a_sound: LIST[INTEGER_16]; a_begin_length_percentage:REAL_64; a_end_length_percentage: REAL_64;
+				  a_begin_volume_percentage: REAL_64; a_end_volume_percentage:REAL_64;)
+		-- fades (a_begin_length_percentage % to a_length_end_percentage) from (a_begin_volume_percentage % to a_end_volume_percentage %)
+		-- of the sound. Fade out or fade in.
+		-- side effect on a_sound.
+		require
+			Begin_Length_Good: a_begin_length_percentage >= 0 and a_begin_length_percentage <= 1
+			End_length_Good:   a_end_length_percentage >= a_begin_length_percentage and a_end_length_percentage <= 1
+			Begin_Volume_Good: a_begin_volume_percentage >= 0 and a_begin_volume_percentage <= 1
+			End_Volume_Good: a_end_volume_percentage >= 0 and a_end_volume_percentage <= 1
+		local
+			l_sample_index_begin: INTEGER_32
+			l_sample_index_end:   INTEGER_32
+			l_number_of_fade_samples: INTEGER_32
+			l_logarithmic_percentage_list: LIST[REAL_64]
+			i: INTEGER_32
+		do
+			l_sample_index_begin := get_sample_index_from_percentage(a_sound.count, a_begin_length_percentage)
+			l_sample_index_end := get_sample_index_from_percentage(a_sound.count, a_end_length_percentage)
+			l_number_of_fade_samples := l_sample_index_end - l_sample_index_begin + 1
+			l_logarithmic_percentage_list := get_logarithmic_percentage_list_from_linear_percentage_range(
+										a_begin_volume_percentage, a_end_volume_percentage, l_number_of_fade_samples)
+			from
+				i := l_sample_index_begin
+			until
+				i > l_sample_index_end
+			loop
+				a_sound[i] := amplify_sample(a_sound[i], l_logarithmic_percentage_list[i - l_sample_index_begin + 1])
+				i := i + 1
+			end
+		end
+
+	get_logarithmic_percentage_list_from_linear_percentage_range(a_begin_volume_percentage: REAL_64;
+							 a_end_volume_percentage: REAL_64; a_number_of_samples: INTEGER_32): LIST[REAL_64]
+		local
+			l_logarithmic_percentage_list: LIST[REAL_64]
+			l_percentage_iteration: REAL_64
+			i: INTEGER_32
+		do
+			l_percentage_iteration := (a_end_volume_percentage - a_begin_volume_percentage) / a_number_of_samples
+			print(l_percentage_iteration)
+			io.put_new_line
+			create {ARRAYED_LIST[REAL_64]} l_logarithmic_percentage_list.make (a_number_of_samples)
+			from
+				i := 1
+			until
+				i > a_number_of_samples
+			loop
+				l_logarithmic_percentage_list.extend (
+					get_logarithmic_percentage_from_linear_percentage(a_begin_volume_percentage + (i * l_percentage_iteration)))
+				i := i + 1
+			end
+--			across l_logarithmic_percentage_list as la_element loop
+--				io.put_new_line
+--				io.put_string(la_element.item.out)
+--			end
+			Result := l_logarithmic_percentage_list
+		end
+
+	get_logarithmic_percentage_from_linear_percentage(a_linear_percentage: REAL_64):REAL_64
+		require
+			Linear_Percentage_Valid: a_linear_percentage <= 1 and a_linear_percentage >= 0
+		do
+			Result := 0.001*exp(6.908*a_linear_percentage)
+			if(Result > 1) then
+				Result := 1
+			end
+		end
+
+>>>>>>> master:sound_generator.e
 	repeat_wave_from_repetitions(a_sound: LIST[INTEGER_16]; a_repetition: INTEGER_32)
 		--Appends a copy of a_sound to a_sound (a_repetition - 1) duration(s).
 		--1 = no repetition
@@ -365,6 +435,53 @@ feature{NONE} --Implementation
 			At_Least_One_Zero: across a_sound as la_sound some la_sound.item = 0 end
 		end
 
+	get_max_number_from_amplitude(a_amplitude: REAL_32): INTEGER_16
+		--calculates the highest possible number for a given amplitude.
+		require
+			a_amplitude <= max_amplitude
+			a_amplitude >= 0
+		do
+			Result := (10^(a_amplitude / 20)).rounded.to_integer_16
+		end
+
+	get_wave_length_from_frequency(a_frequency: INTEGER_32): INTEGER_32
+		--calculates the wave's length (in samples) for a given frequency.
+		require
+			a_frequency <= max_frequency
+			a_frequency >= min_frequency
+		do
+
+			Result := (sample_rate // a_frequency) * number_of_channels
+		end
+
+	get_number_of_samples_from_duration(a_seconds:REAL_64): INTEGER_32
+		-- calculates the number of samples during a_seconds seconds.s
+		require
+			a_seconds >= 0
+		do
+			Result := (a_seconds * sample_rate).rounded
+		ensure
+			Result >= 0
+		end
+
+	get_duration_from_number_of_samples(a_samples: INTEGER_32):REAL_64
+		-- calculates the duration a_samples samples takes to play.
+		require
+			Samples_Valid: a_samples >= 0
+		do
+			Result := a_samples / sample_rate
+		ensure
+			Result >= 0
+		end
+
+	get_sample_index_from_percentage(a_number_of_samples: INTEGER_32; a_percentage: REAL_64):INTEGER_32
+		-- calculates the index of the sample at a_percentages of a_number_of_samples.
+		require
+			a_percentage >= 0
+		do
+			Result := (a_percentage * (a_number_of_samples - 1)).rounded + 1
+		end
+
 feature --debug
 	print_wave(a_wave: LIST[INTEGER_16])
 		--prints the wave in the console
@@ -402,4 +519,5 @@ feature --debug
 			print(" samples ^^^^^^^^^^^^^^^^^^^^")
 			print("%N-------------------------------------------%N")
 		end
+
 end

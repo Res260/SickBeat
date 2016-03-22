@@ -1,8 +1,8 @@
 note
 	description: "Class used to store the ressources only once in RAM."
 	author: "Guillaume Jean"
-	date: "03 March 2016"
-	revision: "16w06a"
+	date: "22 March 2016"
+	revision: "16w08a"
 
 class
 	RESSOURCE_FACTORY
@@ -62,6 +62,7 @@ feature {NONE} -- Initialization
 		do
 			-- Init all images/sounds
 			menu_background := load_image(a_renderer, "main_menu", "background")
+			game_background := load_image(a_renderer, "game", "background")
 		end
 
 feature -- Access
@@ -70,7 +71,10 @@ feature -- Access
 			-- Previous action caused an error
 
 	menu_background: detachable GAME_TEXTURE
-			-- Image texture used in every menus' background
+			-- Texture used for every menus' background
+
+	game_background: detachable GAME_TEXTURE
+			-- Texture used for the game's background
 
 	menu_font(a_size: INTEGER): TEXT_FONT
 		local

@@ -1,7 +1,7 @@
 note
 	description: "Abstract class used for any element drawn on the screen"
 	author: "Guillaume Jean"
-	date: "Mon, 14 March 2016 14:09"
+	date: "14 March 2016"
 	revision: "16w07a"
 
 deferred class

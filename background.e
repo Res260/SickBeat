@@ -1,7 +1,7 @@
 note
 	description: "A {DRAWABLE} scaled to fit the whole window."
 	author: "Guillaume Jean"
-	date: "Tue, 15 March 2016 09:46"
+	date: "15 March 2016"
 	revision: "16w07a"
 
 class

@@ -1,7 +1,7 @@
 note
 	description: "{MENU} implemented for the user to decide the mode to play on."
 	author: "Guillaume Jean"
-	date: "Mon, 21 Mar 2016 13:45"
+	date: "21 Mar 2016"
 	revision: "16w08a"
 
 class
@@ -45,6 +45,6 @@ feature {NONE} -- Implementation
 			-- Action played when the user clicks the Exit button
 		do
 			io.put_string("Return clicked!%N")
-			stop
+			return_menu
 		end
 end

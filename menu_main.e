@@ -1,7 +1,7 @@
 note
 	description: "{MENU} implemented for the user to decide whether he's playing or configuring the game."
 	author: "Guillaume Jean"
-	date: "Mon, 21 Mar 2016 13:45"
+	date: "21 Mar 2016"
 	revision: "16w08b"
 
 class
@@ -34,21 +34,21 @@ feature {NONE} -- Implementation
 		do
 			io.put_string("Play clicked!%N")
 			create {MENU_PLAY} next_menu.make(context)
-			game_library.stop
+			continue_to_next
 		end
 
 	options_action(a_string: READABLE_STRING_GENERAL)
 			-- Action played when the user clicks the Options button
 		do
 			io.put_string("Options clicked!%N")
-			menu_audio_source.queue_sound(menu_sound)
-			menu_audio_source.play
+--			menu_audio_source.queue_sound(menu_sound)
+--			menu_audio_source.play
 		end
 
 	exit_action(a_string: READABLE_STRING_GENERAL)
 			-- Action played when the user clicks the Exit button
 		do
 			io.put_string("Exit clicked!%N")
-			request_exit
+			close_program
 		end
 end

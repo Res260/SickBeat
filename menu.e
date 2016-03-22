@@ -1,7 +1,7 @@
 note
 	description: "Abstract class used to make {MENU}s."
 	author: "Guillaume Jean"
-	date: "Mon, 21 Mar 2016 13:39"
+	date: "21 Mar 2016"
 	revision: "16w08a"
 
 deferred class
@@ -57,8 +57,8 @@ feature {NONE} -- Implementation
 	on_quit_signal(a_timestamp: NATURAL_32)
 			-- Method run when the X button is clicked
 		do
-			request_exit
-			stop
+			close_program
+			return_menu
 		end
 
 	on_redraw(a_timestamp: NATURAL_32)
@@ -67,8 +67,8 @@ feature {NONE} -- Implementation
 
 			background.draw
 
-			if attached title_texture as la_title and attached title_dimension as la_title_dimension then
-				context.window.renderer.draw_texture(la_title, la_title_dimension.x, la_title_dimension.y)
+			if attached title as la_title then
+				la_title.draw
 			end
 
 			across buttons as la_buttons loop
@@ -149,14 +149,8 @@ feature -- Access
 	background: BACKGROUND
 			-- `Current's background
 
-	title_texture: detachable GAME_TEXTURE
-			-- Image of `Current's title
-
-	title_dimension: detachable TUPLE[x, y, width, height: INTEGER]
-			-- Position and size of `Current's title
-
-	title_font: TEXT_FONT
-			-- Font used to render titles
+	title: detachable TEXT
+			-- `Current's title
 
 	buttons: LIST[BUTTON]
 			-- List of `Current's buttons
@@ -179,35 +173,37 @@ feature -- Access
 				game_library.clear_all_events
 				if attached next_menu as la_menu then
 					la_menu.start
+					if la_menu.exit_requested then
+						close_program
+					end
 				end
 			end
 		end
 
-	stop
-			-- Stop the execution of `Current'
+	continue_to_next
+			-- Stop this {MENU} and go to `next_menu'
 		do
-			stop_menu := True
 			game_library.stop
 		end
 
-	request_exit
-			-- Request `Current' to stop
+	return_menu
+			-- Quit this {MENU} and return to the previous one
+		do
+			stop_menu := True
+			continue_to_next
+		end
+
+	close_program
+			-- Recursively exit all {MENU}s
 		do
 			exit_requested := True
-			stop
+			return_menu
 		end
 
 	set_title(a_title: READABLE_STRING_GENERAL)
 			-- Set `Current's title's texture and dimension
-		local
-			l_image: TEXT_SURFACE_BLENDED
 		do
-			create l_image.make(a_title, title_font, text_color)
-			if l_image.is_open then
-				create title_texture.make_from_surface(context.window.renderer, l_image)
-			else
-				has_error := True
-			end
+			create title.make(a_title, text_color, context)
 			update_buttons_dimension
 		end
 
@@ -230,16 +226,19 @@ feature -- Access
 			l_left_margin_title: INTEGER
 			l_y: INTEGER
 			l_button_font_size: INTEGER
+			l_title_font_size: INTEGER
+			l_title_font: TEXT_FONT
 		do
-			title_font := context.ressource_factory.menu_font(context.window.height // 15)
+			l_title_font_size := context.window.height // 15
+			l_title_font := context.ressource_factory.menu_font(l_title_font_size)
 			l_button_font_size := context.window.height // 30
 			l_height_between := context.window.height // 100
 			l_left_margin := context.window.width // 15
 			l_left_margin_title := context.window.width // 30
 			l_y := context.window.height // 2
 
-			if attached title_texture as la_title then
-				title_dimension := [l_left_margin_title, l_y - la_title.height - l_height_between, la_title.width, la_title.height]
+			if attached title as la_title then
+				la_title.change(l_left_margin_title, l_y - l_title_font.text_dimension(la_title.text).height - l_height_between, l_title_font_size)
 			end
 
 			across buttons as la_buttons loop

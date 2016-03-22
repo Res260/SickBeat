@@ -41,8 +41,8 @@ feature {NONE} -- Implementation
 			-- Action played when the user clicks the Options button
 		do
 			io.put_string("Options clicked!%N")
---			menu_audio_source.queue_sound(menu_sound)
---			menu_audio_source.play
+			menu_audio_source.queue_sound(menu_sound)
+			menu_audio_source.play
 		end
 
 	exit_action(a_string: READABLE_STRING_GENERAL)

@@ -46,30 +46,6 @@ feature --Access
 
 	max_integer_32: INTEGER_32
 	min_integer_32: INTEGER_32
-<<<<<<< HEAD:sound_factory.e
-
-	create_sound_menu_click:SOUND
-		--Method that creates a sound for a menu button click.
-		local
-			l_wave:LIST[INTEGER_16]
-			l_wave2: LIST[INTEGER_16]
-			l_sound: SOUND
-			l_1:INTEGER_16
-			l_2:INTEGER_16
-		do
-			l_wave:= create_sine_wave(0, 415)
---			l_wave2 := create_triangle_wave(60, 256)
---			mix(l_wave2, l_wave)
-			repeat_wave_from_duration(l_wave, 1)
-			add_noise(l_wave, 90)
-			create l_sound.make(l_wave)
-			Result:= l_sound
-		end
-=======
->>>>>>> master:sound_generator.e
-
-	FADE_IN: INTEGER_8 =  0
-	FADE_OUT: INTEGER_8 = 1
 
 	create_square_wave(a_amplitude: REAL_32; a_frequency: INTEGER_32):LIST[INTEGER_16]
 		--Method that creates a single square wave and returns it as a list of INTEGER_16
@@ -182,7 +158,7 @@ feature --Access
 			Result := l_wave
 		end
 
-	amplify(a_sound: LIST[INTEGER_16]; a_amp_value: REAL_64)
+	amplify_wave(a_sound: LIST[INTEGER_16]; a_amp_value: REAL_64)
 		--amplifies a_sound by multiplicating a_sound[i] with a_amp_value
 		--side effect on a_sound
 		require
@@ -231,10 +207,6 @@ feature --Access
 			until
 				i >= a_sound1.count
 			loop
-<<<<<<< HEAD:sound_factory.e
-				io.put_new_line
-=======
->>>>>>> master:sound_generator.e
 				a_sound1[i] := add_up(a_sound1[i], a_sound2[i])
 				i := i + 1
 			end
@@ -253,8 +225,6 @@ feature --Access
 			Result := l_mix_result.to_integer_16
 		end
 
-<<<<<<< HEAD:sound_factory.e
-=======
 	fade(a_sound: LIST[INTEGER_16]; a_begin_length_percentage:REAL_64; a_end_length_percentage: REAL_64;
 				  a_begin_volume_percentage: REAL_64; a_end_volume_percentage:REAL_64;)
 		-- fades (a_begin_length_percentage % to a_length_end_percentage) from (a_begin_volume_percentage % to a_end_volume_percentage %)
@@ -324,7 +294,6 @@ feature --Access
 			end
 		end
 
->>>>>>> master:sound_generator.e
 	repeat_wave_from_repetitions(a_sound: LIST[INTEGER_16]; a_repetition: INTEGER_32)
 		--Appends a copy of a_sound to a_sound (a_repetition - 1) duration(s).
 		--1 = no repetition

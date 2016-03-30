@@ -45,6 +45,17 @@ feature -- Access
 			Result := audio_library.last_source_added
 		end
 
+	set_master_volume(a_new_volume: REAL_32)
+		--sets the master volume to a_new_volume
+		--side effect on audio_library sources
+		require
+			New_Volume_Valid: a_new_volume >= 0 and a_new_volume <= 1
+		do
+			across audio_library.sources as la_source loop
+				la_source.item.set_gain (a_new_volume)
+			end
+		end
+
 	run
 			--do `Current's job
 		do

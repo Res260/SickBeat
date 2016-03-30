@@ -1,8 +1,8 @@
 note
 	description: "Class that generates sound using lists of INTEGER_16"
 	author: "Émilio Gonzalez"
-	date: "2016-03-22"
-	revision: "1"
+	date: "2016-03-29"
+	revision: "16w08a"
 
 class
 	SOUND_GENERATOR
@@ -85,6 +85,8 @@ feature --Access
 			end
 
 			Result:= l_wave
+		ensure
+			Result_Valid: Result.count = get_wave_length_from_frequency(a_frequency)
 		end
 
 	create_sine_wave(a_amplitude: REAL_32; a_frequency: INTEGER_32):LIST[INTEGER_16]
@@ -113,6 +115,8 @@ feature --Access
 				i := i + 1
 			end
 			Result := l_wave
+		ensure
+			Result_Valid: Result.count = get_wave_length_from_frequency(a_frequency)
 		end
 
 	create_triangle_wave(a_amplitude: REAL_32; a_frequency: INTEGER_32):LIST[INTEGER_16]
@@ -156,13 +160,15 @@ feature --Access
 			end
 
 			Result := l_wave
+		ensure
+			Result_Valid: Result.count = get_wave_length_from_frequency(a_frequency)
 		end
 
 	amplify_wave(a_sound: LIST[INTEGER_16]; a_amp_value: REAL_64)
 		--amplifies a_sound by multiplicating a_sound[i] with a_amp_value
 		--side effect on a_sound
 		require
-			a_amp_value >= 0
+			Amp_Value_Valid: a_amp_value >= 0
 		local
 			l_sound_length: INTEGER_32
 			i: INTEGER_32
@@ -174,9 +180,13 @@ feature --Access
 			loop
 				a_sound[i] := amplify_sample(a_sound[i], a_amp_value)
 			end
+		ensure
+			Result_Valid: old a_sound.count = a_sound.count
 		end
 
 	amplify_sample(a_sample: INTEGER_16; a_amp_value: REAL_64): INTEGER_16
+		require
+			Amp_Value_Valid: a_amp_value >= 0
 		local
 			l_amp_result: REAL_64
 		do
@@ -187,29 +197,43 @@ feature --Access
 				l_amp_result := min_integer_16
 			end
 			Result := l_amp_result.rounded.to_integer_16
+		ensure
+			Result_Valid: Result <= max_integer_16 and Result >= min_integer_16
 		end
 
-	mix(a_sound1: LIST[INTEGER_16]; a_sound2: LIST[INTEGER_16])
+	mix(a_sound1: LIST[INTEGER_16]; a_sound2: LIST[INTEGER_16]; a_percentage: REAL_64)
 		-- Mixes two waves by adding up a_sound2[i] to a_sound2[i].
 		-- if there is overflow, caps the amplitude.
+		--COMPLETE DOC
 		-- side effect on a_sound1
+		require
+			Sound1_Valid: a_sound1.count > 0
+			Sound2_Valid: a_sound2.count > 0
+			Percentage_Valid: a_percentage >= 0 and a_percentage <= 1
 		local
 			i: INTEGER_32
+			j: INTEGER_32
 			l_length_difference: INTEGER_32
 			l_mix_result: INTEGER_32
+			l_first_sample_number: INTEGER_32
 		do
-			l_length_difference := a_sound2.count - a_sound1.count
+			l_first_sample_number := get_sample_index_from_percentage(a_sound1.count, a_percentage)
+			l_length_difference := l_first_sample_number + a_sound2.count - a_sound1.count
 			if(l_length_difference > 0) then
 				add_silence_from_samples(a_sound1, l_length_difference)
 			end
 			from
-				i := 1
+				i := l_first_sample_number
+				j := 1
 			until
-				i >= a_sound1.count
+				i >= a_sound2.count
 			loop
-				a_sound1[i] := add_up(a_sound1[i], a_sound2[i])
+				a_sound1[i] := add_up(a_sound1[i], a_sound2[j])
 				i := i + 1
+				j := j + 1
 			end
+		ensure
+			Result_Valid: a_sound1.count >= a_sound2.count
 		end
 
 	add_up(a_sample1: INTEGER_16; a_sample2: INTEGER_16): INTEGER_16
@@ -223,6 +247,8 @@ feature --Access
 				l_mix_result := min_integer_16
 			end
 			Result := l_mix_result.to_integer_16
+		ensure
+			Result_Valid: Result <= max_integer_16 and Result >= min_integer_16
 		end
 
 	fade(a_sound: LIST[INTEGER_16]; a_begin_length_percentage:REAL_64; a_end_length_percentage: REAL_64;
@@ -255,18 +281,22 @@ feature --Access
 				a_sound[i] := amplify_sample(a_sound[i], l_logarithmic_percentage_list[i - l_sample_index_begin + 1])
 				i := i + 1
 			end
+		ensure
+			Result_Valid: old a_sound.count = a_sound.count
 		end
 
 	get_logarithmic_percentage_list_from_linear_percentage_range(a_begin_volume_percentage: REAL_64;
 							 a_end_volume_percentage: REAL_64; a_number_of_samples: INTEGER_32): LIST[REAL_64]
+		require
+			Begin_Volume_Percentage_Valid: a_begin_volume_percentage >= 0
+			End_Volume_Percentage_Valid: a_end_volume_percentage >= 0
+			Number_Of_Samples_Valid: a_number_of_samples >= 0
 		local
 			l_logarithmic_percentage_list: LIST[REAL_64]
 			l_percentage_iteration: REAL_64
 			i: INTEGER_32
 		do
 			l_percentage_iteration := (a_end_volume_percentage - a_begin_volume_percentage) / a_number_of_samples
-			print(l_percentage_iteration)
-			io.put_new_line
 			create {ARRAYED_LIST[REAL_64]} l_logarithmic_percentage_list.make (a_number_of_samples)
 			from
 				i := 1
@@ -277,11 +307,9 @@ feature --Access
 					get_logarithmic_percentage_from_linear_percentage(a_begin_volume_percentage + (i * l_percentage_iteration)))
 				i := i + 1
 			end
---			across l_logarithmic_percentage_list as la_element loop
---				io.put_new_line
---				io.put_string(la_element.item.out)
---			end
 			Result := l_logarithmic_percentage_list
+		ensure
+			Result_Valid: Result.count = a_number_of_samples
 		end
 
 	get_logarithmic_percentage_from_linear_percentage(a_linear_percentage: REAL_64):REAL_64
@@ -299,7 +327,7 @@ feature --Access
 		--1 = no repetition
 		--Side effect on a_sound
 		require
-			a_repetition > 0
+			Repetition_Valid: a_repetition > 0
 		local
 			i: INTEGER_32
 			l_list:LIST[INTEGER_16]
@@ -322,7 +350,7 @@ feature --Access
 		--1 = no repetition
 		--Side effect on a_sound
 		require
-			duration_Valid: a_seconds > get_duration_from_number_of_samples(a_sound.count)
+			Duration_Valid: a_seconds >= 0
 		local
 			i: INTEGER_32
 			l_list:LIST[INTEGER_16]
@@ -347,7 +375,7 @@ feature --Access
 		--adds random numbers to a_sound
 		--side effect on a_sound
 		require
-			a_amplitude >= 0
+			Amplitude_Valid: a_amplitude >= 0
 		local
 			l_max_number: INTEGER_16
 			l_random_number: RANDOM
@@ -364,7 +392,8 @@ feature --Access
 				l_random_number.forth
 				i := i + 1
 			end
-
+		ensure
+			Result_Valid: old a_sound.count = a_sound.count
 		end
 
 	add_silence_from_seconds(a_sound: LIST[INTEGER_16]; a_seconds: REAL_64)
@@ -387,7 +416,7 @@ feature --Access
 		-- Adds a silence (zeros) of a_samples samples to a_sound.
 		-- Of course, it has a side effect on a_sound.
 		require
-			a_samples > 0
+			Samples_Valid: a_samples > 0
 		local
 			i: INTEGER_32
 		do
@@ -400,15 +429,13 @@ feature --Access
 				i := i + 1
 			end
 		ensure
-			Sound_Count_Valid: a_sound.count = old a_sound.count + get_number_of_samples_from_duration(a_samples)
 			At_Least_One_Zero: across a_sound as la_sound some la_sound.item = 0 end
 		end
 
 	get_max_number_from_amplitude(a_amplitude: REAL_32): INTEGER_16
 		--calculates the highest possible number for a given amplitude.
 		require
-			a_amplitude <= max_amplitude
-			a_amplitude >= 0
+			Amplitude_Valid: a_amplitude <= max_amplitude and a_amplitude >= 0
 		do
 			Result := (10^(a_amplitude / 20)).rounded.to_integer_16
 		end
@@ -416,8 +443,7 @@ feature --Access
 	get_wave_length_from_frequency(a_frequency: INTEGER_32): INTEGER_32
 		--calculates the wave's length (in samples) for a given frequency.
 		require
-			a_frequency <= max_frequency
-			a_frequency >= min_frequency
+			Frequency_Valid: a_frequency <= max_frequency and a_frequency >= min_frequency
 		do
 
 			Result := (sample_rate // a_frequency) * number_of_channels
@@ -426,11 +452,11 @@ feature --Access
 	get_number_of_samples_from_duration(a_seconds:REAL_64): INTEGER_32
 		-- calculates the number of samples during a_seconds seconds.s
 		require
-			a_seconds >= 0
+			Seconds_Valid: a_seconds >= 0
 		do
 			Result := (a_seconds * sample_rate).rounded
 		ensure
-			Result >= 0
+			Result_Valid: Result >= 0
 		end
 
 	get_duration_from_number_of_samples(a_samples: INTEGER_32):REAL_64
@@ -440,13 +466,13 @@ feature --Access
 		do
 			Result := a_samples / sample_rate
 		ensure
-			Result >= 0
+			Result_Valid: Result >= 0
 		end
 
 	get_sample_index_from_percentage(a_number_of_samples: INTEGER_32; a_percentage: REAL_64):INTEGER_32
 		-- calculates the index of the sample at a_percentages of a_number_of_samples.
 		require
-			a_percentage >= 0
+			Percentage_Valid: a_percentage >= 0
 		do
 			Result := (a_percentage * (a_number_of_samples - 1)).rounded + 1
 		end

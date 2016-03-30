@@ -1,5 +1,5 @@
 note
-	description: "Class that creates (generates) sounds for the game."
+	description: "Class that creates sounds for the game."
 	author: "Émilio G!"
 	date: "16-3-29"
 	revision: "16w08b"
@@ -16,6 +16,7 @@ create
 feature --Initialization
 
 	make
+		-- Initialization for `Current'. Nothing for now.
 		do
 
 		end
@@ -25,9 +26,9 @@ feature --Access
 	create_sound_menu_click:SOUND
 		--Method that creates a sound for a menu button click.
 		local
-			l_wave : LIST[INTEGER_16]
-			l_wave2: LIST[INTEGER_16]
-			l_wave3: LIST[INTEGER_16]
+			l_wave : CHAIN[INTEGER_16]
+			l_wave2: CHAIN[INTEGER_16]
+			l_wave3: CHAIN[INTEGER_16]
 			l_sound: SOUND
 			l_initial_frequency: INTEGER_32
 		do

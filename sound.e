@@ -3,6 +3,7 @@ note
 	author: "Émilio G!"
 	date: "16-02-23"
 	revision: "16w07b"
+	legal: "See notice at end of class."
 
 class
 	SOUND
@@ -15,7 +16,7 @@ create
 
 feature {NONE}
 
-	make (a_sound_data : LIST[INTEGER_16])
+	make (a_sound_data : CHAIN[INTEGER_16])
 		-- Initialization for `Current'.
 		-- Sets sound data and initializes features.
 		local
@@ -52,11 +53,13 @@ feature
 		--length in samples
 
 	channel_count:INTEGER_32
+		-- <Precursor>
 
 	frequency: INTEGER_32
 		-- in samples per second
 
 	bits_per_sample: INTEGER_32
+		-- <Precursor>
 
 	is_signed: BOOLEAN
 		-- is sound_data signed
@@ -74,6 +77,7 @@ feature
 		end
 
 	is_openable: BOOLEAN = False
+		-- <Precursor>
 
 	open
 		--nothing. This is actually useless but necessary to inherit from AUDIO_SOUND.
@@ -87,7 +91,6 @@ feature {AUDIO_LIBRARY_CONTROLLER}
 		--This method should only be called by AUDIO_LIBRARY_CONTROLLER.
 		--Side effect on a_buffer.
 		local
-			l_buffer: ARRAYED_LIST[INTEGER_16]
 			l_max: INTEGER_32
 			l_count: INTEGER_32
 			l_buffer_size: INTEGER_32
@@ -109,5 +112,7 @@ feature {AUDIO_LIBRARY_CONTROLLER}
 			end
 			last_buffer_size:= l_buffer_size
 		end
-
+note
+	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"
+	source: "[file: LICENSE]"
 end

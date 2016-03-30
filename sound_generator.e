@@ -16,6 +16,7 @@ create
 
 feature --Initialization
 	make
+		-- Initialization for `Current'. Sets some attributes.
 		do
 			max_frequency := sample_rate // 2
 			max_integer_16 := max_integer_16.Max_value
@@ -27,27 +28,37 @@ feature --Initialization
 feature --Access
 
 	sample_rate:INTEGER_32 = 44100
+		--number of samples playing per second
 
 	number_of_channels:INTEGER_32 = 1
+		--number of channels for the sound.
 
 	bits_per_sample:INTEGER_32 = 16
+		--number of bits per sample in the sound.
 
 	max_amplitude:REAL_64
+		--maximum amplitude (in relative dB) that can be expressed using INTEGER_16.
 		once
 			Result := 20 * log10(2^(bits_per_sample - 1) - 1)
 		end
 
 	max_frequency: INTEGER_32
+		--sample_rate // 2
 
 	min_frequency: INTEGER_32 = 20
+		--can't really hear below this frequency
 
 	max_integer_16: INTEGER_16
+		--Highest value for an INTEGER_16
 	min_integer_16: INTEGER_16
+		--Lowest value for an INTEGER_16
 
 	max_integer_32: INTEGER_32
+		--Highest value for an INTEGER_32
 	min_integer_32: INTEGER_32
+		--Lowest value for an INTEGER_32
 
-	create_square_wave(a_amplitude: REAL_32; a_frequency: INTEGER_32):LIST[INTEGER_16]
+	create_square_wave(a_amplitude: REAL_32; a_frequency: INTEGER_32):CHAIN[INTEGER_16]
 		--Method that creates a single square wave and returns it as a list of INTEGER_16
 		-- amplitude is in (relative) dB, frequency is in Hz
 		require
@@ -89,7 +100,7 @@ feature --Access
 			Result_Valid: Result.count = get_wave_length_from_frequency(a_frequency)
 		end
 
-	create_sine_wave(a_amplitude: REAL_32; a_frequency: INTEGER_32):LIST[INTEGER_16]
+	create_sine_wave(a_amplitude: REAL_32; a_frequency: INTEGER_32):CHAIN[INTEGER_16]
 		--Method that creates a sine square wave and returns it as a list of INTEGER_16
 		-- amplitude is in (relative) dB, frequency is in Hz
 		require
@@ -119,7 +130,7 @@ feature --Access
 			Result_Valid: Result.count = get_wave_length_from_frequency(a_frequency)
 		end
 
-	create_triangle_wave(a_amplitude: REAL_32; a_frequency: INTEGER_32):LIST[INTEGER_16]
+	create_triangle_wave(a_amplitude: REAL_32; a_frequency: INTEGER_32):CHAIN[INTEGER_16]
 		--Method that creates a triangle square wave and returns it as a list of INTEGER_16
 		-- amplitude is in (relative) dB, frequency is in Hz
 		require
@@ -164,7 +175,7 @@ feature --Access
 			Result_Valid: Result.count = get_wave_length_from_frequency(a_frequency)
 		end
 
-	amplify_wave(a_sound: LIST[INTEGER_16]; a_amp_value: REAL_64)
+	amplify_wave(a_sound: CHAIN[INTEGER_16]; a_amp_value: REAL_64)
 		--amplifies a_sound by multiplicating a_sound[i] with a_amp_value
 		--side effect on a_sound
 		require
@@ -201,7 +212,7 @@ feature --Access
 			Result_Valid: Result <= max_integer_16 and Result >= min_integer_16
 		end
 
-	mix(a_sound1: LIST[INTEGER_16]; a_sound2: LIST[INTEGER_16]; a_percentage: REAL_64)
+	mix(a_sound1: CHAIN[INTEGER_16]; a_sound2: CHAIN[INTEGER_16]; a_percentage: REAL_64)
 		-- Mixes two waves by adding up a_sound2[i] to a_sound2[i].
 		-- if there is overflow, caps the amplitude.
 		--COMPLETE DOC
@@ -237,6 +248,7 @@ feature --Access
 		end
 
 	add_up(a_sample1: INTEGER_16; a_sample2: INTEGER_16): INTEGER_16
+		--makes the sum of two samples and caps if necessary, then returns the result.
 		local
 			l_mix_result: INTEGER_32
 		do
@@ -251,7 +263,7 @@ feature --Access
 			Result_Valid: Result <= max_integer_16 and Result >= min_integer_16
 		end
 
-	fade(a_sound: LIST[INTEGER_16]; a_begin_length_percentage:REAL_64; a_end_length_percentage: REAL_64;
+	fade(a_sound: CHAIN[INTEGER_16]; a_begin_length_percentage:REAL_64; a_end_length_percentage: REAL_64;
 				  a_begin_volume_percentage: REAL_64; a_end_volume_percentage:REAL_64;)
 		-- fades (a_begin_length_percentage % to a_length_end_percentage) from (a_begin_volume_percentage % to a_end_volume_percentage %)
 		-- of the sound. Fade out or fade in.
@@ -287,6 +299,8 @@ feature --Access
 
 	get_logarithmic_percentage_list_from_linear_percentage_range(a_begin_volume_percentage: REAL_64;
 							 a_end_volume_percentage: REAL_64; a_number_of_samples: INTEGER_32): LIST[REAL_64]
+		--Calculates the logarithmic value for each linear percentage value of 1 to a_number_of_sample
+		--using the linear scaling from a_begin_volume_percentage to a_end_volume_percentage... yeah.
 		require
 			Begin_Volume_Percentage_Valid: a_begin_volume_percentage >= 0
 			End_Volume_Percentage_Valid: a_end_volume_percentage >= 0
@@ -313,6 +327,7 @@ feature --Access
 		end
 
 	get_logarithmic_percentage_from_linear_percentage(a_linear_percentage: REAL_64):REAL_64
+		--returns the logarithmic percentage for perception of sound from a linear percentage.
 		require
 			Linear_Percentage_Valid: a_linear_percentage <= 1 and a_linear_percentage >= 0
 		do
@@ -322,7 +337,7 @@ feature --Access
 			end
 		end
 
-	repeat_wave_from_repetitions(a_sound: LIST[INTEGER_16]; a_repetition: INTEGER_32)
+	repeat_wave_from_repetitions(a_sound: CHAIN[INTEGER_16]; a_repetition: INTEGER_32)
 		--Appends a copy of a_sound to a_sound (a_repetition - 1) duration(s).
 		--1 = no repetition
 		--Side effect on a_sound
@@ -330,7 +345,7 @@ feature --Access
 			Repetition_Valid: a_repetition > 0
 		local
 			i: INTEGER_32
-			l_list:LIST[INTEGER_16]
+			l_list:CHAIN[INTEGER_16]
 		do
 			l_list := a_sound.twin
 			from
@@ -345,7 +360,7 @@ feature --Access
 			Repetition_Valid: a_sound.count = old a_sound.count * a_repetition
 		end
 
-	repeat_wave_from_duration(a_sound: LIST[INTEGER_16]; a_seconds: REAL_64)
+	repeat_wave_from_duration(a_sound: CHAIN[INTEGER_16]; a_seconds: REAL_64)
 		--Repeats a_sound until it lasts a_seconds seconds.
 		--1 = no repetition
 		--Side effect on a_sound
@@ -353,7 +368,7 @@ feature --Access
 			Duration_Valid: a_seconds >= 0
 		local
 			i: INTEGER_32
-			l_list:LIST[INTEGER_16]
+			l_list:CHAIN[INTEGER_16]
 			l_initial_sound_length: INTEGER_32
 			l_number_of_silence_samples: INTEGER_32
 		do
@@ -371,7 +386,7 @@ feature --Access
 			Repetition_Valid: a_sound.count =get_number_of_samples_from_duration(a_seconds)
 		end
 
-	add_noise(a_sound:LIST[INTEGER_16]; a_amplitude:INTEGER_32)
+	add_noise(a_sound:CHAIN[INTEGER_16]; a_amplitude:INTEGER_32)
 		--adds random numbers to a_sound
 		--side effect on a_sound
 		require
@@ -396,7 +411,7 @@ feature --Access
 			Result_Valid: old a_sound.count = a_sound.count
 		end
 
-	add_silence_from_seconds(a_sound: LIST[INTEGER_16]; a_seconds: REAL_64)
+	add_silence_from_seconds(a_sound: CHAIN[INTEGER_16]; a_seconds: REAL_64)
 		-- Adds a silence (zeros) of a_seconds seconds to a_sound.
 		-- Of course, it has a side effect on a_sound.
 		require
@@ -412,7 +427,7 @@ feature --Access
 			At_Least_One_Zero: across a_sound as la_sound some la_sound.item = 0 end
 		end
 
-	add_silence_from_samples(a_sound: LIST[INTEGER_16]; a_samples: INTEGER_32)
+	add_silence_from_samples(a_sound: CHAIN[INTEGER_16]; a_samples: INTEGER_32)
 		-- Adds a silence (zeros) of a_samples samples to a_sound.
 		-- Of course, it has a side effect on a_sound.
 		require
@@ -478,7 +493,7 @@ feature --Access
 		end
 
 feature --debug
-	print_wave(a_wave: LIST[INTEGER_16])
+	print_wave(a_wave: CHAIN[INTEGER_16])
 		--prints the wave in the console
 		local
 			i: INTEGER_32

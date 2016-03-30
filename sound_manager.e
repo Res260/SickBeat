@@ -1,8 +1,8 @@
 note
 	description: "Class that manages sounds/musics for the game."
 	author: "Émilio G!"
-	date: "16-02-22"
-	revision: "16w07a"
+	date: "16-02-29"
+	revision: "16w08a"
 
 class
 	SOUND_MANAGER
@@ -16,6 +16,7 @@ create
 feature {NONE}
 
 	make
+		-- Initialization for `Current'. Enables the audio_library.
 		do
 			sound_on := TRUE
 			audio_library.enable_sound
@@ -25,7 +26,7 @@ feature {NONE}
 
 feature -- Access
 
-	sound_on:BOOLEAN
+	sound_on:BOOLEAN --boolean (doesnt work for now) that is true when sound is on.
 
 	toggle_sound
 		--toggle if sound plays or not
@@ -57,7 +58,7 @@ feature -- Access
 		end
 
 	run
-			--do `Current's job
+			--do `Current's job... nothing to see here for now.
 		do
 
 		end

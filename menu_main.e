@@ -43,6 +43,9 @@ feature {NONE} -- Implementation
 		do
 			io.put_string("Options clicked!%N")
 			menu_audio_source.queue_sound(menu_sound)
+			if(menu_audio_source.is_playing) then
+				menu_audio_source.stop
+			end
 			menu_audio_source.play
 		end
 

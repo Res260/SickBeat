@@ -3,6 +3,7 @@ note
 	author: "Guillaume Jean"
 	date: "15 March 2016"
 	revision: "16w07a"
+	legal: "See notice at end of class."
 
 class
 	BACKGROUND
@@ -33,4 +34,7 @@ feature -- Implementation
 															     		 0, 0, context.window.width, context.window.height)
 			end
 		end
+note
+	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"
+	source: "[file: LICENSE]"
 end

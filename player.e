@@ -3,6 +3,7 @@ note
 	author: "Guillaume Jean"
 	date: "27 March 2016"
 	revision: "16w08a"
+	legal: "See notice at end of class."
 
 class
 	PLAYER
@@ -85,4 +86,7 @@ feature -- Access
 		do
 			color := a_color
 		end
+note
+	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"
+	source: "[file: LICENSE]"
 end

@@ -3,6 +3,7 @@ note
 	author: "Guillaume Jean"
 	date: "29 March 2016"
 	revision: "16w08a"
+	legal: "See notice at end of class."
 
 class
 	MAP
@@ -27,4 +28,7 @@ feature {NONE} -- Implementation
 	context: CONTEXT
 			-- Graphical context of the application (renderer, window and ressource_factory)
 
+note
+	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"
+	source: "[file: LICENSE]"
 end

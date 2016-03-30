@@ -3,6 +3,7 @@ note
 	author: "Guillaume Jean"
 	date: "21 March 2016"
 	revision: "16w08a"
+	legal: "See notice at end of class."
 
 deferred class
 	MENU
@@ -299,4 +300,7 @@ invariant
 	Pressed_Button_Valid: 0 <= pressed_button and pressed_button <= buttons.count
 	Released_Button_Valid: 0 <= released_button and released_button <= buttons.count
 	Clicked_Button_Valid: 0 <= clicked_button and clicked_button <= buttons.count
+note
+	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"
+	source: "[file: LICENSE]"
 end

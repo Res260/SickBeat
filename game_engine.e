@@ -3,6 +3,7 @@ note
 	author: "Guillaume Jean"
 	date: "22 March 2016"
 	revision: "16w08a"
+	legal: "See notice at end of class."
 
 class
 	GAME_ENGINE
@@ -374,4 +375,7 @@ feature -- Access
 
 	drawables: LIST[DRAWABLE]
 			-- List of all objects to render every frame
+note
+	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"
+	source: "[file: LICENSE]"
 end

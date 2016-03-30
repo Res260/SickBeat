@@ -1,11 +1,11 @@
 note
-	description: "{MENU} implemented for the user to decide whether he's playing or configuring the game."
+	description: "{MENU} implemented for the user to configure the game while playing."
 	author: "Guillaume Jean"
-	date: "21 March 2016"
-	revision: "16w08b"
+	date: "24 March 2016"
+	revision: "16w08a"
 
 class
-	MENU_MAIN
+	MENU_PAUSE
 
 inherit
 	MENU
@@ -23,20 +23,19 @@ feature {NONE} -- Initialization
 			-- Initialization of `Current'
 		do
 			Precursor(a_context)
-			set_title("SickBeat")
-			add_button("Play", agent play_action)
+			set_title("SickBeat - Pause")
+			add_button("Return to game", agent return_action)
 			add_button("Options", agent options_action)
-			add_button("Exit", agent exit_action)
+			add_button("Leave to main menu", agent leave_action)
 		end
 
 feature {NONE} -- Implementation
 
-	play_action(a_string: READABLE_STRING_GENERAL)
+	leave_action(a_string: READABLE_STRING_GENERAL)
 			-- Action played when the user clicks the Play button
 		do
-			io.put_string("Play clicked!%N")
-			create {MENU_PLAY} next_menu.make(context)
-			continue_to_next
+			io.put_string("Leave to main menu clicked!%N")
+			return_to_main
 		end
 
 	options_action(a_string: READABLE_STRING_GENERAL)
@@ -45,10 +44,10 @@ feature {NONE} -- Implementation
 			io.put_string("Options clicked!%N")
 		end
 
-	exit_action(a_string: READABLE_STRING_GENERAL)
+	return_action(a_string: READABLE_STRING_GENERAL)
 			-- Action played when the user clicks the Exit button
 		do
-			io.put_string("Exit clicked!%N")
-			close_program
+			io.put_string("Return clicked!%N")
+			return_menu
 		end
 end

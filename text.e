@@ -16,6 +16,7 @@ create
 feature {NONE} -- Initialization
 
 	make(a_text: READABLE_STRING_GENERAL; a_color: GAME_COLOR; a_context: CONTEXT)
+			-- Initialization of `Current' with a string and a color
 		do
 			make_drawable(0, 0, Void, a_context)
 			text := a_text
@@ -33,7 +34,8 @@ feature -- Access
 			-- String of the text used when drawing
 
 	change(a_x, a_y, a_font_size: INTEGER)
-			-- Change `Current's position to specified x and y
+			-- Change `Current's position to specified x, y and font_size
+			-- Recreates the text {GAME_TEXTURE}
 		local
 			l_font: TEXT_FONT
 			l_text_surface: TEXT_SURFACE_BLENDED
@@ -44,8 +46,6 @@ feature -- Access
 			create l_text_surface.make(text, l_font, text_color)
 			if l_text_surface.is_open then
 				create texture.make_from_surface(context.renderer, l_text_surface)
-			else
-				has_error := True
 			end
 		end
 end

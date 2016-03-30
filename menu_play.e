@@ -14,11 +14,13 @@ inherit
 		end
 
 create
-	make
+	make,
+	make_as_main
 
 feature {NONE} -- Initialization
 
 	make(a_context: CONTEXT)
+			-- Initialization of `Current'
 		do
 			Precursor(a_context)
 			set_title("SickBeat - Play")
@@ -30,19 +32,21 @@ feature {NONE} -- Initialization
 feature {NONE} -- Implementation
 
 	singleplayer_action(a_string: READABLE_STRING_GENERAL)
-			-- Action played when the user clicks the Play button
+			-- Action played when the user clicks the Singleplayer button
 		do
 			io.put_string("Singleplayer clicked!%N")
+			create {GAME_ENGINE} next_menu.make(context)
+			continue_to_next
 		end
 
 	multiplayer_action(a_string: READABLE_STRING_GENERAL)
-			-- Action played when the user clicks the Options button
+			-- Action played when the user clicks the Multiplayer button
 		do
 			io.put_string("Multiplayer clicked!%N")
 		end
 
 	return_action(a_string: READABLE_STRING_GENERAL)
-			-- Action played when the user clicks the Exit button
+			-- Action played when the user clicks the Return button
 		do
 			io.put_string("Return clicked!%N")
 			return_menu

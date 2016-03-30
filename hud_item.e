@@ -7,4 +7,10 @@ note
 class
 	HUD_ITEM
 
+inherit
+	DRAWABLE
+
+create
+	make_drawable
+
 end

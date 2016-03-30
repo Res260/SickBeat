@@ -17,7 +17,7 @@ create
 feature {NONE} -- Initialization
 
 	make
-			-- Run application.
+			-- Run application
 		do
 			game_library.enable_video
 			text_library.enable_text
@@ -53,7 +53,7 @@ feature {NONE} -- Initialization
 				io.error.put_string("An error occured while loading ressources.%N")
 			else
 				create l_context.make(l_window, l_ressource_factory)
-				create {MENU_MAIN} l_main_menu.make(l_context)
+				create {MENU_MAIN} l_main_menu.make_as_main(l_context)
 				l_main_menu.start
 			end
 		end

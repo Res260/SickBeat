@@ -57,10 +57,8 @@ feature {NONE} -- Constants
 feature {NONE} -- Initialization
 
 	make(a_renderer: GAME_RENDERER; a_format: GAME_PIXEL_FORMAT_READABLE)
-			-- Initialization of `Current' using `a_renderer' and `a_format'
-			-- to initialize images.
+			-- Initialization of `Current' using `a_renderer' and `a_format' to initialize images and sounds.
 		do
-			-- Init all images/sounds
 			menu_background := load_image(a_renderer, "main_menu", "background")
 			game_background := load_image(a_renderer, "game", "background")
 		end
@@ -71,12 +69,13 @@ feature -- Access
 			-- Previous action caused an error
 
 	menu_background: detachable GAME_TEXTURE
-			-- Texture used for every menus' background
+			-- Texture used for every {MENU}s' background
 
 	game_background: detachable GAME_TEXTURE
 			-- Texture used for the game's background
 
 	menu_font(a_size: INTEGER): TEXT_FONT
+			-- Generate a {TEXT_FONT} of size `a_size' in pixels for the menus
 		local
 			l_path: PATH
 		do
@@ -87,6 +86,8 @@ feature -- Access
 			create Result.make(l_path.name, a_size)
 			if Result.is_openable then
 				Result.open
+			else
+				has_error := True
 			end
 		ensure
 			Font_Is_Open: Result.is_open
@@ -95,7 +96,7 @@ feature -- Access
 feature {NONE} -- Implementation
 
 	load_image(a_renderer: GAME_RENDERER; a_sub_folder, a_image_name: READABLE_STRING_GENERAL): detachable GAME_TEXTURE
-			-- Loading the image named `a_image_name' into RAM.
+			-- Loading the {GAME_TEXTURE} named `a_image_name' from `a_sub_folder' into RAM.
 		local
 			l_image: IMG_IMAGE_FILE
 			l_path: PATH
@@ -111,7 +112,11 @@ feature {NONE} -- Implementation
 				l_image.open
 				if l_image.is_open then
 					create Result.make_from_image (a_renderer, l_image)
+				else
+					has_error := True
 				end
+			else
+				has_error := True
 			end
 		ensure
 			Result_Has_No_Error: attached Result as result_img and then not result_img.has_error

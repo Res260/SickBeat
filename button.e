@@ -22,6 +22,7 @@ feature {NONE} -- Initialization
 			a_text: READABLE_STRING_GENERAL; a_color: GAME_COLOR; a_context: CONTEXT;
 			a_action: PROCEDURE[ANY, TUPLE[READABLE_STRING_GENERAL]]
 		)
+			-- Basic creation of a {BUTTON}
 		do
 			make_text(a_text, a_color, a_context)
 			button_action := a_action
@@ -33,6 +34,17 @@ feature {NONE} -- Implementation
 			-- Procedure called by the button when a click happens on the button
 
 feature -- Access
+
+	point_in_button(a_x, a_y: INTEGER): BOOLEAN
+			-- Returns whether or not the point is in the button
+		local
+			l_result: BOOLEAN
+		do
+			if x < a_x and y < a_y and x + width > a_x and y + height > a_y then
+				l_result := True
+			end
+			Result := l_result
+		end
 
 	do_click
 			-- Procedure called when a click happens on the button

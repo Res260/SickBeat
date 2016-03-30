@@ -28,8 +28,8 @@ feature {NONE} -- Initialization
 			create background.make(context.ressource_factory.menu_background, context)
 			create {LINKED_LIST[BUTTON]} buttons.make
 			update_buttons_dimension
-			sound_engine.create_audio_source
-			menu_audio_source := sound_engine.last_audio_source
+			sound_manager.create_audio_source
+			menu_audio_source := sound_manager.last_audio_source
 			menu_sound := sound_factory.create_sound_menu_click
 		ensure
 			context = a_context

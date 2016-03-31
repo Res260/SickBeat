@@ -20,15 +20,17 @@ create
 
 feature {NONE} -- Initialization
 
-	make(a_x, a_y, a_direction, a_angle, a_max_radius: REAL_64; a_color: GAME_COLOR; a_context: CONTEXT)
+	make(a_x, a_y, a_direction, a_angle, a_max_radius: REAL_64; a_center_speed: TUPLE[x, y: REAL_64]; a_color: GAME_COLOR; a_context: CONTEXT)
 			-- Initialize `Current' with a direction, angle, maximum radius, and color
 		do
 			make_entity(a_x, a_y, a_context)
 			direction := a_direction
 			angle := a_angle
 			max_radius := a_max_radius
-			color := a_color
+			create color.make_from_other(a_color)
 			radius := 0
+			lifetime := initial_lifetime
+			center_speed := a_center_speed
 		end
 
 feature {NONE} -- Basic Operations
@@ -64,6 +66,21 @@ feature {NONE} -- Basic Operations
 
 feature -- Access
 
+	alpha: NATURAL_8
+			-- Alpha channel of `Current'
+
+	lifetime: REAL_64
+			-- Time left for `Current' to survive
+
+	initial_lifetime: REAL_64 = 10.0
+			-- Initial `lifetime'
+
+	center_speed: TUPLE[x, y: REAL_64]
+			-- Speed of the moving arc center
+
+	radius_speed: REAL_64 = 100.0
+			-- Radius incrementation speed of `Current's arc
+
 	direction: REAL_64
 			-- Direction of `Current's arc
 
@@ -91,6 +108,7 @@ feature -- Access
 		do
 			l_previous_color := context.renderer.drawing_color
 
+			color.set_alpha(alpha)
 			context.renderer.set_drawing_color(color)
 			draw_arc(x_real, y_real, direction - angle / 2, direction + angle / 2, radius, 40, context.renderer)
 
@@ -103,8 +121,12 @@ feature -- Access
 		require else
 			Still_In_Screen: not hit_max
 		do
-			radius := radius + (50 * a_timediff)
-			if radius ^ 2 > max_radius then
+			x_real := x_real + (center_speed.x * a_timediff)
+			y_real := y_real + (center_speed.y * a_timediff)
+			radius := radius + (radius_speed * a_timediff)
+			lifetime := (0.0).max(lifetime - a_timediff)
+			alpha := (255 * lifetime / initial_lifetime).rounded.as_natural_8
+			if radius ^ 2 > max_radius or alpha = 0 then
 				hit_max := True
 			end
 		end

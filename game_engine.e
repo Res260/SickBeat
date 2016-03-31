@@ -116,14 +116,11 @@ feature {NONE} -- Implementation
 		do
 			create l_to_remove.make
 			across entities as la_entities loop
+				la_entities.item.update(time_since_last)
 				if attached {WAVE} la_entities.item as la_wave then
 					if la_wave.hit_max then
 						l_to_remove.extend(la_wave)
-					else
-						la_entities.item.update(time_since_last)
 					end
-				else
-					la_entities.item.update(time_since_last)
 				end
 			end
 			from
@@ -262,15 +259,19 @@ feature {NONE} -- Implementation
 			l_max_radius: REAL_64
 			l_x: INTEGER
 			l_y: INTEGER
+			l_speed: TUPLE[x, y: REAL_64]
 		do
 			if a_mouse_state.is_left_button_pressed then
-				l_angle := Pi_4
+				l_angle := 2 * Pi
 				l_x := a_mouse_state.x - current_player.x_real.rounded
 				l_y := a_mouse_state.y - current_player.y_real.rounded
 				l_direction := calculate_circle_angle(l_x, l_y)
 				l_max_radius := calculate_furthest_corner_distance(current_player.x_real, current_player.y_real)
+				create l_speed
+				l_speed.x := current_player.speed.x * 0.75
+				l_speed.y := current_player.speed.y * 0.75
 				if attached {GAME_COLOR} wave_colors.at(current_color_index + 1) as la_color then
-					create l_wave.make(current_player.x_real, current_player.y_real, l_direction, l_angle, l_max_radius, la_color, context)
+					create l_wave.make(current_player.x_real, current_player.y_real, l_direction, l_angle, l_max_radius, l_speed, la_color, context)
 					entities.extend(l_wave)
 					drawables.extend(l_wave)
 				end
@@ -294,6 +295,17 @@ feature {NONE} -- Implementation
 		end
 
 feature -- Basic Operations
+
+--	calculate_speed_sum(a_speed1: TUPLE[direction, quantity: REAL_64]; a_speed2: TUPLE[x, y: REAL_64]): REAL_64
+--			-- Calculates the sum of a directed speed and a speed vector. Returns a directed speed.
+--		local
+--			l_result_x: REAL_64
+--			l_result_y: REAL_64
+--		do
+--			l_result_x := (a_speed1.quantity * cosine(a_speed1.direction)) + a_speed2.x
+--			l_result_y := (a_speed1.quantity * sine(a_speed1.direction)) + a_speed2.y
+--			Result := sqrt((l_result_x ^ 2) + (l_result_y ^ 2))
+--		end
 
 	calculate_circle_angle(a_x, a_y: INTEGER): REAL_64
 			-- Correctly handles arc_tangent negatives

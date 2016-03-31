@@ -48,6 +48,7 @@ feature {NONE} -- Initialization
 			l_window_builder.must_renderer_synchronize_update := True
 			l_window_builder.title := "SickBeat"
 			l_window := l_window_builder.generate_window
+			l_window.renderer.enable_alpha_blending
 			create l_ressource_factory.make(l_window.renderer, l_window.pixel_format)
 			if l_ressource_factory.has_error then
 				io.error.put_string("An error occured while loading ressources.%N")

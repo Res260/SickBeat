@@ -262,16 +262,15 @@ feature {NONE} -- Implementation
 			l_speed: TUPLE[x, y: REAL_64]
 		do
 			if a_mouse_state.is_left_button_pressed then
-				l_angle := 2 * Pi
+				l_angle := Pi_4
 				l_x := a_mouse_state.x - current_player.x_real.rounded
 				l_y := a_mouse_state.y - current_player.y_real.rounded
 				l_direction := calculate_circle_angle(l_x, l_y)
-				l_max_radius := calculate_furthest_corner_distance(current_player.x_real, current_player.y_real)
 				create l_speed
 				l_speed.x := current_player.speed.x * 0.75
 				l_speed.y := current_player.speed.y * 0.75
 				if attached {GAME_COLOR} wave_colors.at(current_color_index + 1) as la_color then
-					create l_wave.make(current_player.x_real, current_player.y_real, l_direction, l_angle, l_max_radius, l_speed, la_color, context)
+					create l_wave.make(current_player.x_real, current_player.y_real, l_direction, l_angle, l_speed, la_color, context)
 					entities.extend(l_wave)
 					drawables.extend(l_wave)
 				end
@@ -333,25 +332,25 @@ feature -- Basic Operations
 			Result := l_angle
 		end
 
-	calculate_furthest_corner_distance(a_point: TUPLE[x, y: REAL_64]): REAL_64
-			-- Finds the furthest corner of the screen from the point
-		local
-			l_x_width_dist: REAL_64
-			l_y_height_dist: REAL_64
-			l_x_dist: REAL_64
-			l_y_dist: REAL_64
-			l_x_max, l_y_max: REAL_64
-			l_result: REAL_64
-		do
-			l_x_width_dist := (context.window.width - a_point.x) ^ 2
-			l_y_height_dist := (context.window.height - a_point.y) ^ 2
-			l_x_dist := a_point.x ^ 2
-			l_y_dist := a_point.y ^ 2
-			l_x_max := l_x_width_dist.max(l_x_dist)
-			l_y_max := l_y_height_dist.max(l_y_dist)
-			l_result := l_x_max + l_y_max
-			Result := l_result
-		end
+--	calculate_furthest_corner_distance(a_point: TUPLE[x, y: REAL_64]): REAL_64
+--			-- Finds the furthest corner of the screen from the point
+--		local
+--			l_x_width_dist: REAL_64
+--			l_y_height_dist: REAL_64
+--			l_x_dist: REAL_64
+--			l_y_dist: REAL_64
+--			l_x_max, l_y_max: REAL_64
+--			l_result: REAL_64
+--		do
+--			l_x_width_dist := (context.window.width - a_point.x) ^ 2
+--			l_y_height_dist := (context.window.height - a_point.y) ^ 2
+--			l_x_dist := a_point.x ^ 2
+--			l_y_dist := a_point.y ^ 2
+--			l_x_max := l_x_width_dist.max(l_x_dist)
+--			l_y_max := l_y_height_dist.max(l_y_dist)
+--			l_result := l_x_max + l_y_max
+--			Result := l_result
+--		end
 
 feature -- Initialization
 

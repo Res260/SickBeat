@@ -20,13 +20,12 @@ create
 
 feature {NONE} -- Initialization
 
-	make(a_x, a_y, a_direction, a_angle, a_max_radius: REAL_64; a_center_speed: TUPLE[x, y: REAL_64]; a_color: GAME_COLOR; a_context: CONTEXT)
+	make(a_x, a_y, a_direction, a_angle: REAL_64; a_center_speed: TUPLE[x, y: REAL_64]; a_color: GAME_COLOR; a_context: CONTEXT)
 			-- Initialize `Current' with a direction, angle, maximum radius, and color
 		do
 			make_entity(a_x, a_y, a_context)
 			direction := a_direction
 			angle := a_angle
-			max_radius := a_max_radius
 			create color.make_from_other(a_color)
 			radius := 0
 			lifetime := initial_lifetime
@@ -72,7 +71,7 @@ feature -- Access
 	lifetime: REAL_64
 			-- Time left for `Current' to survive
 
-	initial_lifetime: REAL_64 = 10.0
+	initial_lifetime: REAL_64 = 5.0
 			-- Initial `lifetime'
 
 	center_speed: TUPLE[x, y: REAL_64]
@@ -89,9 +88,6 @@ feature -- Access
 
 	radius: REAL_64
 			-- Radius of `Current's arc
-
-	max_radius: REAL_64
-			-- Squared maximum radius of `Current's arc
 
 	hit_max: BOOLEAN
 			-- Whether or not `Current's radius has surpassed it's maximum radius
@@ -126,7 +122,7 @@ feature -- Access
 			radius := radius + (radius_speed * a_timediff)
 			lifetime := (0.0).max(lifetime - a_timediff)
 			alpha := (255 * lifetime / initial_lifetime).rounded.as_natural_8
-			if radius ^ 2 > max_radius or alpha = 0 then
+			if lifetime <= 0 then
 				hit_max := True
 			end
 		end

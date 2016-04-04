@@ -3,6 +3,7 @@ note
 	author: "Guillaume Jean"
 	date: "Tue, 15 March 2016 21:05"
 	revision: "16w07a"
+	legal: "See notice at end of class."
 
 class
 	CONTEXT
@@ -29,4 +30,8 @@ feature -- Access
 
 	ressource_factory: RESSOURCE_FACTORY
 			-- The application's ressource factory
+invariant
+note
+	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"
+	source: "[file: LICENSE]"
 end

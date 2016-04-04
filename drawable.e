@@ -3,6 +3,7 @@ note
 	author: "Guillaume Jean"
 	date: "14 March 2016"
 	revision: "16w07a"
+	legal: "See notice at end of class."
 
 deferred class
 	DRAWABLE
@@ -64,4 +65,7 @@ feature -- Access
 				context.renderer.draw_texture(la_texture, x, y)
 			end
 		end
+note
+	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"
+	source: "[file: LICENSE]"
 end

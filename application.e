@@ -3,6 +3,7 @@ note
 	author: "Guillaume Jean"
 	date: "21 March 2016"
 	revision: "16w08a"
+	legal: "See notice at end of class."
 
 class
 	APPLICATION
@@ -58,4 +59,7 @@ feature {NONE} -- Initialization
 				l_main_menu.start
 			end
 		end
+note
+	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"
+	source: "[file: LICENSE]"
 end

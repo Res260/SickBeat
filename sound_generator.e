@@ -51,11 +51,13 @@ feature --Access
 
 	max_integer_16: INTEGER_16
 		--Highest value for an INTEGER_16
+
 	min_integer_16: INTEGER_16
 		--Lowest value for an INTEGER_16
 
 	max_integer_32: INTEGER_32
 		--Highest value for an INTEGER_32
+
 	min_integer_32: INTEGER_32
 		--Lowest value for an INTEGER_32
 
@@ -145,7 +147,6 @@ feature --Access
 			l_highest_number: INTEGER_16
 			l_max_range: INTEGER_32
 			l_wave: ARRAYED_LIST[INTEGER_16]
-			l_second_half_begin_index: INTEGER_32
 			i: INTEGER_32
 		do
 			l_length := (sample_rate // a_frequency) * number_of_channels
@@ -226,7 +227,6 @@ feature --Access
 			i: INTEGER_32
 			j: INTEGER_32
 			l_length_difference: INTEGER_32
-			l_mix_result: INTEGER_32
 			l_first_sample_number: INTEGER_32
 		do
 			l_first_sample_number := get_sample_index_from_percentage(a_sound1.count, a_percentage)
@@ -369,7 +369,6 @@ feature --Access
 			Duration_Valid: a_seconds >= 0
 		local
 			i: INTEGER_32
-			l_list:CHAIN[INTEGER_16]
 			l_initial_sound_length: INTEGER_32
 			l_number_of_silence_samples: INTEGER_32
 		do
@@ -418,7 +417,6 @@ feature --Access
 		require
 			Seconds_Valid: a_seconds > 0
 		local
-			i: INTEGER_32
 			l_number_of_silence_samples: INTEGER_32
 		do
 			l_number_of_silence_samples := get_number_of_samples_from_duration(a_seconds)
@@ -493,7 +491,7 @@ feature --Access
 			Result := (a_percentage * (a_number_of_samples - 1)).rounded + 1
 		end
 
-feature --debug
+feature -- Debug
 	print_wave(a_wave: CHAIN[INTEGER_16])
 		--prints the wave in the console
 		local
@@ -530,6 +528,10 @@ feature --debug
 			print(" samples ^^^^^^^^^^^^^^^^^^^^")
 			print("%N-------------------------------------------%N")
 		end
+
+invariant
+	max_frequency_valid: max_frequency = sample_rate // 2
+
 note
 	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"
 	source: "[file: LICENSE]"

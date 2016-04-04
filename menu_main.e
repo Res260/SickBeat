@@ -3,6 +3,7 @@ note
 	author: "Guillaume Jean"
 	date: "21 March 2016"
 	revision: "16w08b"
+	legal: "See notice at end of class."
 
 class
 	MENU_MAIN
@@ -57,4 +58,7 @@ feature {NONE} -- Implementation
 			io.put_string("Exit clicked!%N")
 			close_program
 		end
+note
+	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"
+	source: "[file: LICENSE]"
 end

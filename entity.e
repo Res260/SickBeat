@@ -3,6 +3,7 @@ note
 	author: "Guillaume Jean"
 	date: "23 March 2016"
 	revision: "16w08a"
+	legal: "See notice at end of class."
 
 deferred class
 	ENTITY
@@ -47,4 +48,7 @@ feature -- Access
 			y_real := a_new_y
 			y := a_new_y.rounded
 		end
+note
+	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"
+	source: "[file: LICENSE]"
 end

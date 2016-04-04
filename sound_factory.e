@@ -28,8 +28,6 @@ feature --Access
 		--Method that creates a sound for a menu button click.
 		local
 			l_wave : CHAIN[INTEGER_16]
-			l_wave2: CHAIN[INTEGER_16]
-			l_wave3: CHAIN[INTEGER_16]
 			l_sound: SOUND
 			l_initial_frequency: INTEGER_32
 		do
@@ -40,6 +38,7 @@ feature --Access
 			create l_sound.make(l_wave)
 			Result:= l_sound
 		end
+		
 note
 	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"
 	source: "[file: LICENSE]"

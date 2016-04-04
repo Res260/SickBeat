@@ -3,6 +3,7 @@ note
 	author: "Guillaume Jean"
 	date: "15 March 2016"
 	revision: "16w07a"
+	legal: "See notice at end of class."
 
 class
 	BUTTON
@@ -51,4 +52,7 @@ feature -- Access
 		do
 			button_action(text)
 		end
+note
+	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"
+	source: "[file: LICENSE]"
 end

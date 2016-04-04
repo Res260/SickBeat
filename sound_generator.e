@@ -494,6 +494,7 @@ feature --Access
 feature -- Debug
 	print_wave(a_wave: CHAIN[INTEGER_16])
 		--prints the wave in the console
+		--pls forgive me for le big method i didnt want to sry :'( pls show mercy
 		local
 			i: INTEGER_32
 			j: INTEGER_32

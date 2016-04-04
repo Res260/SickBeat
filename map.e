@@ -21,10 +21,12 @@ feature {NONE} -- Initialization
 
 feature {NONE} -- Implementation
 
-	background: BACKGROUND
-			-- Background of `Current'
-
 	context: CONTEXT
 			-- Graphical context of the application (renderer, window and ressource_factory)
+
+feature -- Access
+
+	background: BACKGROUND
+			-- Background of `Current'
 
 end

@@ -30,7 +30,7 @@ feature {NONE} -- Implementation
 
 feature -- Access
 
-	text: READABLE_STRING_GENERAL
+	text: READABLE_STRING_GENERAL assign set_text
 			-- String of the text used when drawing
 
 	change(a_x, a_y, a_font_size: INTEGER)
@@ -47,5 +47,10 @@ feature -- Access
 			if l_text_surface.is_open then
 				create texture.make_from_surface(context.renderer, l_text_surface)
 			end
+		end
+
+	set_text(a_text: READABLE_STRING_GENERAL)
+		do
+			text := a_text
 		end
 end

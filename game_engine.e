@@ -52,6 +52,7 @@ feature {NONE} -- Initialization
 			create renderer.make(current_map, context)
 			create current_player.make(context)
 			make_wave_colors
+			update_player_color
 			create {LINKED_LIST[ENTITY]} entities.make
 			create {ARRAYED_LIST[HUD_ITEM]} hud_items.make(0)
 			create {ARRAYED_LIST[DRAWABLE]} drawables.make(0)
@@ -62,6 +63,15 @@ feature {NONE} -- Initialization
 		end
 
 feature {NONE} -- Implementation
+
+	frame_display: INTEGER
+			-- Number of frames in the past second
+
+	frame_counter: INTEGER
+			-- Number of frames this second
+
+	second_counter: REAL_64
+			-- Time since last frame
 
 	player_acceleration: REAL_64 = 200.0
 			-- Acceleration of the player
@@ -102,6 +112,14 @@ feature {NONE} -- Implementation
 			end
 			last_tick := a_timestamp
 
+			second_counter := second_counter + time_since_last
+			if second_counter >= 1.0 then
+				second_counter := second_counter - 1.0
+				frame_display := frame_counter
+				frame_counter := 0
+				io.put_string("Frames: " + frame_display.out + "%N")
+			end
+
 			update_player
 
 			clear_out_of_bounds_waves
@@ -135,16 +153,20 @@ feature {NONE} -- Implementation
 				l_to_remove.forth
 			end
 		ensure
-			Entities_Out_Of_Bounds_Deleted: across entities as la_entities all if attached {WAVE} la_entities.item as la_wave then
-				not la_wave.hit_max
-			else
-				True
-			end end
-			Drawables_Out_Of_Bounds_Deleted: across drawables as la_drawables all if attached {WAVE} la_drawables.item as la_wave then
-				not la_wave.hit_max
-			else
-				True
-			end end
+			Entities_Out_Of_Bounds_Deleted: across entities as la_entities all
+												if attached {WAVE} la_entities.item as la_wave then
+													not la_wave.hit_max
+												else
+													True
+												end
+											end
+			Drawables_Out_Of_Bounds_Deleted: across drawables as la_drawables all
+												if attached {WAVE} la_drawables.item as la_wave then
+													not la_wave.hit_max
+												else
+													True
+												end
+											end
 		end
 
 	update_player
@@ -183,7 +205,8 @@ feature {NONE} -- Implementation
 	on_redraw(a_timestamp: NATURAL_32)
 			-- Redraw the screen
 		do
-			renderer.render(background, drawables)
+			frame_counter := frame_counter + 1
+			renderer.render(drawables)
 		end
 
 	on_keyboard_focus_lost(a_timestamp: NATURAL_32)
@@ -256,13 +279,12 @@ feature {NONE} -- Implementation
 			l_wave: WAVE
 			l_direction: REAL_64
 			l_angle: REAL_64
-			l_max_radius: REAL_64
 			l_x: INTEGER
 			l_y: INTEGER
 			l_speed: TUPLE[x, y: REAL_64]
 		do
 			if a_mouse_state.is_left_button_pressed then
-				l_angle := Pi_4
+				l_angle := 2 * Pi
 				l_x := a_mouse_state.x - current_player.x_real.rounded
 				l_y := a_mouse_state.y - current_player.y_real.rounded
 				l_direction := calculate_circle_angle(l_x, l_y)
@@ -295,17 +317,6 @@ feature {NONE} -- Implementation
 
 feature -- Basic Operations
 
---	calculate_speed_sum(a_speed1: TUPLE[direction, quantity: REAL_64]; a_speed2: TUPLE[x, y: REAL_64]): REAL_64
---			-- Calculates the sum of a directed speed and a speed vector. Returns a directed speed.
---		local
---			l_result_x: REAL_64
---			l_result_y: REAL_64
---		do
---			l_result_x := (a_speed1.quantity * cosine(a_speed1.direction)) + a_speed2.x
---			l_result_y := (a_speed1.quantity * sine(a_speed1.direction)) + a_speed2.y
---			Result := sqrt((l_result_x ^ 2) + (l_result_y ^ 2))
---		end
-
 	calculate_circle_angle(a_x, a_y: INTEGER): REAL_64
 			-- Correctly handles arc_tangent negatives
 		local
@@ -331,26 +342,6 @@ feature -- Basic Operations
 			end
 			Result := l_angle
 		end
-
---	calculate_furthest_corner_distance(a_point: TUPLE[x, y: REAL_64]): REAL_64
---			-- Finds the furthest corner of the screen from the point
---		local
---			l_x_width_dist: REAL_64
---			l_y_height_dist: REAL_64
---			l_x_dist: REAL_64
---			l_y_dist: REAL_64
---			l_x_max, l_y_max: REAL_64
---			l_result: REAL_64
---		do
---			l_x_width_dist := (context.window.width - a_point.x) ^ 2
---			l_y_height_dist := (context.window.height - a_point.y) ^ 2
---			l_x_dist := a_point.x ^ 2
---			l_y_dist := a_point.y ^ 2
---			l_x_max := l_x_width_dist.max(l_x_dist)
---			l_y_max := l_y_height_dist.max(l_y_dist)
---			l_result := l_x_max + l_y_max
---			Result := l_result
---		end
 
 feature -- Initialization
 

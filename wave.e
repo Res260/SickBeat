@@ -71,7 +71,7 @@ feature -- Access
 	lifetime: REAL_64
 			-- Time left for `Current' to survive
 
-	initial_lifetime: REAL_64 = 5.0
+	initial_lifetime: REAL_64 = 3.5
 			-- Initial `lifetime'
 
 	center_speed: TUPLE[x, y: REAL_64]
@@ -115,7 +115,7 @@ feature -- Access
 			-- Update `Current' on every game tick
 			-- Increments `radius' until it is bigger than max_radius
 		require else
-			Still_In_Screen: not hit_max
+			Still_Alive: not hit_max
 		do
 			x_real := x_real + (center_speed.x * a_timediff)
 			y_real := y_real + (center_speed.y * a_timediff)

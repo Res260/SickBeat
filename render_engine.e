@@ -29,12 +29,12 @@ feature {NONE} -- Implementation
 
 feature -- Access
 
-	render(a_background: BACKGROUND; a_drawables: LIST[DRAWABLE])
-			-- Draws the background with the drawables on top of it
+	render(a_drawables: LIST[DRAWABLE])
+			-- Draws `background' with the `a_drawables' on top of it
 		do
 			context.renderer.clear
 
-			a_background.draw
+			current_map.background.draw
 
 			across a_drawables as la_drawables loop
 				la_drawables.item.draw

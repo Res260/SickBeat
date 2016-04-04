@@ -17,9 +17,9 @@
 		<library name="gobo_math" location="$ISE_LIBRARY\library\gobo\gobo_math-safe.ecf"/>
 		<cluster name="sickbeat" location=".\" recursive="true">
 			<file_rule>
+				<exclude>/.git$</exclude>
 				<exclude>/EIFGENs$</exclude>
 				<exclude>/ressources$</exclude>
-				<exclude>/.git$</exclude>
 			</file_rule>
 		</cluster>
 	</target>

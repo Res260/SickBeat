@@ -91,8 +91,6 @@ feature {AUDIO_LIBRARY_CONTROLLER}
 		--This method should only be called by AUDIO_LIBRARY_CONTROLLER.
 		--Side effect on a_buffer.
 		local
-			l_max: INTEGER_32
-			l_count: INTEGER_32
 			l_buffer_size: INTEGER_32
 			l_index_max: INTEGER_32
 			l_sound_length_byte: INTEGER_32
@@ -112,6 +110,9 @@ feature {AUDIO_LIBRARY_CONTROLLER}
 			end
 			last_buffer_size:= l_buffer_size
 		end
+
+invariant
+	buffer_index_not_retarded: 0 <= buffer_index and buffer_index <= sound_length
 note
 	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"
 	source: "[file: LICENSE]"

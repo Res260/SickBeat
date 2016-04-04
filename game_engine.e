@@ -375,6 +375,7 @@ feature -- Access
 
 	drawables: LIST[DRAWABLE]
 			-- List of all objects to render every frame
+invariant
 note
 	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"
 	source: "[file: LICENSE]"

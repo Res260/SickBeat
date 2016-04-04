@@ -27,7 +27,7 @@ feature {NONE} -- Implementation
 
 	context: CONTEXT
 			-- Graphical context of the application (renderer, window and ressource_factory)
-
+invariant
 note
 	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"
 	source: "[file: LICENSE]"

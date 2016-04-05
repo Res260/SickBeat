@@ -30,15 +30,34 @@ feature {NONE} -- Implementation
 
 feature -- Access
 
+	camera: detachable CAMERA assign set_camera
+			-- Camera used to offset all drawables when drawing them
+
+	set_camera(a_new_camera: detachable CAMERA)
+			-- Changes `Current's camera
+		do
+			if attached a_new_camera as la_new_camera then
+				camera := la_new_camera
+			end
+		ensure
+			Attached_Camera_Sets_Camera: attached a_new_camera implies camera = a_new_camera
+		end
+
 	render(a_drawables: LIST[DRAWABLE])
 			-- Draws `background' with the `a_drawables' on top of it
+		require
+			Camera_Exists: attached camera
 		do
 			context.renderer.clear
 
-			current_map.background.draw
+			check attached camera as la_camera then
+					-- Camera should always be attached when rendering stuff
+					-- No Camera = No Rendering (Where are you even looking at without a camera?)
+				current_map.background.draw(la_camera)
 
-			across a_drawables as la_drawables loop
-				la_drawables.item.draw
+				across a_drawables as la_drawables loop
+					la_drawables.item.draw(la_camera)
+				end
 			end
 
 			context.window.update

@@ -24,22 +24,39 @@ feature {NONE} -- Initialization
 			-- Initialization of `Current'
 		do
 			Precursor(a_context)
+			sound_manager.create_audio_source
+			menu_audio_source_music := sound_manager.last_audio_source
+			menu_sound_music := sound_factory.create_menu_music
+			play_menu_music
 			set_title("SickBeat")
 			add_button("Play", agent play_action)
 			add_button("Options", agent options_action)
 			add_button("Exit", agent exit_action)
-			play_menu_music
 		end
 
+
 feature {NONE} -- Implementation
+
+	menu_audio_source_music: AUDIO_SOURCE
+			-- Source for the music in the background
+
+	menu_sound_music: SOUND
+			-- Music playing in the background.
+
+	play_menu_music
+			-- Plays the menu music
+		do
+			menu_audio_source_music.queue_sound_infinite_loop(menu_sound_music)
+			menu_audio_source_music.play
+		end
 
 	play_action(a_string: READABLE_STRING_GENERAL)
 			-- Action played when the user clicks the Play button
 		do
 			io.put_string("Play clicked!%N")
 			sound_manager.set_master_volume (1)
-			create {MENU_PLAY} next_menu.make(context)
 			play_menu_sound_click
+			create {MENU_PLAY} next_menu.make(context)
 			continue_to_next
 		end
 

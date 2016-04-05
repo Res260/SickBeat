@@ -15,25 +15,71 @@ inherit
 		end
 
 create
-	make
+	make,
+	make_movable
 
 feature {NONE} -- Initialization
 
 	make(a_texture: detachable GAME_TEXTURE; a_context: CONTEXT)
 		do
 			make_drawable(0, 0, a_texture, a_context)
+			movable := False
+		end
+
+	make_movable(a_texture: detachable GAME_TEXTURE; a_size: TUPLE[width, height: INTEGER]; a_context: CONTEXT)
+		do
+			make(a_texture, a_context)
+			size := a_size
+			movable := True
+		end
+
+feature {NONE} -- Implementation
+
+	size: detachable TUPLE[width, height: INTEGER]
+			-- Size of the background. Only used when movable.
+
+	draw_movable(a_camera: CAMERA)
+			-- Draws the background by scaling it to `Current' size
+		require
+			Is_Movable: movable
+		do
+			if attached texture as la_texture and attached size as la_size then
+				context.renderer.draw_sub_texture_with_scale(la_texture, 0, 0, la_texture.width, la_texture.height,
+												   x - a_camera.position.x, y - a_camera.position.y, la_size.width, la_size.height)
+			end
 		end
 
 feature -- Implementation
 
-	draw
+	movable: BOOLEAN
+			-- Whether or not `Current' is not locked to fill the screen
+
+	move(a_x, a_y: INTEGER)
+			-- Move `Current' to (`a_x', `a_y')
+		require
+			Is_Movable: movable
+		do
+			x := a_x
+			y := a_y
+		ensure
+			X_Moved: x = a_x
+			Y_Moved: y = a_y
+		end
+
+	draw(a_camera: CAMERA)
 			-- Draws the background by scaling it to the window size
 		do
-			if attached texture as la_texture then
-				context.renderer.draw_sub_texture_with_scale(la_texture, 0, 0, la_texture.width, la_texture.height,
-															     		 0, 0, context.window.width, context.window.height)
+			if movable then
+				draw_movable(a_camera)
+			else
+				if attached texture as la_texture then
+					context.renderer.draw_sub_texture_with_scale(la_texture, 0, 0, la_texture.width, la_texture.height,
+									   -a_camera.position.x, -a_camera.position.y, context.window.width, context.window.height)
+				end
 			end
 		end
+invariant
+	Size_If_Movable: movable implies attached size
 note
 	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"
 	source: "[file: LICENSE]"

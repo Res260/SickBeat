@@ -90,16 +90,16 @@ feature -- Access
 	radius: REAL_64
 			-- Radius of `Current's arc
 
-	hit_max: BOOLEAN
-			-- Whether or not `Current's radius has surpassed it's maximum radius
+	dead: BOOLEAN
+			-- Whether or not `Current's should be deleted
 
 	color: GAME_COLOR
 			-- Color of `Current'
 
-	draw
+	draw(a_camera: CAMERA)
 			-- Draw `Current' on `context's renderer
 		require else
-			Still_In_Screen: not hit_max
+			Still_In_Screen: not dead
 		local
 			l_previous_color: GAME_COLOR
 		do
@@ -107,7 +107,7 @@ feature -- Access
 
 			color.set_alpha(alpha)
 			context.renderer.set_drawing_color(color)
-			draw_arc(x_real, y_real, direction - angle / 2, direction + angle / 2, radius, 40, context.renderer)
+			draw_arc(x_real - a_camera.position.x, y_real - a_camera.position.y, direction - angle / 2, direction + angle / 2, radius, 40, context.renderer)
 
 			context.renderer.set_drawing_color(l_previous_color)
 		end
@@ -116,7 +116,7 @@ feature -- Access
 			-- Update `Current' on every game tick
 			-- Increments `radius' until it is bigger than max_radius
 		require else
-			Still_Alive: not hit_max
+			Still_Alive: not dead
 		do
 			x_real := x_real + (center_speed.x * a_timediff)
 			y_real := y_real + (center_speed.y * a_timediff)
@@ -124,8 +124,10 @@ feature -- Access
 			lifetime := (0.0).max(lifetime - a_timediff)
 			alpha := (255 * lifetime / initial_lifetime).rounded.as_natural_8
 			if lifetime <= 0 then
-				hit_max := True
+				dead := True
 			end
+		ensure then
+			No_Life_Equals_Dead: lifetime <= 0 = dead
 		end
 note
 	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"

@@ -46,11 +46,18 @@ feature {NONE} -- Initialization
 
 	make(a_context: CONTEXT)
 			-- Initialize all the attributs
+		local
+			l_tuple: TUPLE[width, height: INTEGER]
 		do
 			Precursor(a_context)
-			create background.make(context.ressource_factory.game_background, context)
+			create camera.make(0, 0, context)
+			create l_tuple
+			l_tuple.width := 3840
+			l_tuple.height := 2160
+			create background.make_movable(context.ressource_factory.game_background, l_tuple, context)
 			create current_map.make(background, context)
 			create renderer.make(current_map, context)
+			renderer.camera := camera
 			create current_player.make(context)
 			make_wave_colors
 			update_player_color
@@ -122,6 +129,7 @@ feature {NONE} -- Implementation
 			end
 
 			update_player
+			update_camera
 
 			clear_out_of_bounds_waves
 
@@ -137,7 +145,7 @@ feature {NONE} -- Implementation
 			across entities as la_entities loop
 				la_entities.item.update(time_since_last)
 				if attached {WAVE} la_entities.item as la_wave then
-					if la_wave.hit_max then
+					if la_wave.dead then
 						l_to_remove.extend(la_wave)
 					end
 				end
@@ -156,14 +164,14 @@ feature {NONE} -- Implementation
 		ensure
 			Entities_Out_Of_Bounds_Deleted: across entities as la_entities all
 												if attached {WAVE} la_entities.item as la_wave then
-													not la_wave.hit_max
+													not la_wave.dead
 												else
 													True
 												end
 											end
 			Drawables_Out_Of_Bounds_Deleted: across drawables as la_drawables all
 												if attached {WAVE} la_drawables.item as la_wave then
-													not la_wave.hit_max
+													not la_wave.dead
 												else
 													True
 												end
@@ -193,6 +201,12 @@ feature {NONE} -- Implementation
 			end
 
 			current_player.set_acceleration(l_x_accel, l_y_accel)
+		end
+
+	update_camera
+			-- Update `camera's position
+		do
+			camera.move_at_entity(current_player)
 		end
 
 	on_restart
@@ -285,17 +299,19 @@ feature {NONE} -- Implementation
 			l_speed: TUPLE[x, y: REAL_64]
 		do
 			if a_mouse_state.is_left_button_pressed then
-				l_angle := 2 * Pi
-				l_x := a_mouse_state.x - current_player.x_real.rounded
-				l_y := a_mouse_state.y - current_player.y_real.rounded
-				l_direction := calculate_circle_angle(l_x, l_y)
-				create l_speed
-				l_speed.x := current_player.speed.x * 0.75
-				l_speed.y := current_player.speed.y * 0.75
-				if attached {GAME_COLOR} wave_colors.at(current_color_index + 1) as la_color then
-					create l_wave.make(current_player.x_real, current_player.y_real, l_direction, l_angle, l_speed, la_color, context)
-					entities.extend(l_wave)
-					drawables.extend(l_wave)
+				l_angle := Pi_4
+				l_x := a_mouse_state.x - current_player.x_real.rounded + camera.position.x
+				l_y := a_mouse_state.y - current_player.y_real.rounded + camera.position.y
+				if l_x /= 0 or l_y /= 0 then
+					l_direction := calculate_circle_angle(l_x, l_y)
+					create l_speed
+					l_speed.x := current_player.speed.x * 0.75
+					l_speed.y := current_player.speed.y * 0.75
+					if attached {GAME_COLOR} wave_colors.at(current_color_index + 1) as la_color then
+						create l_wave.make(current_player.x_real, current_player.y_real, l_direction, l_angle, l_speed, la_color, context)
+						entities.extend(l_wave)
+						drawables.extend(l_wave)
+					end
 				end
 			end
 		end
@@ -319,18 +335,18 @@ feature {NONE} -- Implementation
 feature -- Basic Operations
 
 	calculate_circle_angle(a_x, a_y: INTEGER): REAL_64
-			-- Correctly handles arc_tangent negatives
+			-- Correctly handles arc_tangent negatives and zeros
+		require
+			Angle_Possible: a_x /= 0 or a_y /= 0
 		local
 			l_y_x_ratio: REAL_64
 			l_angle: REAL_64
 		do
-			if a_x = 0 then
+			if a_x ~ 0 then
 				if a_y > 0 then
 					l_angle := Pi_2
 				elseif a_y < 0 then
-					l_angle := 1.5 * Pi_2
-				else
-					l_angle := 7
+					l_angle := 1.5 * Pi
 				end
 			else
 				l_y_x_ratio := a_y / a_x
@@ -347,12 +363,10 @@ feature -- Basic Operations
 feature -- Initialization
 
 	renderer: RENDER_ENGINE
-			-- `renderer'
-		attribute check False then end end --| Remove line when `renderer' is initialized in creation procedure.
+			-- Object rendering engine
 
 	current_player: PLAYER
-			-- `current_player'
-		attribute check False then end end --| Remove line when `current_player' is initialized in creation procedure.
+			-- {PLAYER} currently being controlled by the user
 
 	network: NETWORK_ENGINE
 			-- `network'
@@ -365,8 +379,7 @@ feature -- Access
 		attribute check False then end end --| Remove line when `hud_items' is initialized in creation procedure.
 
 	current_map: MAP
-			-- `current_map'
-		attribute check False then end end --| Remove line when `current_map' is initialized in creation procedure.
+			-- Map currently played
 
 	physics: PHYSICS_ENGINE
 			-- `physics'

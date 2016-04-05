@@ -26,15 +26,13 @@ feature {NONE} -- Initialization
 			context := a_context
 			exit_requested := False
 			is_main_menu := False
+			create camera.make(0, 0, context)
 			create background.make(context.ressource_factory.menu_background, context)
 			create {LINKED_LIST[BUTTON]} buttons.make
 			update_buttons_dimension
 			sound_manager.create_audio_source
-			menu_audio_source_click := sound_manager.last_audio_source
+			menu_audio_source := sound_manager.last_audio_source
 			menu_sound := sound_factory.create_sound_menu_click
-			sound_manager.create_audio_source
-			menu_audio_source_music := sound_manager.last_audio_source
-			menu_sound_music := sound_factory.create_menu_music
 		ensure
 			context = a_context
 		end
@@ -48,31 +46,22 @@ feature {NONE} -- Initialization
 
 feature {NONE} -- Implementation
 
-	menu_audio_source_click: AUDIO_SOURCE
+	camera: CAMERA
+			-- Camera for the menus
+			-- Can be used for cool transitions
+
+	menu_audio_source: AUDIO_SOURCE
 			-- Source for the audio sounds of the buttons in `Current'
 
 	menu_sound: SOUND
 			-- Sound to be played when clicking the buttons
 
-	menu_audio_source_music: AUDIO_SOURCE
-			-- Source for the music in the background
-
-	menu_sound_music: SOUND
-			-- Music playing in the background.
-
 	play_menu_sound_click
 			-- Plays the menu sound click
 		do
-			menu_audio_source_click.stop
-			menu_audio_source_click.queue_sound(menu_sound)
-			menu_audio_source_click.play
-		end
-
-	play_menu_music
-			-- Plays the menu music
-		do
-			menu_audio_source_music.queue_sound_infinite_loop(menu_sound_music)
-			menu_audio_source_music.play
+			menu_audio_source.stop
+			menu_audio_source.queue_sound(menu_sound)
+			menu_audio_source.play
 		end
 
 	context: CONTEXT
@@ -105,14 +94,14 @@ feature {NONE} -- Implementation
 		do
 			context.renderer.clear
 
-			background.draw
+			background.draw(camera)
 
 			if attached title as la_title then
-				la_title.draw
+				la_title.draw(camera)
 			end
 
 			across buttons as la_buttons loop
-				la_buttons.item.draw
+				la_buttons.item.draw(camera)
 			end
 
 			context.window.update

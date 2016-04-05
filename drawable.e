@@ -58,11 +58,12 @@ feature -- Access
 	texture: detachable GAME_TEXTURE
 			-- Texture to draw
 
-	draw
+	draw(a_camera: CAMERA)
 			-- Draws `Current's texture if it exists
+			-- Must draw the texture at position - a_camera.position
 		do
 			if attached texture as la_texture then
-				context.renderer.draw_texture(la_texture, x, y)
+				context.renderer.draw_texture(la_texture, x - a_camera.position.x, y - a_camera.position.y)
 			end
 		end
 note

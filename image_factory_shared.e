@@ -1,15 +1,15 @@
 note
-	description: "Class to share SOUND_ENGINE singleton."
+	description: "Class to share IMAGE_FACTORY singleton."
 	author: "Émilio G!"
-	date: "16-2-22"
-	revision: "16w05a"
+	date: "16-04-04"
+	revision: "16w09a"
 	legal: "See notice at end of class."
 
 deferred class
-	SOUND_FACTORY_SHARED
+	IMAGE_FACTORY_SHARED
 
 feature
-	sound_factory:SOUND_FACTORY
+	image_factory:IMAGE_FACTORY
 		once
 			create Result.make
 		end

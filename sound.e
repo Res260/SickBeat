@@ -2,7 +2,7 @@ note
 	description: "Class that holds information for a sound and fills a buffer to play it."
 	author: "Émilio G!"
 	date: "16-02-23"
-	revision: "16w07b"
+	revision: "16w09a"
 	legal: "See notice at end of class."
 
 class
@@ -112,7 +112,8 @@ feature {AUDIO_LIBRARY_CONTROLLER}
 		end
 
 invariant
-	buffer_index_not_retarded: 0 <= buffer_index and buffer_index <= sound_length
+	buffer_index_not_retarded: 0 <= buffer_index and buffer_index <= sound_length * byte_per_buffer_sample
+	buffer_index_even: buffer_index \\ 2 = 0
 note
 	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"
 	source: "[file: LICENSE]"

@@ -2,7 +2,7 @@ note
 	description: "Class that generates sound using lists of INTEGER_16"
 	author: "Émilio Gonzalez"
 	date: "2016-03-29"
-	revision: "16w08a"
+	revision: "16w09a"
 	legal: "See notice at end of class."
 
 class
@@ -215,9 +215,8 @@ feature --Access
 		end
 
 	mix(a_sound1: CHAIN[INTEGER_16]; a_sound2: CHAIN[INTEGER_16]; a_percentage: REAL_64)
-		-- Mixes two waves by adding up a_sound2[i] to a_sound2[i].
+		-- Mixes two waves by adding up a_sound2[i] to a_sound2[j] starting j at a_percentage% of the sound.
 		-- if there is overflow, caps the amplitude.
-		--COMPLETE DOC
 		-- side effect on a_sound1
 		require
 			Sound1_Valid: a_sound1.count > 0

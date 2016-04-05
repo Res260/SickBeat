@@ -35,6 +35,7 @@ feature {NONE} -- Implementation
 	singleplayer_action(a_string: READABLE_STRING_GENERAL)
 			-- Action played when the user clicks the Singleplayer button
 		do
+			play_menu_sound_click
 			io.put_string("Singleplayer clicked!%N")
 			create {GAME_ENGINE} next_menu.make(context)
 			continue_to_next
@@ -43,12 +44,14 @@ feature {NONE} -- Implementation
 	multiplayer_action(a_string: READABLE_STRING_GENERAL)
 			-- Action played when the user clicks the Multiplayer button
 		do
+			play_menu_sound_click
 			io.put_string("Multiplayer clicked!%N")
 		end
 
 	return_action(a_string: READABLE_STRING_GENERAL)
 			-- Action played when the user clicks the Return button
 		do
+			play_menu_sound_click
 			io.put_string("Return clicked!%N")
 			return_menu
 		end

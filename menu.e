@@ -30,8 +30,11 @@ feature {NONE} -- Initialization
 			create {LINKED_LIST[BUTTON]} buttons.make
 			update_buttons_dimension
 			sound_manager.create_audio_source
-			menu_audio_source := sound_manager.last_audio_source
+			menu_audio_source_click := sound_manager.last_audio_source
 			menu_sound := sound_factory.create_sound_menu_click
+			sound_manager.create_audio_source
+			menu_audio_source_music := sound_manager.last_audio_source
+			menu_sound_music := sound_factory.create_menu_music
 		ensure
 			context = a_context
 		end
@@ -45,11 +48,32 @@ feature {NONE} -- Initialization
 
 feature {NONE} -- Implementation
 
-	menu_audio_source: AUDIO_SOURCE
+	menu_audio_source_click: AUDIO_SOURCE
 			-- Source for the audio sounds of the buttons in `Current'
 
 	menu_sound: SOUND
 			-- Sound to be played when clicking the buttons
+
+	menu_audio_source_music: AUDIO_SOURCE
+			-- Source for the music in the background
+
+	menu_sound_music: SOUND
+			-- Music playing in the background.
+
+	play_menu_sound_click
+			-- Plays the menu sound click
+		do
+			menu_audio_source_click.stop
+			menu_audio_source_click.queue_sound(menu_sound)
+			menu_audio_source_click.play
+		end
+
+	play_menu_music
+			-- Plays the menu music
+		do
+			menu_audio_source_music.queue_sound_infinite_loop(menu_sound_music)
+			menu_audio_source_music.play
+		end
 
 	context: CONTEXT
 			-- Context of the application

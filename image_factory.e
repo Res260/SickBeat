@@ -1,18 +1,33 @@
 note
-	description: "Summary description for {IMAGE_FACTORY}."
-	author: ""
-	date: "$Date$"
-	revision: "$Revision$"
+	description: "Class to make images. In progress."
+	author: "Émilio G!"
+	date: "16-04-04"
+	revision: "16w09a"
 	legal: "See notice at end of class."
 
 class
 	IMAGE_FACTORY
 
+--inherit
+--	IMAGE_GENERATOR_SHARED
+
+create
+	make
+
+feature{NONE}
+
+	make
+		do
+
+		end
+
+
 feature -- Access
 
-	new: IMAGE
-			-- `new'
-		attribute check False then end end --| Remove line when `new' is initialized in creation procedure.
+--	get_player_texture():GAME_TEXTURE
+--		do
+--			Result := void
+--		end
 
 note
 	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"

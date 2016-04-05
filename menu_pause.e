@@ -35,6 +35,7 @@ feature {NONE} -- Implementation
 	leave_action(a_string: READABLE_STRING_GENERAL)
 			-- Action played when the user clicks the Play button
 		do
+			play_menu_sound_click
 			io.put_string("Leave to main menu clicked!%N")
 			return_to_main
 		end
@@ -42,12 +43,14 @@ feature {NONE} -- Implementation
 	options_action(a_string: READABLE_STRING_GENERAL)
 			-- Action played when the user clicks the Options button
 		do
+			play_menu_sound_click
 			io.put_string("Options clicked!%N")
 		end
 
 	return_action(a_string: READABLE_STRING_GENERAL)
 			-- Action played when the user clicks the Exit button
 		do
+			play_menu_sound_click
 			io.put_string("Return clicked!%N")
 			return_menu
 		end

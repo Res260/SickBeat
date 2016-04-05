@@ -62,11 +62,9 @@ feature --Access
 			sound_generator.add_silence_from_seconds (l_wave_bass2, 0.8)
 			sound_generator.repeat_wave_from_repetitions (l_wave_bass2, 3)
 			sound_generator.add_silence_from_seconds (l_wave_bass2, 0.3)
-			l_wave_silence.append (l_wave_bass2)
-			sound_generator.repeat_wave_from_duration (l_wave_silence, 20)
+			sound_generator.repeat_wave_from_duration (l_wave_bass2, 20)
 
-
-			sound_generator.mix (l_wave_bass, l_wave_silence, 0)
+			sound_generator.mix (l_wave_bass, l_wave_bass2, 0)
 			create Result.make (l_wave_bass)
 		end
 

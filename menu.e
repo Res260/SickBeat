@@ -26,6 +26,7 @@ feature {NONE} -- Initialization
 			context := a_context
 			exit_requested := False
 			is_main_menu := False
+			create camera.make(0, 0, context)
 			create background.make(context.ressource_factory.menu_background, context)
 			create {LINKED_LIST[BUTTON]} buttons.make
 			update_buttons_dimension
@@ -44,6 +45,10 @@ feature {NONE} -- Initialization
 		end
 
 feature {NONE} -- Implementation
+
+	camera: CAMERA
+			-- Camera for the menus
+			-- Can be used for cool transitions
 
 	menu_audio_source: AUDIO_SOURCE
 			-- Source for the audio sounds of the buttons in `Current'
@@ -81,14 +86,14 @@ feature {NONE} -- Implementation
 		do
 			context.renderer.clear
 
-			background.draw
+			background.draw(camera)
 
 			if attached title as la_title then
-				la_title.draw
+				la_title.draw(camera)
 			end
 
 			across buttons as la_buttons loop
-				la_buttons.item.draw
+				la_buttons.item.draw(camera)
 			end
 
 			context.window.update

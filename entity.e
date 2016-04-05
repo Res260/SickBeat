@@ -40,6 +40,8 @@ feature -- Access
 		do
 			x_real := a_new_x
 			x := a_new_x.rounded
+		ensure
+			X_Real_Set: x_real = a_new_x
 		end
 
 	set_y_real(a_new_y: REAL_64)
@@ -47,6 +49,8 @@ feature -- Access
 		do
 			y_real := a_new_y
 			y := a_new_y.rounded
+		ensure
+			Y_Real_Set: y_real = a_new_y
 		end
 note
 	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"

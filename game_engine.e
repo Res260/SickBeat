@@ -335,7 +335,7 @@ feature {NONE} -- Implementation
 feature -- Basic Operations
 
 	calculate_circle_angle(a_x, a_y: INTEGER): REAL_64
-			-- Correctly handles arc_tangent negatives
+			-- Correctly handles arc_tangent negatives and zeros
 		require
 			Angle_Possible: a_x /= 0 or a_y /= 0
 		local
@@ -363,10 +363,10 @@ feature -- Basic Operations
 feature -- Initialization
 
 	renderer: RENDER_ENGINE
-			-- `renderer'
+			-- Object rendering engine
 
 	current_player: PLAYER
-			-- `current_player'
+			-- {PLAYER} currently being controlled by the user
 
 	network: NETWORK_ENGINE
 			-- `network'
@@ -379,7 +379,7 @@ feature -- Access
 		attribute check False then end end --| Remove line when `hud_items' is initialized in creation procedure.
 
 	current_map: MAP
-			-- `current_map'
+			-- Map currently played
 
 	physics: PHYSICS_ENGINE
 			-- `physics'

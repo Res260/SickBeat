@@ -1,8 +1,8 @@
 note
 	description: "{ENTITY} that damages the {ENNEMY}."
 	author: "Guillaume Jean"
-	date: "29 March 2016"
-	revision: "16w08a"
+	date: "12 April 2016"
+	revision: "16w010a"
 	legal: "See notice at end of class."
 
 class
@@ -34,7 +34,7 @@ feature {NONE} -- Initialization
 			angle := a_angle
 			create color.make_from_other(a_color)
 			radius := a_source.width / 2
-			lifetime := initial_lifetime
+			energy := initial_energy
 			center_speed := a_center_speed
 			source := a_source
 			make_bounding_arc(a_x, a_y, a_direction, a_angle, radius)
@@ -54,7 +54,7 @@ feature {NONE} -- Basic Operations
 			l_resolution_factor: REAL_64
 			i: REAL_64
 		do
-			l_resolution_factor := Pi / a_resolution
+			l_resolution_factor := (a_end_angle - a_start_angle) / a_resolution
 			l_old_x := a_radius * cosine(a_start_angle) + a_center.x
 			l_old_y := a_radius * sine(a_start_angle) + a_center.y
 			from
@@ -83,11 +83,14 @@ feature -- Access
 	alpha: NATURAL_8
 			-- Alpha channel of `Current'
 
-	lifetime: REAL_64
-			-- Time left for `Current' to survive
+	energy: REAL_64
+			-- Energy left for `Current' to survive
 
-	initial_lifetime: REAL_64 = 3.5
-			-- Initial `lifetime'
+	initial_energy: REAL_64 = 3500.0
+			-- Initial `energy'
+
+	energy_loss: REAL_64 = -1000.0
+			-- `energy' loss per second
 
 	center_speed: TUPLE[x, y: REAL_64]
 			-- Speed of the moving arc center
@@ -113,7 +116,7 @@ feature -- Access
 	draw(a_camera: CAMERA)
 			-- Draw `Current' on `context's renderer
 		require else
-			Still_In_Screen: not dead
+			Still_Alive: not dead
 		local
 			l_previous_color: GAME_COLOR
 		do
@@ -134,16 +137,16 @@ feature -- Access
 			x_real := x_real + (center_speed.x * a_timediff)
 			y_real := y_real + (center_speed.y * a_timediff)
 			radius := radius + (radius_speed * a_timediff)
-			lifetime := (0.0).max(lifetime - a_timediff)
-			alpha := (255 * lifetime / initial_lifetime).rounded.as_natural_8
+			energy := (0.0).max(energy + (energy_loss * a_timediff))
+			alpha := (255 * energy / initial_energy).rounded.as_natural_8
 			bounding_radius := radius
 			center.x := x_real
 			center.y := y_real
-			if lifetime <= 0 then
+			if energy <= 0 then
 				dead := True
 			end
 		ensure then
-			No_Life_Equals_Dead: lifetime <= 0 = dead
+			No_Energy_Equals_Dead: energy <= 0 = dead
 		end
 note
 	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"

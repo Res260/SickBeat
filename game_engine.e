@@ -48,6 +48,7 @@ feature {NONE} -- Initialization
 			-- Initialize all the attributs
 		local
 			l_tuple: TUPLE[width, height: INTEGER]
+			l_box1, l_box2: BOUNDING_BOX
 		do
 			Precursor(a_context)
 			create camera.make(0, 0, context)
@@ -68,6 +69,11 @@ feature {NONE} -- Initialization
 			drawables.extend(current_player)
 			time_since_last := 0
 			last_tick := 0
+
+			-- Testing
+			create l_box1.make_box(0, 0, 5, 5)
+			create l_box2.make_box(-2, -2, 2, 2)
+			io.put_boolean(l_box1.collides_with_other(l_box2))
 		end
 
 feature {NONE} -- Implementation
@@ -145,6 +151,9 @@ feature {NONE} -- Implementation
 			across entities as la_entities loop
 				la_entities.item.update(time_since_last)
 				if attached {WAVE} la_entities.item as la_wave then
+					if la_wave.collides_with_other(current_player) then
+--						io.put_string("PogChamp Collision!%N")
+					end
 					if la_wave.dead then
 						l_to_remove.extend(la_wave)
 					end
@@ -308,7 +317,7 @@ feature {NONE} -- Implementation
 					l_speed.x := current_player.speed.x * 0.75
 					l_speed.y := current_player.speed.y * 0.75
 					if attached {GAME_COLOR} wave_colors.at(current_color_index + 1) as la_color then
-						create l_wave.make(current_player.x_real, current_player.y_real, l_direction, l_angle, l_speed, la_color, context)
+						create l_wave.make(current_player.x_real, current_player.y_real, l_direction, l_angle, l_speed, la_color, current_player, context)
 						entities.extend(l_wave)
 						drawables.extend(l_wave)
 					end

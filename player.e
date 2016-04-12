@@ -12,8 +12,11 @@ inherit
 	ENTITY
 		redefine
 			draw,
-			update
+			update,
+			width,
+			height
 		end
+	BOUNDING_BOX
 
 create
 	make
@@ -26,6 +29,7 @@ feature {NONE} -- Initialization
 			x_real := a_context.window.width / 2
 			y_real := a_context.window.height / 2
 			make_entity(x_real, y_real, a_context)
+			make_box(x_real - 25, y_real - 25, x_real + 25, y_real + 25)
 			create max_speed
 			create acceleration
 			create speed
@@ -60,6 +64,8 @@ feature -- Access
 			context.renderer.set_drawing_color(color)
 			context.renderer.draw_filled_rectangle(x - 25 - a_camera.position.x, y - 25 - a_camera.position.y, 50, 50)
 
+			draw_box(a_camera, context)
+
 			context.renderer.set_drawing_color(l_previous_color)
 		end
 
@@ -72,9 +78,23 @@ feature -- Access
 			y_real := y_real + a_timediff * speed.y
 			x := x_real.floor
 			y := y_real.floor
+			upper_corner.x := x_real + width / 2
+			upper_corner.y := y_real + width / 2
+			lower_corner.x := x_real - width / 2
+			lower_corner.y := y_real - width / 2
 		ensure then
 			X_Speed_Is_Bounded: max_speed.x.opposite <= speed.x and speed.x <= max_speed.x
 			Y_Speed_Is_Bounded: max_speed.y.opposite <= speed.y and speed.y <= max_speed.y
+		end
+
+	width: INTEGER
+		do
+			Result := 50
+		end
+
+	height: INTEGER
+		do
+			Result := 50
 		end
 
 	set_acceleration(a_x_accel, a_y_accel: REAL_64)

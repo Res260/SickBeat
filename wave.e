@@ -14,6 +14,11 @@ inherit
 			update,
 			draw
 		end
+	BOUNDING_ARC
+		rename
+			direction as bounding_direction,
+			radius as bounding_radius
+		end
 	DOUBLE_MATH
 
 create
@@ -21,16 +26,18 @@ create
 
 feature {NONE} -- Initialization
 
-	make(a_x, a_y, a_direction, a_angle: REAL_64; a_center_speed: TUPLE[x, y: REAL_64]; a_color: GAME_COLOR; a_context: CONTEXT)
+	make(a_x, a_y, a_direction, a_angle: REAL_64; a_center_speed: TUPLE[x, y: REAL_64]; a_color: GAME_COLOR; a_source: ENTITY; a_context: CONTEXT)
 			-- Initialize `Current' with a direction, angle, maximum radius, and color
 		do
 			make_entity(a_x, a_y, a_context)
 			direction := a_direction
 			angle := a_angle
 			create color.make_from_other(a_color)
-			radius := 0
+			radius := a_source.width / 2
 			lifetime := initial_lifetime
 			center_speed := a_center_speed
+			source := a_source
+			make_bounding_arc(a_x, a_y, a_direction, a_angle, radius)
 		end
 
 feature {NONE} -- Basic Operations
@@ -47,13 +54,13 @@ feature {NONE} -- Basic Operations
 			l_resolution_factor: REAL_64
 			i: REAL_64
 		do
+			l_resolution_factor := Pi / a_resolution
 			l_old_x := a_radius * cosine(a_start_angle) + a_center.x
 			l_old_y := a_radius * sine(a_start_angle) + a_center.y
-			l_resolution_factor := Pi / a_resolution
 			from
-				i := a_start_angle
+				i := a_start_angle + l_resolution_factor
 			until
-				i > a_end_angle + l_resolution_factor
+				i >= a_end_angle
 			loop
 				l_new_x := a_radius * cosine(i) + a_center.x
 				l_new_y := a_radius * sine(i) + a_center.y
@@ -62,9 +69,16 @@ feature {NONE} -- Basic Operations
 				l_old_y := l_new_y
 				i := i + l_resolution_factor
 			end
+			l_new_x := a_radius * cosine(a_end_angle) + a_center.x
+			l_new_y := a_radius * sine(a_end_angle) + a_center.y
+			a_renderer.draw_line(l_old_x.rounded, l_old_y.rounded, l_new_x.rounded, l_new_y.rounded)
 		end
 
 feature -- Access
+
+	source: ENTITY
+			-- {ENTITY} which created `Current'
+			-- Used to determine if it should deal damage or not to an {ENTITY}.
 
 	alpha: NATURAL_8
 			-- Alpha channel of `Current'
@@ -114,7 +128,6 @@ feature -- Access
 
 	update(a_timediff: REAL_64)
 			-- Update `Current' on every game tick
-			-- Increments `radius' until it is bigger than max_radius
 		require else
 			Still_Alive: not dead
 		do
@@ -123,6 +136,9 @@ feature -- Access
 			radius := radius + (radius_speed * a_timediff)
 			lifetime := (0.0).max(lifetime - a_timediff)
 			alpha := (255 * lifetime / initial_lifetime).rounded.as_natural_8
+			bounding_radius := radius
+			center.x := x_real
+			center.y := y_real
 			if lifetime <= 0 then
 				dead := True
 			end

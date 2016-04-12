@@ -53,7 +53,7 @@ feature --Access
 			sound_generator.add_silence_from_seconds (l_wave_bass, 0.3)
 			sound_generator.repeat_wave_from_repetitions (l_wave_bass, 3)
 			sound_generator.add_silence_from_seconds (l_wave_bass, 0.3)
-			sound_generator.repeat_wave_from_duration (l_wave_bass, 20)
+--			sound_generator.repeat_wave_from_duration (l_wave_bass, 20)
 
 			l_wave_bass2 := sound_generator.create_sine_wave (40, 100)
 			sound_generator.repeat_wave_from_duration (l_wave_bass2, 0.2)
@@ -62,7 +62,7 @@ feature --Access
 			sound_generator.add_silence_from_seconds (l_wave_bass2, 0.8)
 			sound_generator.repeat_wave_from_repetitions (l_wave_bass2, 3)
 			sound_generator.add_silence_from_seconds (l_wave_bass2, 0.3)
-			sound_generator.repeat_wave_from_duration (l_wave_bass2, 20)
+--			sound_generator.repeat_wave_from_duration (l_wave_bass2, 20)
 
 			sound_generator.mix (l_wave_bass, l_wave_bass2, 0)
 			create Result.make (l_wave_bass)

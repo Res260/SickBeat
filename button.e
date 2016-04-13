@@ -12,7 +12,10 @@ inherit
 	TEXT
 		rename
 			make as make_text
+		redefine
+			change
 		end
+	BOUNDING_BOX
 
 create
 	make
@@ -27,6 +30,7 @@ feature {NONE} -- Initialization
 		do
 			make_text(a_text, a_color, a_context)
 			button_action := a_action
+			make_box(0, 0, 0, 0)
 		end
 
 feature {NONE} -- Implementation
@@ -36,15 +40,14 @@ feature {NONE} -- Implementation
 
 feature -- Access
 
-	point_in_button(a_x, a_y: INTEGER): BOOLEAN
-			-- Returns whether or not the point is in the button
-		local
-			l_result: BOOLEAN
+	change(a_x, a_y, a_font_size: INTEGER)
+			-- Updates the bounding box
 		do
-			if x < a_x and y < a_y and x + width > a_x and y + height > a_y then
-				l_result := True
-			end
-			Result := l_result
+			Precursor(a_x, a_y, a_font_size)
+			lower_corner.x := x
+			lower_corner.y := y
+			upper_corner.x := x + width
+			upper_corner.y := y + height
 		end
 
 	do_click

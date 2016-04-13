@@ -17,7 +17,7 @@ inherit
 			set_events,
 			on_restart
 		end
-	DOUBLE_MATH
+	MATH_UTILITY
 
 create
 	make,
@@ -25,43 +25,14 @@ create
 
 feature {NONE} -- Initialization
 
-	make_wave_colors
-			-- Initialize the `wave_colors' tuple
-		local
-			l_temp_color: GAME_COLOR
-		do
-			create wave_colors
-			create l_temp_color.make(0, 0, 0, 255)
-			wave_colors.black := l_temp_color
-			create l_temp_color.make(255, 0, 0, 255)
-			wave_colors.red := l_temp_color
-			create l_temp_color.make(0, 255, 0, 255)
-			wave_colors.green := l_temp_color
-			create l_temp_color.make(0, 0, 255, 255)
-			wave_colors.blue := l_temp_color
-			create l_temp_color.make(255, 255, 255, 255)
-			wave_colors.white := l_temp_color
-			current_color_index := 4
-		end
-
 	make(a_context: CONTEXT)
 			-- Initialize all the attributs
-		local
-			l_tuple: TUPLE[width, height: INTEGER]
-			l_box1, l_box2: BOUNDING_BOX
 		do
 			Precursor(a_context)
-			create camera.make(0, 0, context)
-			create l_tuple
-			l_tuple.width := 3840
-			l_tuple.height := 2160
-			create background.make_movable(context.ressource_factory.game_background, l_tuple, context)
+			create background.make_movable(context.ressource_factory.game_background, [3840, 2160], context)
 			create current_map.make(background, context)
 			create renderer.make(current_map, context)
-			renderer.camera := camera
 			create current_player.make(context)
-			make_wave_colors
-			update_player_color
 			create {LINKED_LIST[ENTITY]} entities.make
 			create {ARRAYED_LIST[HUD_ITEM]} hud_items.make(0)
 			create {ARRAYED_LIST[DRAWABLE]} drawables.make(0)
@@ -69,11 +40,11 @@ feature {NONE} -- Initialization
 			drawables.extend(current_player)
 			time_since_last := 0
 			last_tick := 0
-
-			-- Testing
-			create l_box1.make_box(0, 0, 5, 5)
-			create l_box2.make_box(-2, -2, 2, 2)
-			io.put_boolean(l_box1.collides_with_other(l_box2))
+			current_player.launch_wave_event.extend(agent (a_wave:WAVE)
+														do
+															add_entity_to_world(a_wave)
+														end
+													)
 		end
 
 feature {NONE} -- Implementation
@@ -99,12 +70,6 @@ feature {NONE} -- Implementation
 	time_since_last: REAL_64
 			-- Time since last update in seconds
 
-	wave_colors: TUPLE[black, red, green, blue, white: GAME_COLOR]
-			-- Possible colors of the entities
-
-	current_color_index: INTEGER
-			-- Current color of the player
-
 	set_events
 			-- Sets the event handlers for `Current'
 		do
@@ -112,6 +77,7 @@ feature {NONE} -- Implementation
 			context.window.key_pressed_actions.extend(agent on_key_press)
 			context.window.key_released_actions.extend(agent on_key_release)
 			context.window.keyboard_focus_lost_actions.extend(agent on_keyboard_focus_lost)
+			context.window.mouse_motion_actions.extend(agent on_mouse_motion)
 			context.window.mouse_wheel_move_actions.extend(agent on_mouse_wheel)
 			game_library.iteration_actions.extend(agent on_tick)
 		end
@@ -213,9 +179,9 @@ feature {NONE} -- Implementation
 		end
 
 	update_camera
-			-- Update `camera's position
+			-- Update `context.camera's position
 		do
-			camera.move_at_entity(current_player)
+			context.camera.move_at_entity(current_player, context.window)
 		end
 
 	on_restart
@@ -253,6 +219,8 @@ feature {NONE} -- Implementation
 				if a_key_state.is_escape then
 					create {MENU_PAUSE} next_menu.make(context)
 					continue_to_next
+				elseif a_key_state.is_f3 then
+					context.debugging := not context.debugging
 				end
 			end
 			if a_key_state.is_a then
@@ -264,20 +232,15 @@ feature {NONE} -- Implementation
 			elseif a_key_state.is_s then
 				key_down := True
 			elseif a_key_state.is_1 then
-				current_color_index := 0
-				update_player_color
+				current_player.set_color_index(0)
 			elseif a_key_state.is_2 then
-				current_color_index := 1
-				update_player_color
+				current_player.set_color_index(1)
 			elseif a_key_state.is_3 then
-				current_color_index := 2
-				update_player_color
+				current_player.set_color_index(2)
 			elseif a_key_state.is_4 then
-				current_color_index := 3
-				update_player_color
+				current_player.set_color_index(3)
 			elseif a_key_state.is_5 then
-				current_color_index := 4
-				update_player_color
+				current_player.set_color_index(4)
 			end
 		end
 
@@ -299,74 +262,27 @@ feature {NONE} -- Implementation
 	on_pressed(a_timestamp: NATURAL_32; a_mouse_state: GAME_MOUSE_BUTTON_PRESSED_STATE; a_nb_clicks: NATURAL_8)
 			-- Handle the mouse_button_pressed event
 			-- Shoots waves where the player is aiming at
-		local
-			l_wave: WAVE
-			l_direction: REAL_64
-			l_angle: REAL_64
-			l_x: INTEGER
-			l_y: INTEGER
-			l_speed: TUPLE[x, y: REAL_64]
 		do
-			if a_mouse_state.is_left_button_pressed then
-				l_angle := Pi_4
-				l_x := a_mouse_state.x - current_player.x_real.rounded + camera.position.x
-				l_y := a_mouse_state.y - current_player.y_real.rounded + camera.position.y
-				if l_x /= 0 or l_y /= 0 then
-					l_direction := calculate_circle_angle(l_x, l_y)
-					create l_speed
-					l_speed.x := current_player.speed.x * 0.75
-					l_speed.y := current_player.speed.y * 0.75
-					if attached {GAME_COLOR} wave_colors.at(current_color_index + 1) as la_color then
-						create l_wave.make(current_player.x_real, current_player.y_real, l_direction, l_angle, l_speed, la_color, current_player, context)
-						entities.extend(l_wave)
-						drawables.extend(l_wave)
-					end
-				end
-			end
+			current_player.on_click(a_mouse_state)
 		end
 
 	on_mouse_wheel(a_timestamp: NATURAL_32; a_mouse_state: GAME_MOUSE_EVENTS_STATE; a_delta_x, a_delta_y: INTEGER)
 			-- Handle the mouse_wheel_move event
 			-- Changes `current_player's color by looping through the `wave_colors'
 		do
-			current_color_index := (current_color_index + a_delta_y + wave_colors.count) \\ wave_colors.count
-			update_player_color
-		end
-
-	update_player_color
-			-- Update `current_player's color attribute from the `wave_colors'
-		do
-			if attached {GAME_COLOR} wave_colors.at(current_color_index + 1) as la_color then
-				current_player.color := la_color
-			end
+			current_player.set_color_index((current_player.color_index + a_delta_y + current_player.colors.count) \\ current_player.colors.count)
 		end
 
 feature -- Basic Operations
 
-	calculate_circle_angle(a_x, a_y: INTEGER): REAL_64
-			-- Correctly handles arc_tangent negatives and zeros
-		require
-			Angle_Possible: a_x /= 0 or a_y /= 0
-		local
-			l_y_x_ratio: REAL_64
-			l_angle: REAL_64
+	add_entity_to_world(a_entity: ENTITY)
+			-- Adds an entity to the world
 		do
-			if a_x ~ 0 then
-				if a_y > 0 then
-					l_angle := Pi_2
-				elseif a_y < 0 then
-					l_angle := 1.5 * Pi
-				end
-			else
-				l_y_x_ratio := a_y / a_x
-				l_angle := arc_tangent(l_y_x_ratio)
-				if a_x < 0 then
-					l_angle := l_angle + Pi
-				elseif a_x > 0 and a_y < 0 then
-					l_angle := 2 * Pi + l_angle
-				end
-			end
-			Result := l_angle
+--			if attached {TOURELLE} a_entity as la_tourelle then
+--				la_tourelle.launch_wave_event(agent add_entity_to_world)
+--			end
+			entities.extend(a_entity)
+			drawables.extend(a_entity)
 		end
 
 feature -- Initialization

@@ -38,14 +38,14 @@ feature {NONE} -- Implementation
 	size: detachable TUPLE[width, height: INTEGER]
 			-- Size of the background. Only used when movable.
 
-	draw_movable(a_camera: CAMERA)
+	draw_movable
 			-- Draws the background by scaling it to `Current' size
 		require
 			Is_Movable: movable
 		do
 			if attached texture as la_texture and attached size as la_size then
 				context.renderer.draw_sub_texture_with_scale(la_texture, 0, 0, la_texture.width, la_texture.height,
-												   x - a_camera.position.x, y - a_camera.position.y, la_size.width, la_size.height)
+								x - context.camera.position.x, y - context.camera.position.y, la_size.width, la_size.height)
 			end
 		end
 
@@ -66,15 +66,15 @@ feature -- Implementation
 			Y_Moved: y = a_y
 		end
 
-	draw(a_camera: CAMERA)
+	draw
 			-- Draws the background by scaling it to the window size
 		do
 			if movable then
-				draw_movable(a_camera)
+				draw_movable
 			else
 				if attached texture as la_texture then
 					context.renderer.draw_sub_texture_with_scale(la_texture, 0, 0, la_texture.width, la_texture.height,
-									   -a_camera.position.x, -a_camera.position.y, context.window.width, context.window.height)
+							-context.camera.position.x, -context.camera.position.y, context.window.width, context.window.height)
 				end
 			end
 		end

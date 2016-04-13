@@ -46,19 +46,21 @@ feature -- Access
 	lower_corner: TUPLE[x, y: REAL_64]
 			-- Lower corner of `Current's box
 
-	draw_box(a_camera: CAMERA; a_context: CONTEXT)
+	draw_box(a_context: CONTEXT)
 		local
 			l_lower_x, l_lower_y, l_upper_x, l_upper_y: INTEGER
 		do
-			l_lower_x := lower_corner.x.rounded - a_camera.position.x
-			l_lower_y := lower_corner.y.rounded - a_camera.position.y
-			l_upper_x := upper_corner.x.rounded - a_camera.position.x
-			l_upper_y := upper_corner.y.rounded - a_camera.position.y
-			a_context.renderer.set_drawing_color(box_color)
-			a_context.renderer.draw_line(l_lower_x, l_lower_y, l_lower_x, l_upper_y)
-			a_context.renderer.draw_line(l_lower_x, l_lower_y, l_upper_x, l_lower_y)
-			a_context.renderer.draw_line(l_lower_x, l_upper_y, l_upper_x, l_upper_y)
-			a_context.renderer.draw_line(l_upper_x, l_lower_y, l_upper_x, l_upper_y)
+			if a_context.debugging then
+				l_lower_x := lower_corner.x.rounded - a_context.camera.position.x
+				l_lower_y := lower_corner.y.rounded - a_context.camera.position.y
+				l_upper_x := upper_corner.x.rounded - a_context.camera.position.x
+				l_upper_y := upper_corner.y.rounded - a_context.camera.position.y
+				a_context.renderer.set_drawing_color(box_color)
+				a_context.renderer.draw_line(l_lower_x, l_lower_y, l_lower_x, l_upper_y)
+				a_context.renderer.draw_line(l_lower_x, l_lower_y, l_upper_x, l_lower_y)
+				a_context.renderer.draw_line(l_lower_x, l_upper_y, l_upper_x, l_upper_y)
+				a_context.renderer.draw_line(l_upper_x, l_lower_y, l_upper_x, l_upper_y)
+			end
 		end
 
 	as_box: BOUNDING_BOX

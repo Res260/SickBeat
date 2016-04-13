@@ -12,36 +12,28 @@ create
 
 feature {NONE} -- Initialization
 
-	make(a_x, a_y: INTEGER; a_context: CONTEXT)
+	make(a_x, a_y: INTEGER)
 			-- Initializes `Current'
 		do
-			create position
-			position.x := a_x
-			position.y := a_y
-			context := a_context
+			position := [a_x, a_y]
 		end
-
-feature {NONE} -- Implementation
-
-	context: CONTEXT
-			-- Context of the current running application
 
 feature -- Access
 
 	position: TUPLE[x, y: INTEGER]
 			-- Position of `Current'
 
-	move_to_position(a_position: TUPLE[x, y: INTEGER])
+	move_to_position(a_position: TUPLE[x, y: INTEGER]; a_window: GAME_WINDOW_RENDERED)
 			-- Move `position' to `a_position' and center on window
 		do
-			position.x := a_position.x - context.window.width // 2
-			position.y := a_position.y - context.window.height // 2
+			position.x := a_position.x - a_window.width // 2
+			position.y := a_position.y - a_window.height // 2
 		end
 
-	move_at_entity(a_entity: ENTITY)
+	move_at_entity(a_entity: ENTITY; a_window: GAME_WINDOW_RENDERED)
 			-- Move `position' to `a_entity's position and center on window
 		do
-			position.x := a_entity.x - context.window.width // 2
-			position.y := a_entity.y - context.window.height // 2
+			position.x := a_entity.x - a_window.width // 2
+			position.y := a_entity.y - a_window.height // 2
 		end
 end

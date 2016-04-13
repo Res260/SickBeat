@@ -1,5 +1,5 @@
 note
-	description: "{ENTITY} that damages the {ENNEMY}."
+	description: "{ENTITY} that damages other entities and augments in size."
 	author: "Guillaume Jean"
 	date: "12 April 2016"
 	revision: "16w010a"
@@ -19,7 +19,7 @@ inherit
 			direction as bounding_direction,
 			radius as bounding_radius
 		end
-	DOUBLE_MATH
+	MATH_UTILITY
 
 create
 	make
@@ -113,7 +113,7 @@ feature -- Access
 	color: GAME_COLOR
 			-- Color of `Current'
 
-	draw(a_camera: CAMERA)
+	draw
 			-- Draw `Current' on `context's renderer
 		require else
 			Still_Alive: not dead
@@ -124,7 +124,10 @@ feature -- Access
 
 			color.set_alpha(alpha)
 			context.renderer.set_drawing_color(color)
-			draw_arc(x_real - a_camera.position.x, y_real - a_camera.position.y, direction - angle / 2, direction + angle / 2, radius, 40, context.renderer)
+			draw_arc(x_real - context.camera.position.x, y_real - context.camera.position.y, direction - angle / 2, direction + angle / 2,
+						radius, 40, context.renderer)
+
+			draw_box(context)
 
 			context.renderer.set_drawing_color(l_previous_color)
 		end

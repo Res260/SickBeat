@@ -14,6 +14,7 @@ create
 feature {NONE} -- Initialization
 
 	make(a_window: GAME_WINDOW_RENDERED; a_ressource_factory: RESSOURCE_FACTORY)
+			-- Initializes `Current' and creates the camera at (0, 0)
 		do
 			window := a_window
 			renderer := a_window.renderer

@@ -37,6 +37,8 @@ feature -- Access
 	change(a_x, a_y, a_font_size: INTEGER)
 			-- Change `Current's position to specified x, y and font_size
 			-- Recreates the text {GAME_TEXTURE}
+		require
+			Positif_Non_Null_Font_Size: a_font_size > 0
 		local
 			l_font: TEXT_FONT
 			l_text_surface: TEXT_SURFACE_BLENDED
@@ -48,11 +50,16 @@ feature -- Access
 			if l_text_surface.is_open then
 				create texture.make_from_surface(context.renderer, l_text_surface)
 			end
+		ensure
+			Texture_Set: attached texture as la_texture and then la_texture.height = context.ressource_factory.menu_font(a_font_size).text_dimension(text).height
+			Text_Moved: x = a_x and y = a_y
 		end
 
 	set_text(a_text: READABLE_STRING_GENERAL)
 		do
 			text := a_text
+		ensure
+			Text_Set: text = a_text
 		end
 note
 	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"

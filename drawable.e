@@ -57,6 +57,7 @@ feature -- Access
 
 	texture: detachable GAME_TEXTURE
 			-- Texture to draw
+			-- It is detachable to let children exist if something needs to happen before having it
 
 	draw
 			-- Draws `Current's texture if it exists

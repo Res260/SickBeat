@@ -21,12 +21,14 @@ create
 feature {NONE} -- Initialization
 
 	make(a_texture: detachable GAME_TEXTURE; a_context: CONTEXT)
+			-- Initializes `Current' as a {BACKGROUND} that fills the screen
 		do
 			make_drawable(0, 0, a_texture, a_context)
 			movable := False
 		end
 
 	make_movable(a_texture: detachable GAME_TEXTURE; a_size: TUPLE[width, height: INTEGER]; a_context: CONTEXT)
+			-- Initializes `Current' as a {BACKGROUND} of fixed size that can be moved around
 		do
 			make(a_texture, a_context)
 			size := a_size

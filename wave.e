@@ -145,11 +145,10 @@ feature -- Access
 			bounding_radius := radius
 			center.x := x_real
 			center.y := y_real
-			if energy <= 0 then
-				dead := True
-			end
+			dead := energy <= 0
 		ensure then
 			No_Energy_Equals_Dead: energy <= 0 = dead
+			Energy_Loss_Over_Time: (energy = old energy + (energy_loss * a_timediff)) or (energy = 0)
 		end
 note
 	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"

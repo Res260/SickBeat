@@ -29,6 +29,7 @@ feature {NONE} -- Initialization
 			-- Initialize all the attributs
 		do
 			Precursor(a_context)
+			keys := [False, False, False, False]
 			create background.make_movable(context.ressource_factory.game_background, [3840, 2160], context)
 			create current_map.make(background, context)
 			create renderer.make(current_map, context)
@@ -61,7 +62,7 @@ feature {NONE} -- Implementation
 	player_acceleration: REAL_64 = 200.0
 			-- Acceleration of the player
 
-	key_up, key_down, key_left, key_right: BOOLEAN
+	keys: TUPLE[left, right, up, down: BOOLEAN]
 			-- Booleans for each movement keys, if true, the key is currently held
 
 	last_tick: NATURAL_32
@@ -162,16 +163,16 @@ feature {NONE} -- Implementation
 		do
 			l_x_accel := -current_player.speed.x
 			l_y_accel := -current_player.speed.y
-			if key_up then
+			if keys.up then
 				l_y_accel := l_y_accel - player_acceleration
 			end
-			if key_down then
+			if keys.down then
 				l_y_accel := l_y_accel + player_acceleration
 			end
-			if key_left then
+			if keys.left then
 				l_x_accel := l_x_accel - player_acceleration
 			end
-			if key_right then
+			if keys.right then
 				l_x_accel := l_x_accel + player_acceleration
 			end
 
@@ -202,12 +203,12 @@ feature {NONE} -- Implementation
 	on_keyboard_focus_lost(a_timestamp: NATURAL_32)
 			-- Reset the keys whenever the keyboard focus is lost
 		do
-			key_left := False
-			key_right := False
-			key_up := False
-			key_down := False
+			keys.left := False
+			keys.right := False
+			keys.up := False
+			keys.down := False
 		ensure then
-			Keys_Are_No_Longer_Held: not key_left and not key_right and not key_up and not key_down
+			Keys_Are_No_Longer_Held: not keys.left and not keys.right and not keys.up and not keys.down
 		end
 
 	on_key_press(a_timestamp: NATURAL_32; a_key_state: GAME_KEY_STATE)
@@ -224,13 +225,13 @@ feature {NONE} -- Implementation
 				end
 			end
 			if a_key_state.is_a then
-				key_left := True
+				keys.left := True
 			elseif a_key_state.is_d then
-				key_right := True
+				keys.right := True
 			elseif a_key_state.is_w then
-				key_up := True
+				keys.up := True
 			elseif a_key_state.is_s then
-				key_down := True
+				keys.down := True
 			elseif a_key_state.is_1 then
 				current_player.set_color_index(0)
 			elseif a_key_state.is_2 then
@@ -249,13 +250,13 @@ feature {NONE} -- Implementation
 			-- Resets the movement keys
 		do
 			if a_key_state.is_a then
-				key_left := False
+				keys.left := False
 			elseif a_key_state.is_d then
-				key_right := False
+				keys.right := False
 			elseif a_key_state.is_w then
-				key_up := False
+				keys.up := False
 			elseif a_key_state.is_s then
-				key_down := False
+				keys.down := False
 			end
 		end
 

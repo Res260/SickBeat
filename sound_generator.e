@@ -9,8 +9,7 @@ class
 	SOUND_GENERATOR
 
 inherit
-	DOUBLE_MATH
-	MATH_CONST
+	MATH_UTILITY
 
 create
 	make

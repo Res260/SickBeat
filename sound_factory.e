@@ -25,11 +25,11 @@ feature --Initialization
 feature --Access
 
 	create_sound_menu_click:SOUND
-		--Method that creates a sound for a menu button click.
+			--Method that creates a sound for a menu button click.
 		local
 			l_wave : CHAIN[INTEGER_16]
 			l_initial_frequency: INTEGER_32
-		do
+		once
 			l_initial_frequency := 200
 			l_wave:= sound_generator.create_sine_wave(70, l_initial_frequency)
 			sound_generator.repeat_wave_from_duration(l_wave, 0.4)
@@ -42,7 +42,7 @@ feature --Access
 			l_wave_bass: CHAIN[INTEGER_16]
 			l_wave_bass2: CHAIN[INTEGER_16]
 			l_wave_silence: CHAIN[INTEGER_16]
-		do
+		once
 			l_wave_silence := sound_generator.create_square_wave (0, 500)
 --			sound_generator.add_silence_from_seconds (l_wave_silence, 0.8)
 

@@ -25,6 +25,7 @@ feature {NONE} -- Initialization
 		local
 			l_half_angle: REAL_64
 		do
+			make_physic_object
 			center := a_center
 			direction := a_direction
 			l_half_angle := a_angle / 2
@@ -68,10 +69,7 @@ feature {NONE} -- Implementation
 			else
 				l_lower_y := center.y + (radius * (sine(start_angle).min(sine(end_angle))))
 			end
-			minimal_bounding_box.upper_corner.x := l_upper_x
-			minimal_bounding_box.upper_corner.y := l_upper_y
-			minimal_bounding_box.lower_corner.x := l_lower_x
-			minimal_bounding_box.lower_corner.y := l_lower_y
+			minimal_bounding_box.update_to([l_lower_x, l_lower_y], [l_upper_x, l_upper_y])
 		end
 
 feature -- Implementation

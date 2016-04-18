@@ -22,6 +22,7 @@ feature {NONE} -- Initialization
 	make_box(a_x1, a_y1, a_x2, a_y2: REAL_64)
 			-- Initializes `Current'
 		do
+			make_physic_object
 			create upper_corner
 			create lower_corner
 			upper_corner.x := a_x1.max(a_x2)
@@ -42,11 +43,15 @@ feature -- Access
 
 	upper_corner: TUPLE[x, y: REAL_64]
 			-- Upper corner of `Current's box
+			-- Do not modify directly, use instead `move_box_to'
 
 	lower_corner: TUPLE[x, y: REAL_64]
 			-- Lower corner of `Current's box
+			-- Do not modify directly, use instead `move_box_to'
 
 	draw_box(a_context: CONTEXT)
+			-- Draw `Current's outline
+			-- Only happens if `a_context' is in debug mode
 		local
 			l_lower_x, l_lower_y, l_upper_x, l_upper_y: INTEGER
 		do
@@ -70,6 +75,7 @@ feature -- Access
 		end
 
 	collides_with_box(a_other: BOUNDING_BOX): BOOLEAN
+			-- Whether or not `Current' collides with another {BOUNDING_BOX}
 		do
 			if
 				a_other.lower_corner.x <= upper_corner.x and
@@ -81,6 +87,15 @@ feature -- Access
 			else
 				Result := False
 			end
+		end
+
+	update_to(a_lower_corner, a_upper_corner: TUPLE[x, y: REAL_64])
+			-- Update `Current's coordinates
+		do
+			lower_corner.x := a_lower_corner.x
+			lower_corner.y := a_lower_corner.y
+			upper_corner.x := a_upper_corner.x
+			upper_corner.y := a_upper_corner.y
 		end
 
 invariant

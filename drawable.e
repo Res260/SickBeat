@@ -1,8 +1,8 @@
 note
 	description: "Abstract class used for any element drawn on the screen"
 	author: "Guillaume Jean"
-	date: "14 March 2016"
-	revision: "16w07a"
+	date: "12 April 2016"
+	revision: "16w10a"
 	legal: "See notice at end of class."
 
 deferred class
@@ -57,13 +57,14 @@ feature -- Access
 
 	texture: detachable GAME_TEXTURE
 			-- Texture to draw
+			-- It is detachable to let children exist if something needs to happen before having it
 
-	draw(a_camera: CAMERA)
+	draw
 			-- Draws `Current's texture if it exists
-			-- Must draw the texture at position - a_camera.position
+			-- Must draw the texture at position - context.camera.position
 		do
 			if attached texture as la_texture then
-				context.renderer.draw_texture(la_texture, x - a_camera.position.x, y - a_camera.position.y)
+				context.renderer.draw_texture(la_texture, x - context.camera.position.x, y - context.camera.position.y)
 			end
 		end
 note

@@ -1,8 +1,8 @@
 note
 	description: "Abstract class used to make {MENU}s."
 	author: "Guillaume Jean"
-	date: "21 March 2016"
-	revision: "16w08a"
+	date: "12 April 2016"
+	revision: "16w10a"
 	legal: "See notice at end of class."
 
 deferred class
@@ -26,7 +26,7 @@ feature {NONE} -- Initialization
 			context := a_context
 			exit_requested := False
 			is_main_menu := False
-			create camera.make(0, 0, context)
+			create mouse.make(0, 0)
 			create background.make(context.ressource_factory.menu_background, context)
 			create {LINKED_LIST[BUTTON]} buttons.make
 			update_buttons_dimension
@@ -45,10 +45,6 @@ feature {NONE} -- Initialization
 		end
 
 feature {NONE} -- Implementation
-
-	camera: CAMERA
-			-- Camera for the menus
-			-- Can be used for cool transitions
 
 	menu_audio_source: AUDIO_SOURCE
 			-- Source for the audio sounds of the buttons in `Current'
@@ -79,6 +75,7 @@ feature {NONE} -- Implementation
 			context.window.size_change_actions.extend(agent on_size_change)
 			context.window.mouse_button_pressed_actions.extend(agent on_pressed)
 			context.window.mouse_button_released_actions.extend(agent on_released)
+			context.window.mouse_motion_actions.extend(agent on_mouse_motion)
 		end
 
 	on_quit_signal(a_timestamp: NATURAL_32)
@@ -96,14 +93,14 @@ feature {NONE} -- Implementation
 		do
 			context.renderer.clear
 
-			background.draw(camera)
+			background.draw
 
 			if attached title as la_title then
-				la_title.draw(camera)
+				la_title.draw
 			end
 
 			across buttons as la_buttons loop
-				la_buttons.item.draw(camera)
+				la_buttons.item.draw
 			end
 
 			context.window.update
@@ -119,6 +116,14 @@ feature {NONE} -- Implementation
 	on_restart
 			-- Called when `Current' starts again
 		do
+			context.camera.move_to_position(context.window.width // 2, context.window.height // 2, context.window)
+		end
+
+	on_mouse_motion(a_timestamp: NATURAL_32; a_mouse_state: GAME_MOUSE_MOTION_STATE; a_delta_x, a_delta_y: INTEGER)
+			-- Handles the mouse_motion event
+			-- Updates the internal mouse position
+		do
+			mouse.position := [a_mouse_state.x - context.camera.position.x, a_mouse_state.y - context.camera.position.y]
 		end
 
 feature {NONE} -- Basic Operations
@@ -129,14 +134,14 @@ feature {NONE} -- Basic Operations
 	released_button: INTEGER
 			-- Button pressed at the end of the mouse click
 
-	check_button_collision(a_mouse_state: GAME_MOUSE_STATE): INTEGER
-			-- Check in which `buttons' the mouse is
+	check_button_collision: INTEGER
+			-- Check in which `buttons' the `mouse' is
 			-- Returns the last occurence in the case where it hits multiple buttons
 		local
 			l_button_index: INTEGER
 		do
 			across buttons as la_buttons loop
-				if la_buttons.item.point_in_button(a_mouse_state.x, a_mouse_state.y) then
+				if mouse.collides_with_other(la_buttons.item) then
 					l_button_index := la_buttons.cursor_index
 				end
 			end
@@ -146,16 +151,18 @@ feature {NONE} -- Basic Operations
 	on_pressed(a_timestamp: NATURAL_32; a_mouse_state: GAME_MOUSE_BUTTON_PRESSED_STATE; a_nb_clicks: NATURAL_8)
 			-- Whenever a mouse button is pressed in the `window'
 		do
+			mouse.position := [a_mouse_state.x - context.camera.position.x, a_mouse_state.y - context.camera.position.y]
 			if a_mouse_state.is_left_button_pressed then
-				pressed_button := check_button_collision(a_mouse_state)
+				pressed_button := check_button_collision
 			end
 		end
 
 	on_released(a_timestamp: NATURAL_32; a_mouse_state: GAME_MOUSE_BUTTON_RELEASED_STATE; a_nb_clicks: NATURAL_8)
 			-- Whenever a mouse button is released in the `window'
 		do
+			mouse.position := [a_mouse_state.x - context.camera.position.x, a_mouse_state.y - context.camera.position.y]
 			if a_mouse_state.is_left_button_released then
-				released_button := check_button_collision(a_mouse_state)
+				released_button := check_button_collision
 			end
 			if pressed_button = released_button then
 				clicked_button := released_button
@@ -181,6 +188,9 @@ feature -- Access
 
 	clicked_button: INTEGER
 			-- Index of the `buttons' clicked by the user.
+
+	mouse: MOUSE
+			-- `Current's mouse
 
 	background: BACKGROUND
 			-- `Current's background

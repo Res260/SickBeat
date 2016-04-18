@@ -59,7 +59,9 @@ feature {NONE} -- Implementation
 	play_menu_sound_click
 			-- Plays the menu sound click
 		do
-			menu_audio_source.stop
+			if(menu_audio_source.is_playing) then
+				menu_audio_source.stop
+			end
 			menu_audio_source.queue_sound(menu_sound)
 			menu_audio_source.play
 		end

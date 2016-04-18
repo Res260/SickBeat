@@ -58,9 +58,16 @@ feature -- Access
 			l_previous_color := context.renderer.drawing_color
 
 			context.renderer.set_drawing_color(color)
+
 			context.renderer.draw_filled_rectangle(x - 25 - a_camera.position.x, y - 25 - a_camera.position.y, 50, 50)
+			context.renderer.draw_texture (qqchose, 8, 8)
 
 			context.renderer.set_drawing_color(l_previous_color)
+		end
+
+	qqchose: GAME_TEXTURE
+		once
+			Result := context.image_factory.get_player_texture
 		end
 
 	update(a_timediff: REAL_64)

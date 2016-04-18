@@ -1,8 +1,8 @@
 note
 	description: "Class containing some useful objects."
-	author: "Guillaume Jean"
+	author: "Guillaume Jean and Émilio G!"
 	date: "Tue, 15 March 2016 21:05"
-	revision: "16w07a"
+	revision: "16w10a"
 	legal: "See notice at end of class."
 
 class
@@ -18,6 +18,7 @@ feature {NONE} -- Initialization
 			window := a_window
 			renderer := a_window.renderer
 			ressource_factory := a_ressource_factory
+			create image_factory.make(renderer)
 		end
 
 feature -- Access
@@ -30,6 +31,9 @@ feature -- Access
 
 	ressource_factory: RESSOURCE_FACTORY
 			-- The application's ressource factory
+
+	image_factory:IMAGE_FACTORY
+			--The applications' image factory
 invariant
 note
 	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"

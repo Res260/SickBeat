@@ -15,7 +15,6 @@ create
 	make
 
 feature {NONE}
-
 	make (a_sound_data : CHAIN[INTEGER_16])
 		-- Initialization for `Current'.
 		-- Sets sound data and initializes features.

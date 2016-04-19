@@ -111,6 +111,11 @@ feature {NONE} -- Implementation
 			on_redraw(a_timestamp)
 		end
 
+	on_stop
+			-- Called when `Current' is stopped
+		do
+		end
+
 	on_restart
 			-- Called when `Current' starts again
 		do
@@ -218,6 +223,7 @@ feature -- Access
 				on_redraw(game_library.time_since_create)
 				game_library.launch
 				game_library.clear_all_events
+				on_stop
 				if attached next_menu as la_menu then
 					la_menu.start
 					if la_menu.exit_requested then

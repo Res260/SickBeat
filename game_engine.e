@@ -15,7 +15,13 @@ inherit
 			on_redraw,
 			on_pressed,
 			set_events,
-			on_restart
+			on_restart,
+			on_stop
+		end
+	GAME_CORE
+		rename
+			context as context_core,
+			make as make_core
 		end
 	MATH_UTILITY
 
@@ -29,6 +35,7 @@ feature {NONE} -- Initialization
 			-- Initialize all the attributs
 		do
 			Precursor(a_context)
+			context_core := a_context
 			keys := [False, False, False, False]
 			create background.make_movable(context.ressource_factory.game_background, [3840, 2160], context)
 			create current_map.make(background, context)
@@ -41,10 +48,10 @@ feature {NONE} -- Initialization
 			entities.extend(current_player)
 			drawables.extend(current_player)
 			physics.physic_objects.extend(current_player)
-			time_since_last := 0
-			last_tick := 0
+			time_since_last_frame := 0
+			last_frame := 0
 			create game_update_mutex.make
-			create game_update_thread.make
+			create game_update_thread.make(game_update_mutex, Current, game_library)
 			current_player.collision_actions.extend(agent (a_physic_object: PHYSIC_OBJECT)
 														do
 															io.put_string("BOOM!")
@@ -65,27 +72,6 @@ feature {NONE} -- Implementation
 	game_update_thread: GAME_UPDATE_THREAD
 			-- Thread used for the game updates
 
-	frame_display: INTEGER
-			-- Number of frames in the past second
-
-	frame_counter: INTEGER
-			-- Number of frames this second
-
-	second_counter: REAL_64
-			-- Time since last frame
-
-	player_acceleration: REAL_64 = 200.0
-			-- Acceleration of the player
-
-	keys: TUPLE[left, right, up, down: BOOLEAN]
-			-- Booleans for each movement keys, if true, the key is currently held
-
-	last_tick: NATURAL_32
-			-- Time of last update in milliseconds
-
-	time_since_last: REAL_64
-			-- Time since last update in seconds
-
 	set_events
 			-- Sets the event handlers for `Current'
 		do
@@ -101,14 +87,14 @@ feature {NONE} -- Implementation
 	on_tick(a_timestamp: NATURAL_32)
 			-- Method run on every iteration (should be 60 times per second)
 		do
-			if last_tick <= 0 then
-				time_since_last := 0
+			if last_frame <= 0 then
+				time_since_last_frame := 0
 			else
-				time_since_last := (a_timestamp - last_tick) / 1000
+				time_since_last_frame := (a_timestamp - last_frame) / 1000
 			end
-			last_tick := a_timestamp
+			last_frame := a_timestamp
 
-			second_counter := second_counter + time_since_last
+			second_counter := second_counter + time_since_last_frame
 			if second_counter >= 1.0 then
 				second_counter := second_counter - 1.0
 				frame_display := frame_counter
@@ -116,99 +102,29 @@ feature {NONE} -- Implementation
 				io.put_string("Frames: " + frame_display.out + "%N")
 			end
 
-				-- This V can go into a thread
-			update_player_acceleration
-			update_camera
-
-			update_everything
-			physics.check_all
-				-- This ^ can go into a thread
+			game_update_mutex.lock
 
 			on_redraw(a_timestamp)
+
+			game_update_mutex.unlock
 		end
 
-	update_everything
-			-- Updates every {ENTITY} in `entities'
-			-- Clears every {WAVE} that is no longer visible in the screen
-		local
-			l_to_remove: LINKED_LIST[ENTITY]
+	on_stop
+			-- Close the game_update_thread
 		do
-			create l_to_remove.make
-			across entities as la_entities loop
-				la_entities.item.update(time_since_last)
-				if attached {WAVE} la_entities.item as la_wave then
-					if la_wave.dead then
-						l_to_remove.extend(la_wave)
-					end
-				end
-			end
-			from
-				l_to_remove.start
-				entities.start
-				drawables.start
-				physics.physic_objects.start
-			until
-				l_to_remove.exhausted
-			loop
-				entities.prune(l_to_remove.item)
-				drawables.prune(l_to_remove.item)
-				physics.physic_objects.prune(l_to_remove.item)
-				l_to_remove.forth
-			end
-		ensure
-			Entities_Out_Of_Bounds_Deleted: across entities as la_entities all
-												if attached {WAVE} la_entities.item as la_wave then
-													not la_wave.dead
-												else
-													True
-												end
-											end
-			Drawables_Out_Of_Bounds_Deleted: across drawables as la_drawables all
-												if attached {WAVE} la_drawables.item as la_wave then
-													not la_wave.dead
-												else
-													True
-												end
-											end
-		end
-
-	update_player_acceleration
-			-- Update `current_player's speed by following physics
-			-- might be ported into physics engine later
-		local
-			l_x_accel: REAL_64
-			l_y_accel: REAL_64
-		do
-			l_x_accel := -current_player.speed.x
-			l_y_accel := -current_player.speed.y
-			if keys.up then
-				l_y_accel := l_y_accel - player_acceleration
-			end
-			if keys.down then
-				l_y_accel := l_y_accel + player_acceleration
-			end
-			if keys.left then
-				l_x_accel := l_x_accel - player_acceleration
-			end
-			if keys.right then
-				l_x_accel := l_x_accel + player_acceleration
-			end
-
-			current_player.set_acceleration(l_x_accel, l_y_accel)
-		end
-
-	update_camera
-			-- Update `context.camera's position
-		do
-			context.camera.move_at_entity(current_player, context.window)
+			game_update_thread.stop_thread
+			game_update_thread.join
 		end
 
 	on_restart
 			-- Reset the tick counter in order to prevent the game to continue playing when pausing
 		do
-			last_tick := 0
+			last_frame := 0
+			if game_update_thread.is_launchable then
+				game_update_thread.launch
+			end
 		ensure then
-			Tick_Reset: last_tick = 0
+			Tick_Reset: last_frame = 0
 		end
 
 	on_redraw(a_timestamp: NATURAL_32)
@@ -292,48 +208,19 @@ feature {NONE} -- Implementation
 			current_player.set_color_index((current_player.color_index + a_delta_y + current_player.colors.count) \\ current_player.colors.count)
 		end
 
-feature -- Basic Operations
-
-	add_entity_to_world(a_entity: ENTITY)
-			-- Adds an entity to the world
-		do
---			if attached {TOURELLE} a_entity as la_tourelle then
---				la_tourelle.launch_wave_event(agent add_entity_to_world)
---			end
-			entities.extend(a_entity)
-			drawables.extend(a_entity)
-			physics.physic_objects.extend(a_entity)
-		end
-
-feature -- Initialization
+feature -- Access
 
 	renderer: RENDER_ENGINE
 			-- Object rendering engine
-
-	current_player: PLAYER
-			-- {PLAYER} currently being controlled by the user
 
 	network: NETWORK_ENGINE
 			-- `network'
 		attribute check False then end end --| Remove line when `network' is initialized in creation procedure.
 
-feature -- Access
-
 	hud_items: LIST[HUD_ITEM]
 			-- `hud_items'
 		attribute check False then end end --| Remove line when `hud_items' is initialized in creation procedure.
 
-	current_map: MAP
-			-- Map currently played
-
-	physics: PHYSICS_ENGINE
-			-- Physics handling object
-
-	entities: LIST[ENTITY]
-			-- List of all entities to update every tick
-
-	drawables: LIST[DRAWABLE]
-			-- List of all objects to render every frame
 invariant
 note
 	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"

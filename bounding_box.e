@@ -11,7 +11,9 @@ class
 inherit
 	PHYSIC_OBJECT
 		redefine
-			as_box
+			as_box,
+			collides_with_box,
+			collides_with_arc
 		end
 
 create
@@ -37,6 +39,35 @@ feature {NONE} -- Implementation
 			-- Color for the bounding boxes
 		once
 			create Result.make(255, 142, 0, 255)
+		end
+
+feature -- Implementation
+
+	as_box: BOUNDING_BOX
+			-- Returns `Current'
+		do
+			Result := Current
+		end
+
+	collides_with_box(a_other: BOUNDING_BOX): BOOLEAN
+			-- Whether or not `Current' collides with another {BOUNDING_BOX}
+		do
+			if
+				a_other.lower_corner.x <= upper_corner.x and
+				a_other.upper_corner.x >= lower_corner.x and
+				a_other.upper_corner.y >= lower_corner.y and
+				a_other.lower_corner.y <= upper_corner.y
+			then
+				Result := True
+			else
+				Result := False
+			end
+		end
+
+	collides_with_arc(a_arc: BOUNDING_ARC): BOOLEAN
+			-- Whether or not `Current' collides with a {BOUNDING_ARC}
+		do
+			Result := a_arc.collides_with_box(Current)
 		end
 
 feature -- Access
@@ -65,27 +96,6 @@ feature -- Access
 				a_context.renderer.draw_line(l_lower_x, l_lower_y, l_upper_x, l_lower_y)
 				a_context.renderer.draw_line(l_lower_x, l_upper_y, l_upper_x, l_upper_y)
 				a_context.renderer.draw_line(l_upper_x, l_lower_y, l_upper_x, l_upper_y)
-			end
-		end
-
-	as_box: BOUNDING_BOX
-			-- Returns `Current'
-		do
-			Result := Current
-		end
-
-	collides_with_box(a_other: BOUNDING_BOX): BOOLEAN
-			-- Whether or not `Current' collides with another {BOUNDING_BOX}
-		do
-			if
-				a_other.lower_corner.x <= upper_corner.x and
-				a_other.upper_corner.x >= lower_corner.x and
-				a_other.upper_corner.y >= lower_corner.y and
-				a_other.lower_corner.y <= upper_corner.y
-			then
-				Result := True
-			else
-				Result := False
 			end
 		end
 

@@ -33,14 +33,23 @@ feature {NONE} -- Initialization
 			create background.make_movable(context.ressource_factory.game_background, [3840, 2160], context)
 			create current_map.make(background, context)
 			create renderer.make(current_map, context)
+			create physics.make
 			create current_player.make(context)
 			create {LINKED_LIST[ENTITY]} entities.make
 			create {ARRAYED_LIST[HUD_ITEM]} hud_items.make(0)
 			create {ARRAYED_LIST[DRAWABLE]} drawables.make(0)
 			entities.extend(current_player)
 			drawables.extend(current_player)
+			physics.physic_objects.extend(current_player)
 			time_since_last := 0
 			last_tick := 0
+			create game_update_mutex.make
+			create game_update_thread.make
+			current_player.collision_actions.extend(agent (a_physic_object: PHYSIC_OBJECT)
+														do
+															io.put_string("BOOM!")
+														end
+												   )
 			current_player.launch_wave_event.extend(agent (a_wave:WAVE)
 														do
 															add_entity_to_world(a_wave)
@@ -49,6 +58,12 @@ feature {NONE} -- Initialization
 		end
 
 feature {NONE} -- Implementation
+
+	game_update_mutex: MUTEX
+			-- Mutex used to lock the rendered objects
+
+	game_update_thread: GAME_UPDATE_THREAD
+			-- Thread used for the game updates
 
 	frame_display: INTEGER
 			-- Number of frames in the past second
@@ -101,15 +116,19 @@ feature {NONE} -- Implementation
 				io.put_string("Frames: " + frame_display.out + "%N")
 			end
 
-			update_player
+				-- This V can go into a thread
+			update_player_acceleration
 			update_camera
 
-			clear_out_of_bounds_waves
+			update_everything
+			physics.check_all
+				-- This ^ can go into a thread
 
 			on_redraw(a_timestamp)
 		end
 
-	clear_out_of_bounds_waves
+	update_everything
+			-- Updates every {ENTITY} in `entities'
 			-- Clears every {WAVE} that is no longer visible in the screen
 		local
 			l_to_remove: LINKED_LIST[ENTITY]
@@ -118,9 +137,6 @@ feature {NONE} -- Implementation
 			across entities as la_entities loop
 				la_entities.item.update(time_since_last)
 				if attached {WAVE} la_entities.item as la_wave then
-					if la_wave.collides_with_other(current_player) then
---						io.put_string("PogChamp Collision!%N")
-					end
 					if la_wave.dead then
 						l_to_remove.extend(la_wave)
 					end
@@ -130,11 +146,13 @@ feature {NONE} -- Implementation
 				l_to_remove.start
 				entities.start
 				drawables.start
+				physics.physic_objects.start
 			until
 				l_to_remove.exhausted
 			loop
 				entities.prune(l_to_remove.item)
 				drawables.prune(l_to_remove.item)
+				physics.physic_objects.prune(l_to_remove.item)
 				l_to_remove.forth
 			end
 		ensure
@@ -154,7 +172,7 @@ feature {NONE} -- Implementation
 											end
 		end
 
-	update_player
+	update_player_acceleration
 			-- Update `current_player's speed by following physics
 			-- might be ported into physics engine later
 		local
@@ -284,6 +302,7 @@ feature -- Basic Operations
 --			end
 			entities.extend(a_entity)
 			drawables.extend(a_entity)
+			physics.physic_objects.extend(a_entity)
 		end
 
 feature -- Initialization
@@ -308,8 +327,7 @@ feature -- Access
 			-- Map currently played
 
 	physics: PHYSICS_ENGINE
-			-- `physics'
-		attribute check False then end end --| Remove line when `physics' is initialized in creation procedure.
+			-- Physics handling object
 
 	entities: LIST[ENTITY]
 			-- List of all entities to update every tick

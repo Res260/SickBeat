@@ -11,7 +11,9 @@ class
 inherit
 	PHYSIC_OBJECT
 		redefine
-			as_box
+			as_box,
+			collides_with_box,
+			collides_with_arc
 		end
 	MATH_UTILITY
 
@@ -78,6 +80,69 @@ feature -- Implementation
 			-- Return the minimal bounding box of `Current's arc
 		do
 			Result := minimal_bounding_box
+		end
+
+	collides_with_box(a_box: BOUNDING_BOX): BOOLEAN -- TODO: Detect angle within range
+			-- Whether or not `Current' collides with a {BOUNDING_BOX}
+		local
+			l_closest_x, l_closest_y: REAL_64
+			l_distance: REAL_64
+			l_difference_x, l_difference_y: REAL_64
+			l_angle: REAL_64
+		do
+			l_closest_x := clamp(center.x, a_box.lower_corner.x, a_box.upper_corner.x)
+			l_closest_y := clamp(center.y, a_box.lower_corner.y, a_box.upper_corner.y)
+			l_distance := l_closest_x ^ 2 + l_closest_y ^ 2
+			if l_distance <= radius ^ 2 then
+				l_difference_x := l_closest_x - center.x
+				l_difference_y := l_closest_y - center.y
+				l_angle := calculate_circle_angle(l_difference_x, l_difference_y)
+				Result := start_angle <= l_angle and l_angle <= end_angle
+			else
+				Result := False
+			end
+		end
+
+	collides_with_arc(a_arc: BOUNDING_ARC): BOOLEAN -- TODO: Detect angle within range
+			-- Whether or not `Current' collides with a {BOUNDING_ARC}
+		local
+			l_center_distance_x, l_center_distance_y: REAL_64
+			l_center_angle1, l_center_angle2: REAL_64
+			l_temp_start_angle1, l_temp_start_angle2: REAL_64
+			l_temp_end_angle1, l_temp_end_angle2: REAL_64
+		do
+			l_center_distance_x := a_arc.center.x - center.x
+			l_center_distance_y := a_arc.center.y - center.y
+			if l_center_distance_x ~ 0 and l_center_distance_y ~ 0 then
+				Result := radius - a_arc.radius <= 0
+			else
+				l_center_angle1 := calculate_circle_angle(l_center_distance_x, l_center_distance_y)
+				l_center_angle2 := modulo(Pi - l_center_angle1, Two_Pi)
+				l_temp_start_angle1 := start_angle
+				l_temp_start_angle2 := a_arc.start_angle
+				l_temp_end_angle1 := end_angle
+				l_temp_end_angle2 := a_arc.end_angle
+				if end_angle > Two_Pi then
+					l_temp_start_angle1 := l_temp_start_angle1 - Two_Pi
+					l_temp_end_angle1 := l_temp_end_angle1 - Two_Pi
+				elseif start_angle < -Two_Pi then
+					l_temp_start_angle1 := l_temp_start_angle1 + Two_Pi
+					l_temp_end_angle1 := l_temp_end_angle1 + Two_Pi
+				end
+				if a_arc.end_angle > Two_Pi then
+					l_temp_start_angle2 := l_temp_start_angle2 - Two_Pi
+					l_temp_end_angle2 := l_temp_end_angle2 - Two_Pi
+				elseif a_arc.start_angle < -Two_Pi then
+					l_temp_start_angle2 := l_temp_start_angle2 + Two_Pi
+					l_temp_end_angle2 := l_temp_end_angle2 + Two_Pi
+				end
+				Result := (
+								l_temp_start_angle1 <= l_center_angle1 and
+								l_center_angle1 <= l_temp_end_angle1 and
+								l_temp_start_angle2 <= l_center_angle2 and
+								l_center_angle2 <= l_temp_end_angle2
+						  )
+			end
 		end
 
 feature -- Access

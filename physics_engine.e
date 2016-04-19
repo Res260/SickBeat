@@ -1,5 +1,5 @@
 note
-	description: "Summary description for {PHYSICS_ENGINE}."
+	description: "Handles physics."
 	author: "Guillaume Jean"
 	date: "18 April 2016"
 	revision: "16w11a"
@@ -26,8 +26,33 @@ feature -- Access
 
 	check_all
 			-- Checks all collisions of `physic_objects'
+		local
+			l_physic_objects1, l_physic_objects2: LIST[PHYSIC_OBJECT]
 		do
-
+			physic_objects.start
+			l_physic_objects1 := physic_objects.duplicate(physic_objects.count)
+			from
+				l_physic_objects1.start
+			until
+				l_physic_objects1.exhausted
+			loop
+				from
+					l_physic_objects1.forth
+					l_physic_objects2 := l_physic_objects1.duplicate(l_physic_objects1.count)
+					l_physic_objects2.start
+					l_physic_objects1.back
+				until
+					l_physic_objects2.exhausted
+				loop
+					if l_physic_objects1.item.collides_with_other(l_physic_objects2.item) then
+						if l_physic_objects1.item.collides_precisely_with_other(l_physic_objects2.item) then
+							l_physic_objects1.item.collision_actions.call(l_physic_objects2.item)
+						end
+					end
+					l_physic_objects2.forth
+				end
+				l_physic_objects1.forth
+			end
 		end
 
 note

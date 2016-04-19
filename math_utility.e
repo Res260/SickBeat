@@ -26,7 +26,7 @@ feature -- Constants
 
 feature -- Access
 
-	calculate_circle_angle(a_x, a_y: INTEGER): REAL_64
+	calculate_circle_angle(a_x, a_y: REAL_64): REAL_64
 			-- Correctly handles arc_tangent negatives and zeros
 		require
 			Angle_Possible: a_x /= 0 or a_y /= 0
@@ -53,8 +53,22 @@ feature -- Access
 		end
 
 	modulo(x, n: REAL_64): REAL_64
+			-- Same as {INTEGER_32}.integer_remainder but for REAL_64
 		do
 			Result := x - (n * floor(x/n))
 		end
 
+	clamp(value, min, max: REAL_64): REAL_64
+			-- If value > max then max is returned
+			-- If value < min then min is returned
+			-- If min <= value <= max then value is returned
+		do
+			if value > max then
+				Result := max
+			elseif value < min then
+				Result := min
+			else
+				Result := value
+			end
+		end
 end

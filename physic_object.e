@@ -11,6 +11,7 @@ deferred class
 feature {NONE} -- Initialization
 
 	make_physic_object
+			-- Initializes `Current's internal attributes
 		do
 			create collision_actions
 		end
@@ -29,6 +30,26 @@ feature -- Access
 			-- Whether or not `Current' collides with `a_other's minimal bounding box
 		do
 			Result := as_box.collides_with_box(a_other.as_box)
+		end
+
+	collides_precisely_with_other(a_other: PHYSIC_OBJECT): BOOLEAN
+			-- Whether or not `Current' collides with `a_other'
+		do
+			if attached {BOUNDING_BOX} a_other as la_box then
+				Result := collides_with_box(la_box)
+			elseif attached {BOUNDING_ARC} a_other as la_arc then
+				Result := collides_with_arc(la_arc)
+			end
+		end
+
+	collides_with_box(a_box: BOUNDING_BOX): BOOLEAN
+			-- Whether or not `Current' collides with `a_box'
+		deferred
+		end
+
+	collides_with_arc(a_arc: BOUNDING_ARC): BOOLEAN
+			-- Whether or not `Current' collides with `a_arc'
+		deferred
 		end
 
 note

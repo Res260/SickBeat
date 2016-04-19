@@ -14,6 +14,6 @@ feature
 			create Result.make
 		end
 note
-	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"
+	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007 | Copyright (c) 2016 Émilio Gonzalez and Guillaume Jean"
 	source: "[file: LICENSE]"
 end

@@ -19,7 +19,7 @@ feature {NONE}
 	make
 		-- Initialization for `Current'. Enables the audio_library.
 		do
-			sound_on := TRUE
+			sound_on := True
 			audio_library.enable_sound
 			audio_library.launch_in_thread
 			audio_library.disable_print_on_error
@@ -71,6 +71,6 @@ feature -- Access
 			audio_library.quit_library
 		end
 note
-	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"
+	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007 | Copyright (c) 2016 Émilio Gonzalez and Guillaume Jean"
 	source: "[file: LICENSE]"
 end

@@ -83,6 +83,6 @@ feature -- Implementation
 invariant
 	Size_If_Movable: movable implies attached size
 note
-	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"
+	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007 | Copyright (c) 2016 Émilio Gonzalez and Guillaume Jean"
 	source: "[file: LICENSE]"
 end

@@ -118,7 +118,7 @@ feature -- Access
 
 	qqchose: GAME_TEXTURE
 		once
-			Result := context.image_factory.get_player_texture
+			Result := context.image_factory.get_player_texture_red
 		end
 
 	update(a_timediff: REAL_64)
@@ -176,6 +176,6 @@ feature -- Access
 			Color_Index_Set: color_index = a_color_index
 		end
 note
-	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"
+	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007 | Copyright (c) 2016 Émilio Gonzalez and Guillaume Jean"
 	source: "[file: LICENSE]"
 end

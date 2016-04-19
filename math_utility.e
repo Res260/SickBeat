@@ -56,5 +56,7 @@ feature -- Access
 		do
 			Result := x - (n * floor(x/n))
 		end
-
+note
+	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007 | Copyright (c) 2016 Émilio Gonzalez and Guillaume Jean"
+	source: "[file: LICENSE]"
 end

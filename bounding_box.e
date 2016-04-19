@@ -101,6 +101,6 @@ feature -- Access
 invariant
 	Upper_Corner_Biggest_Corner: upper_corner.x >= lower_corner.x and upper_corner.y >= lower_corner.y
 note
-	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"
+	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007 | Copyright (c) 2016 Émilio Gonzalez and Guillaume Jean"
 	source: "[file: LICENSE]"
 end

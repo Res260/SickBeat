@@ -114,6 +114,6 @@ invariant
 	buffer_index_not_retarded: 0 <= buffer_index and buffer_index <= sound_length * byte_per_buffer_sample
 	buffer_index_even: buffer_index \\ 2 = 0
 note
-	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"
+	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007 | Copyright (c) 2016 Émilio Gonzalez and Guillaume Jean"
 	source: "[file: LICENSE]"
 end

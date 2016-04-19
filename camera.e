@@ -36,4 +36,7 @@ feature -- Access
 			position.x := a_entity.x - a_window.width // 2
 			position.y := a_entity.y - a_window.height // 2
 		end
+note
+	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007 | Copyright (c) 2016 Émilio Gonzalez and Guillaume Jean"
+	source: "[file: LICENSE]"
 end

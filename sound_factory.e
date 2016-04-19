@@ -11,17 +11,6 @@ class
 inherit
 	SOUND_GENERATOR_SHARED
 
-create
-	make
-
-feature --Initialization
-
-	make
-		-- Initialization for `Current'. Nothing for now.
-		do
-
-		end
-
 feature --Access
 
 	create_sound_menu_click:SOUND
@@ -37,7 +26,7 @@ feature --Access
 			create Result.make(l_wave)
 		end
 
-	create_menu_music:attached SOUND
+	create_menu_music:SOUND
 		local
 			l_wave_bass: CHAIN[INTEGER_16]
 			l_wave_bass2: CHAIN[INTEGER_16]
@@ -69,6 +58,6 @@ feature --Access
 		end
 
 note
-	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"
+	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007 | Copyright (c) 2016 Émilio Gonzalez and Guillaume Jean"
 	source: "[file: LICENSE]"
 end

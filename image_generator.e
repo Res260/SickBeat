@@ -23,6 +23,7 @@ feature --Initialization
 feature --Access
 
 	make_pixels_transparent(a_pixels: GAME_PIXEL_READER_WRITER)
+			--Loops every pixels in a_pixels and makes it transparent.
 		do
 			across 1 |..| a_pixels.width as l_i loop
 				across 1 |..| a_pixels.height as l_j loop
@@ -33,7 +34,13 @@ feature --Access
 
 	make_circle(a_pixels:GAME_PIXEL_READER_WRITER; a_outside_color, a_inside_color: GAME_COLOR;
 		  a_border_color:detachable GAME_COLOR; a_border_thickness: INTEGER_32)
+			--Makes a circle fading from a_outside_color to a_inside_color that is as large
+			-- as a_pixels can handle. Also makes a a_border_color border of a_border_thickness pixels thick.
+			-- If you do not wish to have a border, simply set a_border_thickness to 0 and a_border_color
+			-- can be void.
 		require
+			Pixels_Dimentions_Valid: a_pixels.width = a_pixels.height
+			Pixels_Dimensions_Even: a_pixels.height \\ 2 = 0
 			Border_Color_With_Border_Thickness: a_border_thickness > 0 implies attached a_border_color
 		local
 			l_resolution: INTEGER_32
@@ -64,13 +71,12 @@ feature --Access
 				make_circle_border(a_pixels, i, l_color, l_resolution)
 				i := i + 1
 			end
-
 			if(attached a_border_color as la_border_color) then
 				l_radius := a_pixels.height // 2
 				from
-					i := l_radius
+					i := l_radius - 1
 				until
-					i <= l_radius - a_border_thickness
+					i <= l_radius - a_border_thickness - 1
 				loop
 					l_resolution := ((pi * i)^1.5).ceiling
 					make_circle_border(a_pixels, i, la_border_color, l_resolution)
@@ -80,6 +86,13 @@ feature --Access
 		end
 
 	make_circle_border(a_pixels:GAME_PIXEL_READER_WRITER; a_radius:INTEGER_32; a_color:GAME_COLOR; a_resolution: INTEGER_32)
+			--Makes a one pixel large border (color a_color) of a circle with a radius of a_radius. a_resolution represents
+			--the number of pixels that will be drawn.
+		require
+			Pixels_Dimentions_Valid: a_pixels.width = a_pixels.height
+			Pixels_Dimensions_Even: a_pixels.height \\ 2 = 0
+			Radius_Valid: a_radius > 0 and a_radius <= a_pixels.height // 2
+			Resolution_Valid: a_resolution > 0
 		local
 			l_center_x:REAL_64
 			l_center_y:REAL_64
@@ -123,6 +136,6 @@ feature --Access
 		end
 
 note
-	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"
+	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007 | Copyright (c) 2016 Émilio Gonzalez and Guillaume Jean"
 	source: "[file: LICENSE]"
 end

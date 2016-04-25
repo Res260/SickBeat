@@ -8,8 +8,8 @@ note
 class
 	ENNEMY
 
-inherit
-	ENTITY
+--inherit
+--	ENTITY
 
 feature -- Access
 

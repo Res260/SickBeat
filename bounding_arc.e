@@ -11,7 +11,9 @@ class
 inherit
 	PHYSIC_OBJECT
 		redefine
-			as_box
+			as_box,
+			collides_with_box,
+			collides_with_arc
 		end
 	MATH_UTILITY
 
@@ -49,27 +51,45 @@ feature {NONE} -- Implementation
 			l_lower_x: REAL_64
 			l_lower_y: REAL_64
 		do
-			if (start_angle <= 0 and 0 <= end_angle) or (start_angle <= Two_Pi and Two_Pi <= end_angle) then
+			if is_angle_in_range(0, start_angle, end_angle) then
 				l_upper_x := center.x + radius
 			else
 				l_upper_x := center.x + (radius * (cosine(start_angle).max(cosine(end_angle))))
 			end
-			if (start_angle <= Pi_2 and Pi_2 <= end_angle) or (start_angle <= 5 * Pi_2 and 5 * Pi_2 <= end_angle) then
+			if is_angle_in_range(Pi_2, start_angle, end_angle) then
 				l_upper_y := center.y + radius
 			else
 				l_upper_y := center.y + (radius * (sine(start_angle).max(sine(end_angle))))
 			end
-			if start_angle <= Pi and Pi <= end_angle then
+			if is_angle_in_range(Pi, start_angle, end_angle) then
 				l_lower_x := center.x - radius
 			else
 				l_lower_x := center.x + (radius * (cosine(start_angle).min(cosine(end_angle))))
 			end
-			if (start_angle <= Three_Pi_2 and Three_Pi_2 <= end_angle) or (start_angle <= -Pi_2 and -Pi_2 <= end_angle) then
+			if is_angle_in_range(Three_Pi_2, start_angle, end_angle) then
 				l_lower_y := center.y - radius
 			else
 				l_lower_y := center.y + (radius * (sine(start_angle).min(sine(end_angle))))
 			end
 			minimal_bounding_box.update_to([l_lower_x, l_lower_y], [l_upper_x, l_upper_y])
+		end
+
+	find_furthest_corner_distance(a_list: LIST[TUPLE[x, y: REAL_64]]; a_center: TUPLE[x, y: REAL_64]): REAL_64
+			-- Finds the furthest tuple of coordinates in the list of coordinates
+		local
+			l_angle: REAL_64
+			l_distance: REAL_64
+			l_temp_x, l_temp_y: REAL_64
+		do
+			across a_list as la_list loop
+				l_temp_x := la_list.item.x - a_center.x
+				l_temp_y := la_list.item.y - a_center.y
+				l_angle := modulo(calculate_circle_angle(l_temp_x, l_temp_y), Two_Pi)
+				if is_angle_in_range(l_angle, start_angle, end_angle) then
+					l_distance := l_distance.max((l_temp_x ^ 2) + (l_temp_y ^ 2))
+				end
+			end
+			Result := l_distance
 		end
 
 feature -- Implementation
@@ -78,6 +98,38 @@ feature -- Implementation
 			-- Return the minimal bounding box of `Current's arc
 		do
 			Result := minimal_bounding_box
+		end
+
+	collides_with_box(a_box: BOUNDING_BOX): BOOLEAN
+			-- Whether or not `Current' collides with a {BOUNDING_BOX}
+		do
+			Result := False
+		end
+
+	collides_with_arc(a_arc: BOUNDING_ARC): BOOLEAN
+			-- Whether or not `Current' collides with a {BOUNDING_ARC}
+		local
+			l_center_distance_x, l_center_distance_y: REAL_64
+			l_center_angle1, l_center_angle2: REAL_64
+		do
+			l_center_distance_x := a_arc.center.x - center.x
+			l_center_distance_y := a_arc.center.y - center.y
+			if l_center_distance_x ~ 0 and l_center_distance_y ~ 0 then
+				Result := radius - a_arc.radius <= 0
+			else
+				l_center_angle1 := calculate_circle_angle(l_center_distance_x, l_center_distance_y)
+				l_center_angle2 := modulo(Pi - l_center_angle1, Two_Pi)
+				Result := (
+								is_angle_in_range(l_center_angle1, start_angle, end_angle) and
+								is_angle_in_range(l_center_angle2, a_arc.start_angle, a_arc.end_angle)
+						  )
+			end
+		end
+
+	collides_with_sphere(a_sphere: BOUNDING_SPHERE): BOOLEAN
+			-- Check if `Current' collides with `a_sphere'
+		do
+			Result := a_sphere.collides_with_arc(Current)
 		end
 
 feature -- Access
@@ -99,6 +151,7 @@ feature -- Access
 			update_minimal_bounding_box
 			if a_context.debugging then
 				minimal_bounding_box.draw_box(a_context)
+				a_context.renderer.draw_filled_rectangle(center.x.rounded - 2 - a_context.camera.position.x, center.y.rounded - 2 - a_context.camera.position.y, 4, 4)
 			end
 		end
 

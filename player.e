@@ -84,7 +84,7 @@ feature -- Access
 			l_speed: TUPLE[x, y: REAL_64]
 		do
 			if a_mouse_state.is_left_button_pressed then
-				l_angle := Pi_4
+				l_angle := Two_Pi
 				l_x := a_mouse_state.x - x_real.rounded + context.camera.position.x
 				l_y := a_mouse_state.y - y_real.rounded + context.camera.position.y
 				if l_x /= 0 or l_y /= 0 then

@@ -39,6 +39,13 @@ feature {NONE} -- Initialization
 			center_speed := a_center_speed
 			source := a_source
 			make_bounding_arc(a_x, a_y, a_direction, a_angle, radius)
+			collision_actions.extend(agent (a_physic_object: PHYSIC_OBJECT)
+										do
+											if not attached {WAVE} a_physic_object then
+												a_physic_object.collision_actions.call(Current)
+											end
+										end
+								    )
 		end
 
 feature {NONE} -- Basic Operations

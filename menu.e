@@ -46,6 +46,10 @@ feature {NONE} -- Initialization
 
 feature {NONE} -- Implementation
 
+	started: BOOLEAN
+			-- Whether or not `Current' has started
+			-- Used for on_start
+
 	menu_audio_source: AUDIO_SOURCE
 			-- Source for the audio sounds of the buttons in `Current'
 
@@ -71,11 +75,21 @@ feature {NONE} -- Implementation
 			Events_Enabled: game_library.is_events_enable
 		do
 			game_library.quit_signal_actions.extend(agent on_quit_signal)
+			game_library.iteration_actions.extend(agent on_iteration)
 			context.window.expose_actions.extend(agent on_redraw)
 			context.window.size_change_actions.extend(agent on_size_change)
 			context.window.mouse_button_pressed_actions.extend(agent on_pressed)
 			context.window.mouse_button_released_actions.extend(agent on_released)
 			context.window.mouse_motion_actions.extend(agent on_mouse_motion)
+		end
+
+	on_iteration(a_timestamp: NATURAL_32)
+			-- Method run on every iteration
+		do
+			if not started then
+				on_start
+				started := True
+			end
 		end
 
 	on_quit_signal(a_timestamp: NATURAL_32)
@@ -111,6 +125,16 @@ feature {NONE} -- Implementation
 		do
 			update_buttons_dimension
 			on_redraw(a_timestamp)
+		end
+
+	on_start
+			-- Called when `Current' starts
+		do
+		end
+
+	on_stop
+			-- Called when `Current' is stopped
+		do
 		end
 
 	on_restart
@@ -220,6 +244,7 @@ feature -- Access
 				on_redraw(game_library.time_since_create)
 				game_library.launch
 				game_library.clear_all_events
+				on_stop
 				if attached next_menu as la_menu then
 					la_menu.start
 					if la_menu.exit_requested then
@@ -263,6 +288,7 @@ feature -- Access
 	set_title(a_title: READABLE_STRING_GENERAL)
 			-- Set `Current's title's texture and dimension
 		do
+			context.window.set_title(a_title)
 			create title.make(a_title, text_color, context)
 			update_buttons_dimension
 		end

@@ -26,7 +26,28 @@ feature -- Constants
 
 feature -- Access
 
-	calculate_circle_angle(a_x, a_y: INTEGER): REAL_64
+	is_angle_in_range(a_angle, a_start_angle, a_end_angle: REAL_64): BOOLEAN
+			-- Checks if `a_angle' is within `a_start_angle' and `a_end_angle'
+			-- Priority #1 for optimizing
+		local
+			l_angle: REAL_64
+			i: REAL_64
+		do
+			Result := False
+			from
+				i := -1
+			until
+				i > 1 or Result
+			loop
+				l_angle := a_angle + (Two_Pi * i)
+				if a_start_angle <= l_angle and l_angle <= a_end_angle then
+					Result := True
+				end
+				i := i + 1
+			end
+		end
+
+	calculate_circle_angle(a_x, a_y: REAL_64): REAL_64
 			-- Correctly handles arc_tangent negatives and zeros
 		require
 			Angle_Possible: a_x /= 0 or a_y /= 0
@@ -53,10 +74,27 @@ feature -- Access
 		end
 
 	modulo(x, n: REAL_64): REAL_64
+			-- Same as {INTEGER_32}.integer_remainder but for REAL_64
 		do
 			Result := x - (n * floor(x/n))
+		end
+
+	clamp(value, min, max: REAL_64): REAL_64
+			-- If value > max then max is returned
+			-- If value < min then min is returned
+			-- If min <= value <= max then value is returned
+		do
+			if value > max then
+				Result := max
+			elseif value < min then
+				Result := min
+			else
+				Result := value
+			end
 		end
 note
 	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007 | Copyright (c) 2016 Émilio Gonzalez and Guillaume Jean"
 	source: "[file: LICENSE]"
 end
+
+

@@ -118,7 +118,7 @@ feature -- Access
 
 	qqchose: GAME_TEXTURE
 		once
-			Result := context.image_factory.get_player_texture_red
+			Result := context.image_factory.get_white_arc
 		end
 
 	update(a_timediff: REAL_64)

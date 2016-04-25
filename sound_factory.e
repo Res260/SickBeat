@@ -1,8 +1,8 @@
 note
 	description: "Class that creates sounds for the game."
 	author: "Émilio G!"
-	date: "16-3-29"
-	revision: "16w08b"
+	date: "16-4-25"
+	revision: "16w12a"
 	legal: "See notice at end of class."
 
 class
@@ -10,6 +10,26 @@ class
 
 inherit
 	SOUND_GENERATOR_SHARED
+
+create
+	make
+
+feature {NONE} -- Initialization
+	make
+			--Initialization for `Current'
+		do
+			create{ARRAYED_LIST[SOUND]} sounds_list.make (max_frequency // min_frequency)
+		end
+
+feature {NONE}
+
+	min_frequency:INTEGER_32 = 20
+		--Minimum frequency for sounds_list
+
+	max_frequency:INTEGER_32 = 19000
+		--Maximum frequency for sounds_list
+
+	sounds_list:CHAIN[SOUND]
 
 feature --Access
 
@@ -55,6 +75,26 @@ feature --Access
 
 			sound_generator.mix (l_wave_bass, l_wave_bass2, 0)
 			create Result.make (l_wave_bass)
+		end
+
+	populate_sounds_list
+			--populates sounds_list by generating many sounds.
+			--side effect on sounds_list.
+		local
+			i:INTEGER_32
+			l_wave:CHAIN[INTEGER_16]
+		do
+			from
+				i := 20
+			until
+				i > 19000
+			loop
+				l_wave := sound_generator.create_sine_wave(90, i)
+				sound_generator.fade (l_wave, 0, 0.30, 0, 0.100)
+				sound_generator.fade (l_wave, 0.7, 1, 1, 0)
+				sounds_list.extend(create{SOUND}.make (l_wave))
+				i := i + 20
+			end
 		end
 
 note

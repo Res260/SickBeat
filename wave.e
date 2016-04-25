@@ -29,6 +29,7 @@ feature {NONE} -- Initialization
 	make(a_x, a_y, a_direction, a_angle: REAL_64; a_center_speed: TUPLE[x, y: REAL_64]; a_color: GAME_COLOR; a_source: ENTITY; a_context: CONTEXT)
 			-- Initialize `Current' with a direction, angle, maximum radius, and color
 		do
+			context := a_context
 			make_entity(a_x, a_y, a_context)
 			direction := a_direction
 			angle := a_angle
@@ -42,37 +43,7 @@ feature {NONE} -- Initialization
 
 feature {NONE} -- Basic Operations
 
-	draw_arc(a_center: TUPLE[x, y: REAL_64]; a_start_angle, a_end_angle, a_radius: REAL_64; a_resolution: INTEGER; a_renderer: GAME_RENDERER)
-			-- Draw an arc centered on a_center with a_radius at a_resolution from a_start_angle to a_end_angle
-		require
-			Start_Angle_Smaller: a_start_angle < a_end_angle
-		local
-			l_old_x: REAL_64
-			l_old_y: REAL_64
-			l_new_x: REAL_64
-			l_new_y: REAL_64
-			l_resolution_factor: REAL_64
-			i: REAL_64
-		do
-			l_resolution_factor := (a_end_angle - a_start_angle) / a_resolution
-			l_old_x := a_radius * cosine(a_start_angle) + a_center.x
-			l_old_y := a_radius * sine(a_start_angle) + a_center.y
-			from
-				i := a_start_angle + l_resolution_factor
-			until
-				i >= a_end_angle
-			loop
-				l_new_x := a_radius * cosine(i) + a_center.x
-				l_new_y := a_radius * sine(i) + a_center.y
-				a_renderer.draw_line(l_old_x.rounded, l_old_y.rounded, l_new_x.rounded, l_new_y.rounded)
-				l_old_x := l_new_x
-				l_old_y := l_new_y
-				i := i + l_resolution_factor
-			end
-			l_new_x := a_radius * cosine(a_end_angle) + a_center.x
-			l_new_y := a_radius * sine(a_end_angle) + a_center.y
-			a_renderer.draw_line(l_old_x.rounded, l_old_y.rounded, l_new_x.rounded, l_new_y.rounded)
-		end
+
 
 feature -- Access
 
@@ -124,9 +95,10 @@ feature -- Access
 
 			color.set_alpha(alpha)
 			context.renderer.set_drawing_color(color)
-			draw_arc(x_real - context.camera.position.x, y_real - context.camera.position.y, direction - angle / 2, direction + angle / 2,
-						radius, 40, context.renderer)
 
+			--draw_arc(x_real - context.camera.position.x, y_real - context.camera.position.y, direction - angle / 2, direction + angle / 2,
+			--			radius, 40, context.renderer)
+			
 			draw_box(context)
 
 			context.renderer.set_drawing_color(l_previous_color)

@@ -37,7 +37,7 @@ feature {NONE} -- Implementation
 		do
 			play_menu_sound_click
 			io.put_string("Singleplayer clicked!%N")
-			create {GAME_ENGINE} next_menu.make(context)
+			create {MENU_LOADING_SCREEN} next_menu.make(context)
 			continue_to_next
 		end
 

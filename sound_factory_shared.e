@@ -11,7 +11,7 @@ deferred class
 feature
 	sound_factory:SOUND_FACTORY
 		once
-			create Result
+			create Result.make
 		end
 note
 	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007 | Copyright (c) 2016 Émilio Gonzalez and Guillaume Jean"

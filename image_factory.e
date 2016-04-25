@@ -28,6 +28,7 @@ feature{NONE}
 		-- The application's game renderer
 
 	pixel_format:GAME_PIXEL_FORMAT
+		-- The pixel format used for the textures
 
 
 feature -- Access
@@ -41,7 +42,18 @@ feature -- Access
 			l_pixels := make_transparent_texture(70,70)
 			image_generator.make_circle(l_pixels, create{GAME_COLOR}.make (255, 0, 0, 255),
 			create{GAME_COLOR}.make (130, 0, 0, 255), create{GAME_COLOR}.make (130, 0, 0, 255), 2)
+			Result := make_texture_from_pixels(l_pixels)
+		end
 
+	get_white_arc:GAME_TEXTURE
+		--Creates once and returns an arc.
+		local
+			l_pixels:GAME_PIXEL_READER_WRITER
+			l_texture:GAME_TEXTURE_STREAMING
+		once
+			l_pixels := make_transparent_texture(400,300)
+			image_generator.make_arc(l_pixels, create{GAME_COLOR}.make (255, 255, 255, 255),
+						[(l_pixels.height / 2), (l_pixels.width / 2)], 0, Two_pi - 0.001, 100, 20)
 			Result := make_texture_from_pixels(l_pixels)
 		end
 

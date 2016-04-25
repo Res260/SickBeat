@@ -51,27 +51,45 @@ feature {NONE} -- Implementation
 			l_lower_x: REAL_64
 			l_lower_y: REAL_64
 		do
-			if (start_angle <= 0 and 0 <= end_angle) or (start_angle <= Two_Pi and Two_Pi <= end_angle) then
+			if is_angle_in_range(0, start_angle, end_angle) then
 				l_upper_x := center.x + radius
 			else
 				l_upper_x := center.x + (radius * (cosine(start_angle).max(cosine(end_angle))))
 			end
-			if (start_angle <= Pi_2 and Pi_2 <= end_angle) or (start_angle <= 5 * Pi_2 and 5 * Pi_2 <= end_angle) then
+			if is_angle_in_range(Pi_2, start_angle, end_angle) then
 				l_upper_y := center.y + radius
 			else
 				l_upper_y := center.y + (radius * (sine(start_angle).max(sine(end_angle))))
 			end
-			if start_angle <= Pi and Pi <= end_angle then
+			if is_angle_in_range(Pi, start_angle, end_angle) then
 				l_lower_x := center.x - radius
 			else
 				l_lower_x := center.x + (radius * (cosine(start_angle).min(cosine(end_angle))))
 			end
-			if (start_angle <= Three_Pi_2 and Three_Pi_2 <= end_angle) or (start_angle <= -Pi_2 and -Pi_2 <= end_angle) then
+			if is_angle_in_range(Three_Pi_2, start_angle, end_angle) then
 				l_lower_y := center.y - radius
 			else
 				l_lower_y := center.y + (radius * (sine(start_angle).min(sine(end_angle))))
 			end
 			minimal_bounding_box.update_to([l_lower_x, l_lower_y], [l_upper_x, l_upper_y])
+		end
+
+	find_furthest_corner_distance(a_list: LIST[TUPLE[x, y: REAL_64]]; a_center: TUPLE[x, y: REAL_64]): REAL_64
+			-- Finds the furthest tuple of coordinates in the list of coordinates
+		local
+			l_angle: REAL_64
+			l_distance: REAL_64
+			l_temp_x, l_temp_y: REAL_64
+		do
+			across a_list as la_list loop
+				l_temp_x := la_list.item.x - a_center.x
+				l_temp_y := la_list.item.y - a_center.y
+				l_angle := modulo(calculate_circle_angle(l_temp_x, l_temp_y), Two_Pi)
+				if is_angle_in_range(l_angle, start_angle, end_angle) then
+					l_distance := l_distance.max((l_temp_x ^ 2) + (l_temp_y ^ 2))
+				end
+			end
+			Result := l_distance
 		end
 
 feature -- Implementation
@@ -82,34 +100,17 @@ feature -- Implementation
 			Result := minimal_bounding_box
 		end
 
-	collides_with_box(a_box: BOUNDING_BOX): BOOLEAN -- TODO: Detect angle within range
+	collides_with_box(a_box: BOUNDING_BOX): BOOLEAN
 			-- Whether or not `Current' collides with a {BOUNDING_BOX}
-		local
-			l_closest_x, l_closest_y: REAL_64
-			l_distance: REAL_64
-			l_difference_x, l_difference_y: REAL_64
-			l_angle: REAL_64
 		do
-			l_closest_x := clamp(center.x, a_box.lower_corner.x, a_box.upper_corner.x)
-			l_closest_y := clamp(center.y, a_box.lower_corner.y, a_box.upper_corner.y)
-			l_distance := l_closest_x ^ 2 + l_closest_y ^ 2
-			if l_distance <= radius ^ 2 then
-				l_difference_x := l_closest_x - center.x
-				l_difference_y := l_closest_y - center.y
-				l_angle := calculate_circle_angle(l_difference_x, l_difference_y)
-				Result := start_angle <= l_angle and l_angle <= end_angle
-			else
-				Result := False
-			end
+			Result := False
 		end
 
-	collides_with_arc(a_arc: BOUNDING_ARC): BOOLEAN -- TODO: Detect angle within range
+	collides_with_arc(a_arc: BOUNDING_ARC): BOOLEAN
 			-- Whether or not `Current' collides with a {BOUNDING_ARC}
 		local
 			l_center_distance_x, l_center_distance_y: REAL_64
 			l_center_angle1, l_center_angle2: REAL_64
-			l_temp_start_angle1, l_temp_start_angle2: REAL_64
-			l_temp_end_angle1, l_temp_end_angle2: REAL_64
 		do
 			l_center_distance_x := a_arc.center.x - center.x
 			l_center_distance_y := a_arc.center.y - center.y
@@ -118,31 +119,17 @@ feature -- Implementation
 			else
 				l_center_angle1 := calculate_circle_angle(l_center_distance_x, l_center_distance_y)
 				l_center_angle2 := modulo(Pi - l_center_angle1, Two_Pi)
-				l_temp_start_angle1 := start_angle
-				l_temp_start_angle2 := a_arc.start_angle
-				l_temp_end_angle1 := end_angle
-				l_temp_end_angle2 := a_arc.end_angle
-				if end_angle > Two_Pi then
-					l_temp_start_angle1 := l_temp_start_angle1 - Two_Pi
-					l_temp_end_angle1 := l_temp_end_angle1 - Two_Pi
-				elseif start_angle < -Two_Pi then
-					l_temp_start_angle1 := l_temp_start_angle1 + Two_Pi
-					l_temp_end_angle1 := l_temp_end_angle1 + Two_Pi
-				end
-				if a_arc.end_angle > Two_Pi then
-					l_temp_start_angle2 := l_temp_start_angle2 - Two_Pi
-					l_temp_end_angle2 := l_temp_end_angle2 - Two_Pi
-				elseif a_arc.start_angle < -Two_Pi then
-					l_temp_start_angle2 := l_temp_start_angle2 + Two_Pi
-					l_temp_end_angle2 := l_temp_end_angle2 + Two_Pi
-				end
 				Result := (
-								l_temp_start_angle1 <= l_center_angle1 and
-								l_center_angle1 <= l_temp_end_angle1 and
-								l_temp_start_angle2 <= l_center_angle2 and
-								l_center_angle2 <= l_temp_end_angle2
+								is_angle_in_range(l_center_angle1, start_angle, end_angle) and
+								is_angle_in_range(l_center_angle2, a_arc.start_angle, a_arc.end_angle)
 						  )
 			end
+		end
+
+	collides_with_sphere(a_sphere: BOUNDING_SPHERE): BOOLEAN
+			-- Check if `Current' collides with `a_sphere'
+		do
+			Result := a_sphere.collides_with_arc(Current)
 		end
 
 feature -- Access
@@ -164,6 +151,7 @@ feature -- Access
 			update_minimal_bounding_box
 			if a_context.debugging then
 				minimal_bounding_box.draw_box(a_context)
+				a_context.renderer.draw_filled_rectangle(center.x.rounded - 2 - a_context.camera.position.x, center.y.rounded - 2 - a_context.camera.position.y, 4, 4)
 			end
 		end
 

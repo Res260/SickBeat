@@ -26,6 +26,27 @@ feature -- Constants
 
 feature -- Access
 
+	is_angle_in_range(a_angle, a_start_angle, a_end_angle: REAL_64): BOOLEAN
+			-- Checks if `a_angle' is within `a_start_angle' and `a_end_angle'
+			-- Priority #1 for optimizing
+		local
+			l_angle: REAL_64
+			i: REAL_64
+		do
+			Result := False
+			from
+				i := -1
+			until
+				i > 1 or Result
+			loop
+				l_angle := a_angle + (Two_Pi * i)
+				if a_start_angle <= l_angle and l_angle <= a_end_angle then
+					Result := True
+				end
+				i := i + 1
+			end
+		end
+
 	calculate_circle_angle(a_x, a_y: REAL_64): REAL_64
 			-- Correctly handles arc_tangent negatives and zeros
 		require

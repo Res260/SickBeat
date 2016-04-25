@@ -52,6 +52,11 @@ feature -- Access
 		deferred
 		end
 
+	collides_with_sphere(a_sphere: BOUNDING_SPHERE): BOOLEAN
+			-- Whether or not `Current' collides with `a_sphere'
+		deferred
+		end
+
 note
 	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"
 	source: "[file: LICENSE]"

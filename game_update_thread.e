@@ -15,20 +15,20 @@ inherit
 		redefine
 			execute
 		end
+	GAME_LIBRARY_SHARED
 
 create
 	make
 
 feature {NONE} -- Initialization
 
-	make(a_mutex: MUTEX; a_game_core: GAME_CORE; a_game_library: GAME_LIBRARY_CONTROLLER)
+	make(a_mutex: MUTEX; a_game_core: GAME_CORE)
 			-- Initializes `Current'
 		do
 			make_thread
 			must_stop := False
 			game_update_mutex := a_mutex
 			game_core := a_game_core
-			game_library := a_game_library
 		end
 
 feature {NONE} -- Implementation
@@ -42,56 +42,52 @@ feature {NONE} -- Implementation
 	game_core: GAME_CORE
 			-- Where the ressources are
 
-	game_library: GAME_LIBRARY_CONTROLLER
-			-- The game_library used by the main thread
-
-	tick_display: INTEGER
-			-- Number of ticks in the past second
-
-	tick_counter: INTEGER
-			-- Number of ticks this second
-
-	second_counter: REAL_64
-			-- Time since last tick
-
-	last_tick: NATURAL_32
+	last_tick: REAL_64
 			-- Time of last update in milliseconds
 
-	time_since_last_tick: REAL_64
-			-- Time since last update in seconds
+	ticks_per_seconds: NATURAL_32 = 120
+			-- Ticks executed per second
+
+	milliseconds_per_tick: REAL_64
+			-- Fraction of seconds per tick
+		once("PROCESS")
+			Result := 1000 / ticks_per_seconds
+		end
 
 feature -- Implementation
 
 	execute
 			-- Executed when the thread is launched
+		local
+			l_previous_tick: REAL_64
+			l_update_time_difference: REAL_64
+			l_time_difference: REAL_64
+			l_execution_time: REAL_64
 		do
 			from
 			until
 				must_stop
 			loop
-				if last_tick <= 0 then
-					time_since_last_tick := 0
-				else
-					time_since_last_tick := (game_library.time_since_create - last_tick) / 1000
-				end
-				last_tick := game_library.time_since_create
-
-				second_counter := second_counter + time_since_last_tick
-				if second_counter >= 1.0 then
-					second_counter := second_counter - 1.0
-					tick_display := tick_counter
-					tick_counter := 0
-					io.put_string("Ticks: " + tick_display.out + "%N")
-				end
-
 				game_update_mutex.lock
+
+				l_previous_tick := last_tick
+				last_tick := game_library.time_since_create.to_real_64
+				l_update_time_difference := (last_tick - l_previous_tick) / 1000
+
+				game_core.increment_ticks
 
 				game_core.update_player_acceleration
 				game_core.update_camera
-				game_core.update_everything
+				game_core.update_everything(l_update_time_difference)
 				game_core.physics.check_all
 
 				game_update_mutex.unlock
+
+				l_execution_time := game_library.time_since_create.to_real_64 - last_tick
+				l_time_difference := milliseconds_per_tick - l_execution_time - 0.5
+				if l_time_difference > 0 then
+					sleep((l_time_difference * 1000000).truncated_to_integer_64) -- Nanosecondes
+				end
 			end
 		end
 

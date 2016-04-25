@@ -22,8 +22,14 @@ feature {NONE} -- Implementation
 	frame_display: INTEGER
 			-- Number of frames in the past second
 
+	tick_display: INTEGER
+			-- Number of ticks in the past second
+
 	frame_counter: INTEGER
 			-- Number of frames this second
+
+	tick_counter: INTEGER
+			-- Number of ticks this second
 
 	second_counter: REAL_64
 			-- Time since last frame
@@ -57,7 +63,7 @@ feature -- Access
 	physics: PHYSICS_ENGINE
 			-- Physics handling object
 
-	update_everything
+	update_everything(a_time_difference: REAL_64)
 			-- Updates every {ENTITY} in `entities'
 			-- Clears every {WAVE} that is no longer visible in the screen
 		local
@@ -65,7 +71,7 @@ feature -- Access
 		do
 			create l_to_remove.make
 			across entities as la_entities loop
-				la_entities.item.update(time_since_last_frame)
+				la_entities.item.update(a_time_difference)
 				if attached {WAVE} la_entities.item as la_wave then
 					if la_wave.dead then
 						l_to_remove.extend(la_wave)
@@ -131,6 +137,14 @@ feature -- Access
 			-- Update `context.camera's position
 		do
 			context.camera.move_at_entity(current_player, context.window)
+		end
+
+	increment_ticks
+			-- Augments the `tick_counter' by one
+		do
+			tick_counter := tick_counter + 1
+		ensure
+			Tick_Counter_Incremented: tick_counter = old tick_counter + 1
 		end
 
 feature -- Basic Operations

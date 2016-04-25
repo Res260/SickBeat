@@ -8,8 +8,8 @@ note
 class
 	ENNEMY
 
-inherit
-	ENTITY
+--inherit
+--	ENTITY
 
 note
 	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"

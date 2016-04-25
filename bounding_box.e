@@ -27,10 +27,8 @@ feature {NONE} -- Initialization
 			make_physic_object
 			create upper_corner
 			create lower_corner
-			upper_corner.x := a_x1.max(a_x2)
-			upper_corner.y := a_y1.max(a_y2)
-			lower_corner.x := a_x1.min(a_x2)
-			lower_corner.y := a_y1.min(a_y2)
+			create box_center
+			update_to([a_x1, a_y1], [a_x2, a_y2])
 		end
 
 feature {NONE} -- Implementation
@@ -47,6 +45,8 @@ feature -- Implementation
 			-- Returns `Current'
 		do
 			Result := Current
+		ensure then
+			Box_Unmodified: Result = Current
 		end
 
 	collides_with_box(a_other: BOUNDING_BOX): BOOLEAN
@@ -70,6 +70,12 @@ feature -- Implementation
 			Result := a_arc.collides_with_box(Current)
 		end
 
+	collides_with_sphere(a_sphere: BOUNDING_SPHERE): BOOLEAN
+			-- Whether or not `Current' collides with a {BOUNDING_SPHERE}
+		do
+			Result := a_sphere.collides_with_box(Current)
+		end
+
 feature -- Access
 
 	upper_corner: TUPLE[x, y: REAL_64]
@@ -79,6 +85,10 @@ feature -- Access
 	lower_corner: TUPLE[x, y: REAL_64]
 			-- Lower corner of `Current's box
 			-- Do not modify directly, use instead `move_box_to'
+
+	box_center: TUPLE[x, y: REAL_64]
+			-- Center of `Current'
+			-- Do not modify directly.
 
 	draw_box(a_context: CONTEXT)
 			-- Draw `Current's outline
@@ -106,6 +116,11 @@ feature -- Access
 			lower_corner.y := a_lower_corner.y
 			upper_corner.x := a_upper_corner.x
 			upper_corner.y := a_upper_corner.y
+			box_center.x := (lower_corner.x + upper_corner.x) / 2
+			box_center.y := (lower_corner.y + upper_corner.y) / 2
+		ensure
+			Corners_Set: lower_corner ~ a_lower_corner and upper_corner ~ a_upper_corner
+			Center_Set: box_center.x >= lower_corner.x and box_center.x <= upper_corner.x and box_center.y >= lower_corner.y and box_center.y <= upper_corner.y
 		end
 
 invariant

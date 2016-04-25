@@ -51,7 +51,7 @@ feature {NONE} -- Initialization
 			time_since_last_frame := 0
 			last_frame := 0
 			create game_update_mutex.make
-			create game_update_thread.make(game_update_mutex, Current, game_library)
+			create game_update_thread.make(game_update_mutex, Current)
 			current_player.collision_actions.extend(agent (a_physic_object: PHYSIC_OBJECT)
 														do
 															io.put_string("BOOM!")
@@ -61,7 +61,7 @@ feature {NONE} -- Initialization
 														do
 															add_entity_to_world(a_wave)
 														end
-													)
+												   )
 		end
 
 feature {NONE} -- Implementation
@@ -87,6 +87,8 @@ feature {NONE} -- Implementation
 	on_tick(a_timestamp: NATURAL_32)
 			-- Method run on every iteration (should be 60 times per second)
 		do
+			game_update_mutex.lock
+			
 			if last_frame <= 0 then
 				time_since_last_frame := 0
 			else
@@ -98,11 +100,12 @@ feature {NONE} -- Implementation
 			if second_counter >= 1.0 then
 				second_counter := second_counter - 1.0
 				frame_display := frame_counter
+				tick_display := tick_counter
 				frame_counter := 0
+				tick_counter := 0
 				io.put_string("Frames: " + frame_display.out + "%N")
+				io.put_string("Ticks: " + tick_display.out + "%N")
 			end
-
-			game_update_mutex.lock
 
 			on_redraw(a_timestamp)
 

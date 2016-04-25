@@ -288,7 +288,6 @@ feature -- Access
 	set_title(a_title: READABLE_STRING_GENERAL)
 			-- Set `Current's title's texture and dimension
 		do
-			context.window.set_title(a_title)
 			create title.make(a_title, text_color, context)
 			update_buttons_dimension
 		end

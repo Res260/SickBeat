@@ -1,5 +1,5 @@
 note
-	description: "Summary description for {LOADING_SCREEN}."
+	description: "The loading screen while textures and sounds are loading."
 	author: "Émilio G!"
 	date: "2016-04-25"
 	revision: "16w12a"
@@ -41,6 +41,7 @@ feature {NONE} -- Initialization
 			io.put_string("Useless button clicked! Bravo champion%N")
 			continue_to_next
 		end
-
-
+note
+	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007 | Copyright (c) 2016 Émilio Gonzalez and Guillaume Jean"
+	source: "[file: LICENSE]"
 end

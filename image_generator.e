@@ -1,8 +1,8 @@
 note
 	description: "Class that generates images using GAME_PIXEL_READER_WRITER"
 	author: "Émilio Gonzalez and Guillaume Jean"
-	date: "2016-04-18"
-	revision: "16w11a"
+	date: "2016-04-26"
+	revision: "16w12a"
 	legal: "See notice at end of class."
 
 class
@@ -11,14 +11,7 @@ class
 inherit
 	MATH_UTILITY
 
-create
-	make
-
 feature --Initialization
-	make
-		-- Initialization for `Current'. Sets some attributes.
-		do
-		end
 
 feature --Access
 
@@ -67,7 +60,7 @@ feature --Access
 				l_color.green := (a_inside_color.green + (l_green_increments * i).rounded).to_natural_8
 				l_color.blue := (a_inside_color.blue + (l_blue_increments * i).rounded).to_natural_8
 				l_color.alpha := (a_inside_color.alpha + (l_alpha_increments * i).rounded).to_natural_8
-				l_resolution := ((pi * i)^1.6).ceiling
+				l_resolution := ((pi * i)^1.6).ceiling + 1
 				make_circle_border(a_pixels, i, l_color, l_resolution)
 				i := i + 1
 			end
@@ -78,7 +71,7 @@ feature --Access
 				until
 					i <= l_radius - a_border_thickness - 1
 				loop
-					l_resolution := ((pi * i)^1.5).ceiling
+					l_resolution := ((pi * i)^1.6).ceiling + 1
 					make_circle_border(a_pixels, i, la_border_color, l_resolution)
 					i := i - 1
 				end
@@ -91,7 +84,7 @@ feature --Access
 		require
 			Pixels_Dimentions_Valid: a_pixels.width = a_pixels.height
 			Pixels_Dimensions_Even: a_pixels.height \\ 2 = 0
-			Radius_Valid: a_radius > 0 and a_radius <= a_pixels.height // 2
+			Radius_Valid: a_radius >= 0 and a_radius <= a_pixels.height // 2
 			Resolution_Valid: a_resolution > 0
 		local
 			l_center_x:REAL_64
@@ -101,30 +94,33 @@ feature --Access
 			l_pixel_x: INTEGER_32
 			l_pixel_y: INTEGER_32
 		do
-			l_center_x := a_pixels.width / 2
-			l_center_y := a_pixels.height / 2
-			l_angle_increments := Two_pi / a_resolution
-			from
-				l_angle := 0
-			until
-				l_angle >= Two_pi
-			loop
-				l_pixel_x := (l_center_x + (a_radius * cosine(l_angle))).rounded.min(a_pixels.width)
-				if(l_pixel_x <= 0) then
-					l_pixel_x := 1
+			if(a_radius > 0) then
+
+				l_center_x := a_pixels.width / 2
+				l_center_y := a_pixels.height / 2
+				l_angle_increments := Two_pi / a_resolution
+				from
+					l_angle := 0
+				until
+					l_angle >= Two_pi
+				loop
+					l_pixel_x := (l_center_x + (a_radius * cosine(l_angle))).rounded.min(a_pixels.width)
+					if(l_pixel_x <= 0) then
+						l_pixel_x := 1
+					elseif(l_pixel_x > a_pixels.width) then
+						l_pixel_x := a_pixels.width
+					end
+					l_pixel_y := (l_center_y + (a_radius * sine(l_angle))).rounded.min(a_pixels.height)
+					if(l_pixel_y <= 0) then
+						l_pixel_y := 1
+					elseif(l_pixel_y > a_pixels.height) then
+						l_pixel_y := a_pixels.height
+					end
+					a_pixels.set_pixel (a_color, l_pixel_x, l_pixel_y)
+					l_angle := l_angle + l_angle_increments
 				end
-				if(l_pixel_x > a_pixels.width) then
-					l_pixel_x := a_pixels.width
-				end
-				l_pixel_y := (l_center_y + (a_radius * sine(l_angle))).rounded.min(a_pixels.height)
-				if(l_pixel_y <= 0) then
-					l_pixel_y := 1
-				end
-				if(l_pixel_y > a_pixels.height) then
-					l_pixel_y := a_pixels.height
-				end
-				a_pixels.set_pixel (a_color, l_pixel_x, l_pixel_y)
-				l_angle := l_angle + l_angle_increments
+			else
+				a_pixels.set_pixel (a_color, a_pixels.width // 2, a_pixels.height // 2)
 			end
 		end
 
@@ -135,6 +131,7 @@ feature --Access
 		require
 			Start_Angle_Smaller: a_start_angle < a_end_angle
 		local
+			l_radius:REAL_64
 			l_old_x: REAL_64
 			l_old_y: REAL_64
 			l_new_x: REAL_64
@@ -142,37 +139,47 @@ feature --Access
 			l_resolution_factor: REAL_64
 			i: REAL_64
 		do
-			l_resolution_factor := (a_end_angle - a_start_angle) / a_resolution
-			l_old_x := a_radius * cosine(a_start_angle) + a_center.x
-			l_old_y := a_radius * sine(a_start_angle) + a_center.y
 			from
-				i := a_start_angle + l_resolution_factor
+				l_radius := a_radius
 			until
-				i >= a_end_angle
+				l_radius < a_radius - 3
 			loop
-				l_new_x := a_radius * cosine(i) + a_center.x
-				l_new_y := a_radius * sine(i) + a_center.y
-				draw_line_between_two_points(a_pixels, a_color, l_old_x.rounded, l_old_y.rounded, l_new_x.rounded, l_new_y.rounded, 3)
-				l_old_x := l_new_x
-				l_old_y := l_new_y
-				i := i + l_resolution_factor
+				l_resolution_factor := (a_end_angle - a_start_angle) / a_resolution
+				l_old_x := l_radius * cosine(a_start_angle) + a_center.x
+				l_old_y := l_radius * sine(a_start_angle) + a_center.y
+				from
+					i := a_start_angle + l_resolution_factor
+				until
+					i >= a_end_angle
+				loop
+					l_new_x := l_radius * cosine(i) + a_center.x
+					l_new_y := l_radius * sine(i) + a_center.y
+					draw_line_between_two_points(a_pixels, a_color, l_old_x.rounded, l_old_y.rounded, l_new_x.rounded, l_new_y.rounded)
+					l_old_x := l_new_x
+					l_old_y := l_new_y
+					i := i + l_resolution_factor
+				end
+				l_new_x := l_radius * cosine(a_end_angle) + a_center.x
+				l_new_y := l_radius * sine(a_end_angle) + a_center.y
+				draw_line_between_two_points(a_pixels, a_color, l_old_x.rounded, l_old_y.rounded, l_new_x.rounded, l_new_y.rounded)
+				l_radius := l_radius - 0.5
 			end
-			l_new_x := a_radius * cosine(a_end_angle) + a_center.x
-			l_new_y := a_radius * sine(a_end_angle) + a_center.y
-			draw_line_between_two_points(a_pixels, a_color, l_old_x.rounded, l_old_y.rounded, l_new_x.rounded, l_new_y.rounded, 3)
 		end
 
-	draw_line_between_two_points(a_pixels:GAME_PIXEL_READER_WRITER; a_color:GAME_COLOR; a_x_1, a_y_1, a_x_2, a_y_2: INTEGER_32; a_thickness:INTEGER_32)
+	draw_line_between_two_points(a_pixels:GAME_PIXEL_READER_WRITER; a_color:GAME_COLOR; a_x_1, a_y_1, a_x_2, a_y_2: INTEGER_32)
+			-- Draws in a_pixels a line from (a_x_1, a_y_1) to (a_x_2, a_y_2) of color a_color.
 		require
 			Position1_Valid: a_x_1 >= 0 and a_y_1 >= 0 and a_x_1 <= a_pixels.width and a_y_1 <= a_pixels.height
 			Position2_Valid: a_x_2 >= 0 and a_y_2 >= 0 and a_x_2 <= a_pixels.width and a_y_2 <= a_pixels.height
 		local
+			l_position: TUPLE[x, y:INTEGER_32]
 			l_slope, l_b: REAL_64
 			l_x_difference, l_y_difference:INTEGER_32
 			l_lowest_x, l_highest_x:INTEGER_32
 			l_lowest_y, l_highest_y:INTEGER_32
-			i:INTEGER_32
+			i, j:INTEGER_32
 		do
+			create l_position
 			l_slope := get_slope(a_x_1, a_y_1, a_x_2, a_y_2)
 			l_b := a_y_1 - (l_slope * a_x_1)
 			l_y_difference := (a_y_2 - a_y_1)
@@ -197,7 +204,8 @@ feature --Access
 				until
 					i > l_highest_x
 				loop
-					a_pixels.set_pixel(a_color, i, ((l_slope * (i)) + l_b).rounded)
+					l_position := get_capped_position(a_pixels, [i + 1, ((l_slope * (i)) + l_b).rounded + 1])
+					a_pixels.set_pixel(a_color, l_position.x, l_position.y)
 					i := i + 1
 				end
 			else
@@ -206,7 +214,8 @@ feature --Access
 				until
 					i > l_highest_y
 				loop
-					a_pixels.set_pixel(a_color, ((i - l_b) / l_slope).rounded, i)
+					l_position := get_capped_position(a_pixels, [((i - l_b) / l_slope).rounded + 1, i + 1])
+					a_pixels.set_pixel(a_color, l_position.x, l_position.y)
 					i := i + 1
 				end
 			end
@@ -230,6 +239,26 @@ feature{NONE}
 				l_slope := 0
 			end
 			Result := l_slope
+		end
+
+	get_capped_position(a_pixels:GAME_PIXEL_READER_WRITER; a_position:TUPLE[x, y:INTEGER_32]):TUPLE[x,y:INTEGER_32]
+			-- Caps positions to a_pixels positions if it is out of bound and returns a TUPLE
+		do
+			create Result
+			if(a_position.x > a_pixels.width) then
+				Result.x := a_pixels.width
+			elseif(a_position.x < 1) then
+				Result.x := 1
+			else
+				Result.x := a_position.x
+			end
+			if(a_position.y > a_pixels.height) then
+					Result.x := a_pixels.height
+			elseif(a_position.y < 1) then
+				Result.y := 1
+			else
+				Result.y := a_position.y
+			end
 		end
 
 note

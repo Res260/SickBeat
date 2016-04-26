@@ -1,8 +1,8 @@
 note
 	description: "Class to make images. In progress."
 	author: "Émilio G!"
-	date: "16-04-04"
-	revision: "16w11a"
+	date: "16-04-26"
+	revision: "16w12a"
 	legal: "See notice at end of class."
 
 class
@@ -18,8 +18,11 @@ create
 feature{NONE}
 
 	make(a_renderer:GAME_RENDERER)
+		-- Initializes `Current's internal attributes
 		do
 			create pixel_format
+			create player_textures
+			create arc_textures
 			pixel_format.set_rgba8888
 			renderer := a_renderer
 		end
@@ -30,30 +33,83 @@ feature{NONE}
 	pixel_format:GAME_PIXEL_FORMAT
 		-- The pixel format used for the textures
 
+	player_texture_dimension:INTEGER_32 = 100
+		-- The player's texture's width and height.
+
+	player_textures:TUPLE[black, red, green, blue, white:GAME_TEXTURE]
+		-- The player's textures
+
+	arc_textures:TUPLE[black, red, green, blue, white: GAME_TEXTURE]
+		-- The arcs textures
 
 feature -- Access
 
-	get_player_texture_red:GAME_TEXTURE
-			--Creates once and returns the player texture (red).
+	make_all_textures
+			-- Stores the player textures in the tuple and the arcs.
+		local
+			l_loading_texture:GAME_TEXTURE
+			l_end_color:GAME_COLOR
+		once("PROCESS")
+			player_textures.black := make_player_texture(
+				create{GAME_COLOR}.make (0, 0, 0, 255),
+				create{GAME_COLOR}.make (100, 100, 100, 255)
+				)
+			player_textures.red := make_player_texture(
+				create{GAME_COLOR}.make (255, 0, 0, 255),
+				create{GAME_COLOR}.make (255, 150, 150, 255)
+				)
+			player_textures.green := make_player_texture(
+				create{GAME_COLOR}.make (0, 255, 0, 255),
+				create{GAME_COLOR}.make (150, 255, 150, 255)
+				)
+			player_textures.blue := make_player_texture(
+				create{GAME_COLOR}.make (0, 0, 255, 255),
+				create{GAME_COLOR}.make (150, 150, 255, 255)
+				)
+			player_textures.white := make_player_texture(
+				create{GAME_COLOR}.make (190, 190, 190, 255),
+				create{GAME_COLOR}.make (255, 255, 255, 255)
+				)
+
+			arc_textures.black := make_arc(create{GAME_COLOR}.make (0, 0, 0, 255))
+			arc_textures.red := make_arc(create{GAME_COLOR}.make (255, 0, 0, 255))
+			arc_textures.green := make_arc(create{GAME_COLOR}.make (0, 255, 0, 255))
+			arc_textures.blue := make_arc(create{GAME_COLOR}.make (0, 0, 255, 255))
+			arc_textures.white := make_arc(create{GAME_COLOR}.make (255, 255, 255, 255))
+		end
+
+	get_player_texture_tuple:TUPLE[black, red, green, blue, white: GAME_TEXTURE]
+			-- Returns a tuple containing the player's textures
+		once("PROCESS")
+			Result := player_textures
+		end
+
+	get_arcs_texture_tuple:TUPLE[black, red, green, blue, white: GAME_TEXTURE]
+			-- Returns a tuple containing the arcs' textures
+		once("PROCESS")
+			Result := arc_textures
+		end
+
+	make_player_texture(a_texture_color_begin, a_texture_color_end:GAME_COLOR):GAME_TEXTURE
+			--Makes the player texture of color a_texture_color_begin to a_texture_color_end
 		local
 			l_pixels:GAME_PIXEL_READER_WRITER
-			l_texture:GAME_TEXTURE_STREAMING
-		once
-			l_pixels := make_transparent_texture(70,70)
-			image_generator.make_circle(l_pixels, create{GAME_COLOR}.make (255, 0, 0, 255),
-			create{GAME_COLOR}.make (130, 0, 0, 255), create{GAME_COLOR}.make (130, 0, 0, 255), 2)
+		do
+			l_pixels := make_transparent_texture(player_texture_dimension, player_texture_dimension)
+			image_generator.make_circle(l_pixels, a_texture_color_begin,
+				a_texture_color_end, void, 0
+				)
 			Result := make_texture_from_pixels(l_pixels)
 		end
 
-	get_white_arc:GAME_TEXTURE
-		--Creates once and returns an arc.
+	make_arc(a_color:GAME_COLOR):GAME_TEXTURE
+			-- Makes and returns an arc of color a_color.
 		local
 			l_pixels:GAME_PIXEL_READER_WRITER
-			l_texture:GAME_TEXTURE_STREAMING
-		once
-			l_pixels := make_transparent_texture(400,300)
-			image_generator.make_arc(l_pixels, create{GAME_COLOR}.make (255, 255, 255, 255),
-						[(l_pixels.height / 2), (l_pixels.width / 2)], 0, Two_pi - 0.001, 100, 20)
+		do
+			l_pixels := make_transparent_texture(400,400)
+			image_generator.make_arc(l_pixels, a_color,
+						[(l_pixels.height / 2), (l_pixels.width / 2)], 0, Two_pi, l_pixels.height // 2, 75)
 			Result := make_texture_from_pixels(l_pixels)
 		end
 

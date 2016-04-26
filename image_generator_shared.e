@@ -11,7 +11,7 @@ deferred class
 feature
 	image_generator:IMAGE_GENERATOR
 		once
-			create Result.make
+			create Result
 		end
 note
 	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007 | Copyright (c) 2016 Émilio Gonzalez and Guillaume Jean"

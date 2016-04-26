@@ -1,5 +1,5 @@
 note
-	description: "Class to share SOUND_ENGINE singleton."
+	description: "Class to share SOUND_FACTORY singleton."
 	author: "Émilio G!"
 	date: "16-2-22"
 	revision: "16w05a"

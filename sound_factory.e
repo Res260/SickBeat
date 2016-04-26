@@ -26,10 +26,11 @@ feature {NONE}
 	min_frequency:INTEGER_32 = 20
 		--Minimum frequency for sounds_list
 
-	max_frequency:INTEGER_32 = 19000
+	max_frequency:INTEGER_32 = 20
 		--Maximum frequency for sounds_list
 
 	sounds_list:CHAIN[SOUND]
+		--List of sounds to play. Not implemented yet.
 
 feature --Access
 
@@ -47,6 +48,7 @@ feature --Access
 		end
 
 	create_menu_music:SOUND
+			--'Music' for the menu. lol not much to see here.
 		local
 			l_wave_bass: CHAIN[INTEGER_16]
 			l_wave_bass2: CHAIN[INTEGER_16]
@@ -85,16 +87,21 @@ feature --Access
 			l_wave:CHAIN[INTEGER_16]
 		do
 			from
-				i := 20
+				i := min_frequency
 			until
-				i > 19000
+				i > max_frequency
 			loop
 				l_wave := sound_generator.create_sine_wave(90, i)
-				sound_generator.fade (l_wave, 0, 0.30, 0, 0.100)
-				sound_generator.fade (l_wave, 0.7, 1, 1, 0)
+				sound_generator.repeat_wave_from_duration (l_wave, 4)
+				sound_generator.fade (l_wave, 0, 0.01, 0, 0.100)
+				sound_generator.fade (l_wave, 0.01, 1, 1, 0)
 				sounds_list.extend(create{SOUND}.make (l_wave))
-				i := i + 20
+				i := (i * 1.5).rounded
+				print(i)
+				io.put_new_line
 			end
+		ensure
+--			sounds_list.count = max_frequency // min_frequency
 		end
 
 note

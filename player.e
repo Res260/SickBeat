@@ -18,6 +18,7 @@ inherit
 		end
 	BOUNDING_BOX
 	MATH_UTILITY
+	SOUND_FACTORY_SHARED
 
 create
 	make
@@ -45,7 +46,11 @@ feature {NONE} -- Initialization
 						create {GAME_COLOR}.make(0, 0, 255, 255),	-- Blue
 						create {GAME_COLOR}.make(255, 255, 255, 255)-- White
 					  ]
+			textures := context.image_factory.get_player_texture_tuple
+			arc_textures := context.image_factory.get_arcs_texture_tuple
+			current_texture := textures.red
 			current_color := colors.white
+			current_arc := arc_textures.red
 		end
 
 feature {NONE} -- Implementation
@@ -61,8 +66,20 @@ feature {NONE} -- Implementation
 
 feature -- Access
 
+	current_texture:GAME_TEXTURE
+			-- Active texture of `Current'
+
+	current_arc:GAME_TEXTURE
+			-- Active arc texture of `Current'
+
 	speed: TUPLE[x, y: REAL_64]
 			-- Speed of `Current'
+
+	textures:TUPLE[black, red, green, blue, white: GAME_TEXTURE]
+			-- Possible colors of the entities
+
+	arc_textures:TUPLE[black, red, green, blue, white: GAME_TEXTURE]
+			-- Possible colors of the arcs
 
 	colors: TUPLE[black, red, green, blue, white: GAME_COLOR]
 			-- Possible colors of the entities
@@ -93,7 +110,7 @@ feature -- Access
 					l_speed.x := speed.x * 0.75
 					l_speed.y := speed.y * 0.75
 					if attached {GAME_COLOR} colors.at(color_index + 1) as la_color then
-						create l_wave.make(x_real, y_real, l_direction, l_angle, l_speed, la_color, Current, context)
+						create l_wave.make(x_real, y_real, l_direction, l_angle, l_speed, la_color, Current, context, current_arc)
 						launch_wave_event.call(l_wave)
 					end
 				end
@@ -106,19 +123,12 @@ feature -- Access
 			l_previous_color: GAME_COLOR
 		do
 			l_previous_color := context.renderer.drawing_color
-
-			context.renderer.draw_texture (qqchose, 8, 8)
 			context.renderer.set_drawing_color(current_color)
 			context.renderer.draw_filled_rectangle(x - 25 - context.camera.position.x, y - 25 - context.camera.position.y, 50, 50)
-
+			context.renderer.draw_texture (current_texture, x - (current_texture.width // 2) - context.camera.position.x, y - (current_texture.height // 2) - context.camera.position.y)
 			draw_box(context)
 
 			context.renderer.set_drawing_color(l_previous_color)
-		end
-
-	qqchose: GAME_TEXTURE
-		once
-			Result := context.image_factory.get_white_arc
 		end
 
 	update(a_timediff: REAL_64)
@@ -144,6 +154,14 @@ feature -- Access
 		do
 			if attached {GAME_COLOR} colors.at(color_index + 1) as la_color then
 				current_color := la_color
+			end
+
+			if attached {GAME_TEXTURE} textures.at(color_index + 1) as la_texture then
+				current_texture := la_texture
+			end
+
+			if attached {GAME_TEXTURE} arc_textures.at(color_index + 1) as la_arc_texture then
+				current_arc := la_arc_texture
 			end
 		end
 

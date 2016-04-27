@@ -87,8 +87,8 @@ feature {NONE} -- Implementation
 			-- Method run on every iteration
 		do
 			if not started then
-				on_start
 				started := True
+				on_start
 			end
 		end
 

@@ -48,8 +48,6 @@ feature {NONE} -- Initialization
 			entities.extend(current_player)
 			drawables.extend(current_player)
 			physics.physic_objects.extend(current_player)
-			drawables.extend(create {WAVE}.make(400, 300, Pi_2, Pi, [(0).to_double, (0).to_double], create {GAME_COLOR}.make(0, 0, 0, 255), current_player, context))
-			physics.physic_objects.extend(create {WAVE}.make(400, 300, Pi_2, Pi, [(0).to_double, (0).to_double], create {GAME_COLOR}.make(0, 0, 0, 255), current_player, context))
 			time_since_last_frame := 0
 			last_frame := 0
 			create game_update_mutex.make

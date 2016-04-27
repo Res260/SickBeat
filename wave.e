@@ -35,6 +35,7 @@ feature {NONE} -- Initialization
 			create color.make_from_other(a_color)
 			radius := a_source.width / 2
 			energy := initial_energy
+			alpha := 255
 			center_speed := a_center_speed
 			source := a_source
 			make_bounding_arc(a_x, a_y, a_direction, a_angle, radius)

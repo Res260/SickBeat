@@ -88,7 +88,7 @@ feature -- Access
 				l_x := a_mouse_state.x - x_real.rounded + context.camera.position.x
 				l_y := a_mouse_state.y - y_real.rounded + context.camera.position.y
 				if l_x /= 0 or l_y /= 0 then
-					l_direction := calculate_circle_angle(l_x, l_y)
+					l_direction := atan2(l_x, l_y)
 					create l_speed
 					l_speed.x := speed.x * 0.75
 					l_speed.y := speed.y * 0.75

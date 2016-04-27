@@ -20,17 +20,74 @@ inherit
 
 feature -- Test routines
 
+	dot_product_test
+			-- Tests the `dot_product' routine
+		do
+			assert("Dot product normal test failed.", dot_product([5.0, 5.0], [5.0, 5.0]) ~ 50.0)
+			assert("Dot product normal test 2 failed.", dot_product([0.0, 0.0], [0.0, 0.0]) ~ 0.0)
+		end
+
+	normalize_vector_test
+			-- Tests the `normalize_vector' routine
+		local
+			l_vector_test: TUPLE[x, y: REAL_64]
+			l_norm_result: REAL_64
+			l_assert_result: BOOLEAN
+		do
+			l_vector_test := [(3).to_double, (4).to_double]
+			l_norm_result := normalize_vector(l_vector_test)
+			l_assert_result := l_norm_result ~ 5 and l_vector_test.x ~ (3.0/5.0) and l_vector_test.y ~ (4.0/5.0)
+			assert("Normalized vector normal test failed.", l_assert_result)
+			l_vector_test := [0.0, 0.0]
+			l_norm_result := normalize_vector(l_vector_test)
+			l_assert_result := l_norm_result ~ 0 and l_vector_test.x ~ 0.0 and l_vector_test.y ~ 0.0
+			assert("Normalized vector limit test failed.", l_assert_result)
+		end
+
+	normalize_angle_test
+			-- Tests the `normalize_angle' routine
+		do
+			assert("Normalized angle normal test failed.", normalize_angle(0, 0) ~ 0)
+			assert("Normalized angle lower limit test failed.", normalize_angle(-Pi, Pi) ~ Pi)
+			assert("Normalized angle upper limit test failed.", normalize_angle(Pi, Pi) ~ Pi)
+		end
+
+	is_angle_in_range_test
+			-- Tests the `is_angle_in_range' routine
+		do
+			assert("Angle range normal test failed.", is_angle_in_range(Pi, 0, Two_Pi))
+			assert("Angle range lower limit test failed.", is_angle_in_range(0, 0, Two_Pi))
+			assert("Angle range upper limit test failed.", is_angle_in_range(Two_Pi, 0, Two_Pi))
+		end
+
+	are_is_angle_in_ranges_equal_test
+			-- Test to verify the equality of the two methods
+			-- is_angle_in_range is a better optimized version of is_angle_in_range2
+			-- Temporary
+		local
+			l_angle_test: REAL_64
+		do
+			from
+				l_angle_test := -Two_Pi
+			until
+				l_angle_test > Two_Pi
+			loop
+				assert("is_angle_in_range inequality.", is_angle_in_range(l_angle_test, Pi_2, Pi) ~ is_angle_in_range2(l_angle_test, Pi_2, Pi))
+				l_angle_test := l_angle_test + (1 / (Pi * 720))
+			end
+		end
+
 	calculate_circle_angle_test
 			-- Tests the circle calculating routine
 		local
 			l_angle_test: REAL_64
 		do
 			l_angle_test := Pi_4
-			assert("Circle angle normal value test failed.", calculate_circle_angle(cosine(l_angle_test), sine(l_angle_test)) ~ l_angle_test)
-			assert("Circle angle limit value test failed.", calculate_circle_angle(-1, 0) ~ Pi)
-			assert("Circle angle limit value test failed.", calculate_circle_angle(1, 0) ~ 0)
-			assert("Circle angle limit value test failed.", calculate_circle_angle(0, -1) ~ Three_Pi_2)
-			assert("Circle angle limit value test failed.", calculate_circle_angle(0, 1) ~ Pi_2)
+			assert("Circle angle normal value test failed.", atan2(cosine(l_angle_test), sine(l_angle_test)) ~ l_angle_test)
+			assert("Circle angle limit value test failed.", atan2(-1, 0) ~ Pi)
+			assert("Circle angle limit value test failed.", atan2(1, 0) ~ 0)
+			assert("Circle angle limit value test failed.", atan2(0, -1) ~ Three_Pi_2)
+			assert("Circle angle limit value test failed.", atan2(0, 1) ~ Pi_2)
 		end
 
 	clamp_test

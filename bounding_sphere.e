@@ -93,6 +93,49 @@ feature -- Access
 	radius: REAL_64
 			-- Radius of `Current'
 
+	draw_collision(a_context: CONTEXT)
+			-- Draws `Current's minimal bounding box and a sphere
+		do
+			if a_context.debugging then
+				update_minimal_bounding_box
+				minimal_bounding_box.draw_box(a_context)
+				a_context.renderer.draw_line(center.x.rounded - a_context.camera.position.x, center.y.rounded - a_context.camera.position.y, (center.x + radius).rounded - a_context.camera.position.x, center.y.rounded - a_context.camera.position.y)
+				draw_circle(a_context, center.x - a_context.camera.position.x, center.y - a_context.camera.position.y)
+			end
+		end
+
+	draw_circle(a_context: CONTEXT; a_center: TUPLE[x, y: REAL_64])
+			-- Creates an arc centered on a_center with a radius of a_radius at a rasoultion of
+			-- a_resolution from a_start_angle rad to a_end_angle rad.
+		local
+			l_old_x: REAL_64
+			l_old_y: REAL_64
+			l_new_x: REAL_64
+			l_new_y: REAL_64
+			l_resolution_factor: REAL_64
+			i: REAL_64
+		do
+			a_context.renderer.set_drawing_color(minimal_bounding_box.box_color)
+			l_resolution_factor := Two_Pi / 50
+			l_old_x := radius + a_center.x
+			l_old_y := a_center.y
+			from
+				i := l_resolution_factor
+			until
+				i >= Two_Pi
+			loop
+				l_new_x := radius * cosine(i) + a_center.x
+				l_new_y := radius * sine(i) + a_center.y
+				a_context.renderer.draw_line(l_old_x.rounded, l_old_y.rounded, l_new_x.rounded, l_new_y.rounded)
+				l_old_x := l_new_x
+				l_old_y := l_new_y
+				i := i + l_resolution_factor
+			end
+			l_new_x := radius + a_center.x
+			l_new_y := a_center.y
+			a_context.renderer.draw_line(l_old_x.rounded, l_old_y.rounded, l_new_x.rounded, l_new_y.rounded)
+		end
+
 invariant
 note
 	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"

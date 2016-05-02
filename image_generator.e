@@ -142,7 +142,7 @@ feature --Access
 			from
 				l_radius := a_radius
 			until
-				l_radius < a_radius - 3
+				l_radius < a_radius - 1
 			loop
 				l_resolution_factor := (a_end_angle - a_start_angle) / a_resolution
 				l_old_x := l_radius * cosine(a_start_angle) + a_center.x

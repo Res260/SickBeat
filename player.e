@@ -12,11 +12,12 @@ inherit
 	ENTITY
 		redefine
 			draw,
-			update,
-			width,
-			height
+			update
 		end
-	BOUNDING_BOX
+	BOUNDING_SPHERE
+		rename
+			radius as bounding_radius
+		end
 	MATH_UTILITY
 	SOUND_FACTORY_SHARED
 
@@ -31,7 +32,7 @@ feature {NONE} -- Initialization
 			x_real := a_context.window.width / 2
 			y_real := a_context.window.height / 2
 			make_entity(x_real, y_real, a_context)
-			make_box(x_real - 25, y_real - 25, x_real + 25, y_real + 25)
+			make_sphere(x_real, y_real, radius)
 			create max_speed
 			create acceleration
 			create speed
@@ -51,6 +52,9 @@ feature {NONE} -- Initialization
 			current_texture := textures.red
 			current_color := colors.white
 			current_arc := arc_textures.red
+			radius := current_texture.width / 2
+			bounding_radius := radius
+			normal_angle := context.image_factory.player_arc_angle
 		end
 
 feature {NONE} -- Implementation
@@ -75,6 +79,12 @@ feature -- Access
 	speed: TUPLE[x, y: REAL_64]
 			-- Speed of `Current'
 
+	radius: REAL_64
+			-- `Current's radius
+
+	normal_angle: REAL_64
+			-- Wave angle for normal attacks
+
 	textures:TUPLE[black, red, green, blue, white: GAME_TEXTURE]
 			-- Possible colors of the entities
 
@@ -95,13 +105,11 @@ feature -- Access
 		local
 			l_wave: WAVE
 			l_direction: REAL_64
-			l_angle: REAL_64
 			l_x: INTEGER
 			l_y: INTEGER
 			l_speed: TUPLE[x, y: REAL_64]
 		do
 			if a_mouse_state.is_left_button_pressed then
-				l_angle := Two_Pi
 				l_x := a_mouse_state.x - x_real.rounded + context.camera.position.x
 				l_y := a_mouse_state.y - y_real.rounded + context.camera.position.y
 				if l_x /= 0 or l_y /= 0 then
@@ -110,7 +118,7 @@ feature -- Access
 					l_speed.x := speed.x * 0.75
 					l_speed.y := speed.y * 0.75
 					if attached {GAME_COLOR} colors.at(color_index + 1) as la_color then
-						create l_wave.make(x_real, y_real, l_direction, l_angle, l_speed, la_color, Current, context, current_arc)
+						create l_wave.make(x_real, y_real, l_direction, normal_angle, l_speed, la_color, Current, context, current_arc)
 						launch_wave_event.call(l_wave)
 					end
 				end
@@ -124,9 +132,9 @@ feature -- Access
 		do
 			l_previous_color := context.renderer.drawing_color
 			context.renderer.set_drawing_color(current_color)
-			context.renderer.draw_filled_rectangle(x - 25 - context.camera.position.x, y - 25 - context.camera.position.y, 50, 50)
-			context.renderer.draw_texture (current_texture, x - (current_texture.width // 2) - context.camera.position.x, y - (current_texture.height // 2) - context.camera.position.y)
-			draw_box(context)
+			--context.renderer.draw_filled_rectangle(x - 25 - context.camera.position.x, y - 25 - context.camera.position.y, 50, 50)
+			context.renderer.draw_texture(current_texture, x - (current_texture.width // 2) - context.camera.position.x, y - (current_texture.height // 2) - context.camera.position.y)
+			draw_collision(context)
 
 			context.renderer.set_drawing_color(l_previous_color)
 		end
@@ -140,10 +148,8 @@ feature -- Access
 			y_real := y_real + a_timediff * speed.y
 			x := x_real.floor
 			y := y_real.floor
-			upper_corner.x := x_real + width / 2
-			upper_corner.y := y_real + width / 2
-			lower_corner.x := x_real - width / 2
-			lower_corner.y := y_real - width / 2
+			center.x := x_real
+			center.y := y_real
 		ensure then
 			X_Speed_Is_Bounded: max_speed.x.opposite <= speed.x and speed.x <= max_speed.x
 			Y_Speed_Is_Bounded: max_speed.y.opposite <= speed.y and speed.y <= max_speed.y
@@ -163,16 +169,6 @@ feature -- Access
 			if attached {GAME_TEXTURE} arc_textures.at(color_index + 1) as la_arc_texture then
 				current_arc := la_arc_texture
 			end
-		end
-
-	width: INTEGER
-		do
-			Result := 50
-		end
-
-	height: INTEGER
-		do
-			Result := 50
 		end
 
 	set_acceleration(a_x_accel, a_y_accel: REAL_64)

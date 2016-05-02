@@ -31,11 +31,11 @@ feature {NONE} -- Initialization
 			update_to([a_x1, a_y1], [a_x2, a_y2])
 		end
 
-feature {NONE} -- Implementation
+feature -- Access
 
 	box_color: GAME_COLOR
 			-- Color for the bounding boxes
-		once
+		once("PROCESS")
 			create Result.make(255, 142, 0, 255)
 		end
 

@@ -109,8 +109,7 @@ feature -- Access
 		end
 
 	update_player_acceleration
-			-- Update `current_player's speed by following physics
-			-- might be ported into physics engine later
+			-- Will be ported to {PLAYER} when it becomes controllable
 		local
 			l_x_accel: REAL_64
 			l_y_accel: REAL_64

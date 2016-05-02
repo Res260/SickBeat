@@ -107,6 +107,8 @@ feature {NONE} -- Implementation
 				io.put_string("Ticks: " + tick_display.out + "%N")
 			end
 
+			
+
 			on_redraw(a_timestamp)
 
 			game_update_mutex.unlock

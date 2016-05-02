@@ -88,7 +88,7 @@ feature {NONE} -- Implementation
 			-- Method run on every iteration (should be 60 times per second)
 		do
 			game_update_mutex.lock
-			
+
 			if last_frame <= 0 then
 				time_since_last_frame := 0
 			else

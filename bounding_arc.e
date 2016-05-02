@@ -34,6 +34,7 @@ feature {NONE} -- Initialization
 			start_angle := direction - l_half_angle
 			end_angle := direction + l_half_angle
 			radius := a_radius
+			thickness := 1
 			create minimal_bounding_box.make_box(0, 0, 0, 0)
 			update_minimal_bounding_box
 		end
@@ -84,7 +85,7 @@ feature {NONE} -- Implementation
 			across a_list as la_list loop
 				l_temp_x := la_list.item.x - a_center.x
 				l_temp_y := la_list.item.y - a_center.y
-				l_angle := modulo(calculate_circle_angle(l_temp_x, l_temp_y), Two_Pi)
+				l_angle := modulo(atan2(l_temp_x, l_temp_y), Two_Pi)
 				if is_angle_in_range(l_angle, start_angle, end_angle) then
 					l_distance := l_distance.max((l_temp_x ^ 2) + (l_temp_y ^ 2))
 				end
@@ -102,8 +103,26 @@ feature -- Implementation
 
 	collides_with_box(a_box: BOUNDING_BOX): BOOLEAN
 			-- Whether or not `Current' collides with a {BOUNDING_BOX}
+		local
+			l_distance: REAL_64
+			l_vector: TUPLE[x, y: REAL_64]
+			l_facing: REAL_64
+			l_angle: REAL_64
 		do
 			Result := False
+			l_vector := [
+							clamp_to_sides(center.x, a_box.lower_corner.x, a_box.upper_corner.x) - center.x,
+							clamp_to_sides(center.y, a_box.lower_corner.y, a_box.upper_corner.y) - center.y
+						]
+			l_distance := normalize_vector(l_vector)
+
+			if radius - thickness < l_distance and l_distance < radius + thickness then
+				l_facing := dot_product([cosine(direction), sine(direction)], l_vector)
+				l_angle := arc_cosine(l_facing)
+				if l_facing > 0 and is_angle_in_range(l_angle, start_angle, end_angle) then
+					Result := True
+				end
+			end
 		end
 
 	collides_with_arc(a_arc: BOUNDING_ARC): BOOLEAN
@@ -117,7 +136,7 @@ feature -- Implementation
 			if l_center_distance_x ~ 0 and l_center_distance_y ~ 0 then
 				Result := radius - a_arc.radius <= 0
 			else
-				l_center_angle1 := calculate_circle_angle(l_center_distance_x, l_center_distance_y)
+				l_center_angle1 := atan2(l_center_distance_x, l_center_distance_y)
 				l_center_angle2 := modulo(Pi - l_center_angle1, Two_Pi)
 				Result := (
 								is_angle_in_range(l_center_angle1, start_angle, end_angle) and
@@ -145,6 +164,9 @@ feature -- Access
 
 	radius: REAL_64
 			-- Radius of the arc
+
+	thickness: REAL_64
+			-- Thickness of the arc
 
 	draw_box(a_context: CONTEXT)
 		do

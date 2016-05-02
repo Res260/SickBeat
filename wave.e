@@ -56,10 +56,6 @@ feature {NONE} -- Initialization
 
 		end
 
-feature {NONE} -- Basic Operations
-
-
-
 feature -- Access
 
 	audio_source:AUDIO_SOURCE
@@ -128,14 +124,14 @@ feature -- Access
 			color.set_alpha(alpha)
 			context.renderer.set_drawing_color(color)
 
-			l_width_destination := (minimal_bounding_box.upper_corner.x - minimal_bounding_box.lower_corner.x).rounded.abs
-			l_height_destination := (minimal_bounding_box.upper_corner.y - minimal_bounding_box.lower_corner.y).rounded.abs
+			l_width_destination := (radius * 2).rounded
+			l_height_destination := (radius * 2).rounded
 			wave_texture.set_additionnal_alpha (alpha)
 			context.renderer.draw_sub_texture_with_scale_rotation_and_mirror (wave_texture,
 					0, 0,
 					wave_texture.width, wave_texture.height,
 					x_real.rounded - context.camera.position.x - (l_width_destination // 2), y_real.rounded - context.camera.position.y - (l_height_destination // 2),
-					l_width_destination, l_height_destination, l_width_destination // 2, l_height_destination // 2, angle, False, False)
+					l_width_destination, l_height_destination, l_width_destination // 2, l_height_destination // 2, (direction - (angle / 2)) * To_Degrees, False, False)
 			draw_box(context)
 			context.renderer.set_drawing_color(l_previous_color)
 		end

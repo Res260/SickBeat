@@ -15,13 +15,19 @@ feature -- Constants
 	Two_Pi: REAL_64
 			-- Pi * 2
 		once
-			Result := 2*Pi
+			Result := 2 * Pi
 		end
 
 	Three_Pi_2: REAL_64
 			-- 3Pi / 2
 		once
 			Result := 3 * Pi_2
+		end
+
+	To_Degrees: REAL_64
+			-- 360 / `Two_Pi'
+		once
+			Result := 360 / Two_Pi
 		end
 
 feature -- Access

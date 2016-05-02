@@ -47,7 +47,7 @@ feature -- Access
 	player_arc_angle: REAL_64
 			-- The player's normal arcs' length (in rad).
 		once
-			Result := Pi
+			Result := Pi_2
 		end
 
 	make_all_textures

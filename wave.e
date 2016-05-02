@@ -56,10 +56,6 @@ feature {NONE} -- Initialization
 
 		end
 
-feature {NONE} -- Basic Operations
-
-
-
 feature -- Access
 
 	audio_source:AUDIO_SOURCE

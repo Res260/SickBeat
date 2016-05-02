@@ -70,8 +70,27 @@ feature -- Implementation
 
 	collides_with_arc(a_arc: BOUNDING_ARC): BOOLEAN
 			-- Check if `Current' collides with `a_arc'
+		local
+			l_min_radius_distance, l_max_radius_distance: REAL_64
+			l_center_distance: REAL_64
+			l_difference_x, l_difference_y: REAL_64
+			l_collision_angle: REAL_64
+			l_do_borders_touch: BOOLEAN
+			l_is_angle_in_range: BOOLEAN
 		do
-			Result := False
+			l_min_radius_distance := radius + a_arc.radius - a_arc.thickness
+			l_max_radius_distance := radius + a_arc.radius
+			l_difference_x := a_arc.center.x - center.x
+			l_difference_y := a_arc.center.y - center.y
+			l_center_distance := l_difference_x ^ 2 + l_difference_y ^ 2
+			l_do_borders_touch := l_min_radius_distance ^ 2 <= l_center_distance and l_center_distance <= l_max_radius_distance ^ 2
+			if l_difference_x ~ 0 and l_difference_y ~ 0 then
+				Result := l_do_borders_touch
+			else
+				l_collision_angle := atan2(l_difference_x, l_difference_y)
+				l_is_angle_in_range := is_angle_in_range(l_collision_angle, a_arc.start_angle, a_arc.end_angle)
+				Result := l_do_borders_touch and l_is_angle_in_range
+			end
 		end
 
 	collides_with_sphere(a_sphere: BOUNDING_SPHERE): BOOLEAN

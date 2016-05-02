@@ -23,16 +23,16 @@ feature {NONE} -- Initialization
 
 feature {NONE}
 
-	min_frequency:INTEGER_32 = 20
+	min_frequency:INTEGER_32 = 200
 		--Minimum frequency for sounds_list
 
-	max_frequency:INTEGER_32 = 20
+	max_frequency:INTEGER_32 = 300
 		--Maximum frequency for sounds_list
 
-	sounds_list:CHAIN[SOUND]
-		--List of sounds to play. Not implemented yet.
-
 feature --Access
+
+	sounds_list:CHAIN[SOUND]
+		--List of sounds to play.
 
 	create_sound_menu_click:SOUND
 			--Method that creates a sound for a menu button click.
@@ -57,7 +57,7 @@ feature --Access
 			l_wave_silence := sound_generator.create_square_wave (0, 500)
 --			sound_generator.add_silence_from_seconds (l_wave_silence, 0.8)
 
-			l_wave_bass := sound_generator.create_sine_wave (50, 60)
+			l_wave_bass := sound_generator.create_sine_wave (0, 60)
 --			sound_generator.repeat_wave_from_duration (l_wave_bass, 0.2)
 --			sound_generator.fade (l_wave_bass, 0, 0.40, 0, 1)
 --			sound_generator.fade (l_wave_bass, 0.6, 1, 1, 0)
@@ -66,7 +66,7 @@ feature --Access
 --			sound_generator.add_silence_from_seconds (l_wave_bass, 0.3)
 --			sound_generator.repeat_wave_from_duration (l_wave_bass, 20)
 
-			l_wave_bass2 := sound_generator.create_sine_wave (40, 100)
+			l_wave_bass2 := sound_generator.create_sine_wave (0, 100)
 --			sound_generator.repeat_wave_from_duration (l_wave_bass2, 0.2)
 --			sound_generator.fade (l_wave_bass2, 0, 0.40, 0, 1)
 --			sound_generator.fade (l_wave_bass2, 0.6, 1, 1, 0)
@@ -93,15 +93,11 @@ feature --Access
 			loop
 				l_wave := sound_generator.create_sine_wave(90, i)
 				sound_generator.repeat_wave_from_duration (l_wave, 4)
-				sound_generator.fade (l_wave, 0, 0.01, 0, 0.100)
+				sound_generator.fade (l_wave, 0, 0.01, 0, 1)
 				sound_generator.fade (l_wave, 0.01, 1, 1, 0)
 				sounds_list.extend(create{SOUND}.make (l_wave))
 				i := (i * 1.5).rounded
-				print(i)
-				io.put_new_line
 			end
-		ensure
---			sounds_list.count = max_frequency // min_frequency
 		end
 
 note

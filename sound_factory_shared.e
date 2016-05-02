@@ -10,7 +10,7 @@ deferred class
 
 feature
 	sound_factory:SOUND_FACTORY
-		once
+		once("PROCESS")
 			create Result.make
 		end
 note

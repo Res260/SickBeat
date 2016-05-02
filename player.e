@@ -107,10 +107,10 @@ feature -- Access
 				if l_x /= 0 or l_y /= 0 then
 					l_direction := calculate_circle_angle(l_x, l_y)
 					create l_speed
-					l_speed.x := speed.x * 0.75
-					l_speed.y := speed.y * 0.75
+					l_speed.x := speed.x * 1
+					l_speed.y := speed.y * 1
 					if attached {GAME_COLOR} colors.at(color_index + 1) as la_color then
-						create l_wave.make(x_real, y_real, l_direction, l_angle, l_speed, la_color, Current, context, current_arc)
+						create l_wave.make(x_real, y_real, l_direction, l_angle, l_speed, la_color, Current, context, current_arc, create{SOUND}.make_from_other (sound_factory.sounds_list[1]))
 						launch_wave_event.call(l_wave)
 					end
 				end

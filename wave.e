@@ -27,7 +27,7 @@ create
 
 feature {NONE} -- Initialization
 
-	make(a_x, a_y, a_direction, a_angle: REAL_64; a_center_speed: TUPLE[x, y: REAL_64]; a_color: GAME_COLOR; a_source: ENTITY; a_context: CONTEXT; a_texture:GAME_TEXTURE)
+	make(a_x, a_y, a_direction, a_angle: REAL_64; a_center_speed: TUPLE[x, y: REAL_64]; a_color: GAME_COLOR; a_source: ENTITY; a_context: CONTEXT; a_texture:GAME_TEXTURE; a_sound:SOUND)
 			-- Initialize `Current' with a direction, angle, maximum radius, and color
 		do
 			context := a_context
@@ -41,6 +41,11 @@ feature {NONE} -- Initialization
 			center_speed := a_center_speed
 			source := a_source
 			make_bounding_arc(a_x, a_y, a_direction, a_angle, radius)
+			sound_manager.create_audio_source
+			audio_source := sound_manager.last_audio_source
+			sound := a_sound
+			audio_source.queue_sound (sound)
+			audio_source.play
 			collision_actions.extend(agent (a_physic_object: PHYSIC_OBJECT)
 										do
 											if not attached {WAVE} a_physic_object then
@@ -57,11 +62,11 @@ feature {NONE} -- Basic Operations
 
 feature -- Access
 
---	audio_source:AUDIO_SOURCE
---		-- Audio source to play the wave's sound.
+	audio_source:AUDIO_SOURCE
+		-- Audio source to play the wave's sound.
 
---	sound:SOUND
---		-- The sound to be played when the wave is alive.
+	sound:SOUND
+		-- The sound to be played when the wave is alive.
 
 	wave_texture:GAME_TEXTURE
 		-- The wave's game texture
@@ -81,6 +86,12 @@ feature -- Access
 
 	energy_loss: REAL_64 = -1000.0
 			-- `energy' loss per second
+
+	wave_duration:REAL_64
+			-- The total duration of the wave
+			once
+				Result := (initial_energy / energy_loss).abs
+			end
 
 	center_speed: TUPLE[x, y: REAL_64]
 			-- Speed of the moving arc center

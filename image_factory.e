@@ -44,6 +44,12 @@ feature{NONE}
 
 feature -- Access
 
+	player_arc_angle: REAL_64
+			-- The player's normal arcs' length (in rad).
+		once
+			Result := Pi
+		end
+
 	make_all_textures
 			-- Stores the player textures in the tuple and the arcs.
 		local
@@ -109,7 +115,7 @@ feature -- Access
 		do
 			l_pixels := make_transparent_texture(400,400)
 			image_generator.make_arc(l_pixels, a_color,
-						[(l_pixels.height / 2), (l_pixels.width / 2)], 0, Two_pi, l_pixels.height // 2, 75)
+						[(l_pixels.height / 2), (l_pixels.width / 2)], 0, player_arc_angle, l_pixels.height // 2, 75)
 			Result := make_texture_from_pixels(l_pixels)
 		end
 

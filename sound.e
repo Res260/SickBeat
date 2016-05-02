@@ -12,7 +12,8 @@ inherit
 	AUDIO_SOUND
 
 create
-	make
+	make,
+	make_from_other
 
 feature {NONE}
 	make (a_sound_data : CHAIN[INTEGER_16])
@@ -21,10 +22,6 @@ feature {NONE}
 		local
 			i: INTEGER_32
 		do
-			channel_count:= 1
-			frequency:= 44100
-			bits_per_sample:= 16
-			is_signed:= True
 			buffer_index:= 0
 			byte_per_buffer_sample:= channel_count * (bits_per_sample // 8)
 			sound_length:= a_sound_data.count
@@ -40,6 +37,16 @@ feature {NONE}
 			end
 		end
 
+	make_from_other (a_sound: SOUND)
+		-- Initialization for `Current' using another sound.
+		do
+			buffer_index:= 0
+			byte_per_buffer_sample:= a_sound.channel_count * (a_sound.bits_per_sample // 8)
+			sound_length:= a_sound.sound_length
+			is_open := True
+			create sound_data.make_from_pointer (a_sound.sound_data.item, a_sound.sound_length * byte_per_buffer_sample)
+		end
+
 feature
 
 	buffer_index: INTEGER_32
@@ -51,16 +58,16 @@ feature
 	sound_length: INTEGER_32
 		--length in samples
 
-	channel_count:INTEGER_32
+	channel_count:INTEGER_32 = 1
 		-- <Precursor>
 
-	frequency: INTEGER_32
+	frequency: INTEGER_32 = 44100
 		-- in samples per second
 
-	bits_per_sample: INTEGER_32
+	bits_per_sample: INTEGER_32 = 16
 		-- <Precursor>
 
-	is_signed: BOOLEAN
+	is_signed: BOOLEAN = True
 		-- is sound_data signed
 
 	byte_per_buffer_sample: INTEGER_32

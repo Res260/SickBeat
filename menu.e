@@ -177,7 +177,12 @@ feature {NONE} -- Basic Operations
 		do
 			mouse.position := [a_mouse_state.x - context.camera.position.x, a_mouse_state.y - context.camera.position.y]
 			if a_mouse_state.is_left_button_pressed then
+				mouse.buttons.left := True
 				pressed_button := check_button_collision
+			elseif a_mouse_state.is_middle_button_pressed then
+				mouse.buttons.mouse_wheel := True
+			elseif a_mouse_state.is_right_button_pressed then
+				mouse.buttons.right := True
 			end
 		end
 
@@ -186,7 +191,12 @@ feature {NONE} -- Basic Operations
 		do
 			mouse.position := [a_mouse_state.x - context.camera.position.x, a_mouse_state.y - context.camera.position.y]
 			if a_mouse_state.is_left_button_released then
+				mouse.buttons.left := False
 				released_button := check_button_collision
+			elseif a_mouse_state.is_middle_button_released then
+				mouse.buttons.mouse_wheel := False
+			elseif a_mouse_state.is_right_button_released then
+				mouse.buttons.right := False
 			end
 			if pressed_button = released_button then
 				clicked_button := released_button

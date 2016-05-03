@@ -26,9 +26,10 @@ create
 
 feature {NONE} -- Initialization
 
-	make(a_context: CONTEXT)
+	make(a_controller: CONTROLLER; a_context: CONTEXT)
 			-- Initialize `Current'
 		do
+			controller := a_controller
 			x_real := a_context.window.width / 2
 			y_real := a_context.window.height / 2
 			make_entity(x_real, y_real, a_context)
@@ -59,6 +60,9 @@ feature {NONE} -- Initialization
 
 feature {NONE} -- Implementation
 
+	acceleration_input: REAL_64 = 200.0
+			-- Acceleration of the player given by the inputs
+
 	max_speed: TUPLE[x, y: REAL_64]
 			-- Max speed of `Current'
 
@@ -69,6 +73,9 @@ feature {NONE} -- Implementation
 			-- Temporary color until it is changed from the `color_index'
 
 feature -- Access
+
+	controller: CONTROLLER
+			-- Controller controlling the player
 
 	current_texture:GAME_TEXTURE
 			-- Active texture of `Current'
@@ -100,8 +107,14 @@ feature -- Access
 	launch_wave_event: ACTION_SEQUENCE[TUPLE[WAVE]]
 			-- Called when `Current' creates a new wave
 
-	on_click(a_mouse_state: GAME_MOUSE_BUTTON_PRESSED_STATE)
-			-- Mouse button pressed listener for `Current'
+	on_mouse_wheel(a_delta_x, a_delta_y: INTEGER)
+			-- Mouse wheel listener for updating the colors based on where it was
+		do
+			set_color_index((color_index + a_delta_y + colors.count) \\ colors.count)
+		end
+
+	on_click(a_mouse: MOUSE)
+			-- Mouse update listener for `Current'
 		local
 			l_wave: WAVE
 			l_direction: REAL_64
@@ -109,9 +122,9 @@ feature -- Access
 			l_y: INTEGER
 			l_speed: TUPLE[x, y: REAL_64]
 		do
-			if a_mouse_state.is_left_button_pressed then
-				l_x := a_mouse_state.x - x_real.rounded + context.camera.position.x
-				l_y := a_mouse_state.y - y_real.rounded + context.camera.position.y
+			if a_mouse.buttons.left then
+				l_x := a_mouse.position.x - x_real.rounded + context.camera.position.x
+				l_y := a_mouse.position.y - y_real.rounded + context.camera.position.y
 				if l_x /= 0 or l_y /= 0 then
 					l_direction := atan2(l_x, l_y)
 					create l_speed
@@ -139,9 +152,34 @@ feature -- Access
 			context.renderer.set_drawing_color(l_previous_color)
 		end
 
+	update_acceleration
+			-- Update `Current's acceleration from the current `controller' inputs
+		local
+			l_x_accel: REAL_64
+			l_y_accel: REAL_64
+		do
+			l_x_accel := -speed.x
+			l_y_accel := -speed.y
+			if controller.keys.up then
+				l_y_accel := l_y_accel - acceleration_input
+			end
+			if controller.keys.down then
+				l_y_accel := l_y_accel + acceleration_input
+			end
+			if controller.keys.left then
+				l_x_accel := l_x_accel - acceleration_input
+			end
+			if controller.keys.right then
+				l_x_accel := l_x_accel + acceleration_input
+			end
+
+			set_acceleration(l_x_accel, l_y_accel)
+		end
+
 	update(a_timediff: REAL_64)
 			-- Update `Current's `speed' and position from it's `acceleration'
 		do
+			update_acceleration
 			speed.x := max_speed.x.opposite.max(max_speed.x.min(speed.x + acceleration.x * a_timediff))
 			speed.y := max_speed.y.opposite.max(max_speed.y.min(speed.y + acceleration.y * a_timediff))
 			x_real := x_real + a_timediff * speed.x

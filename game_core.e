@@ -37,11 +37,8 @@ feature {NONE} -- Implementation
 	current_player: PLAYER
 			-- {PLAYER} currently being controlled by the user
 
-	player_acceleration: REAL_64 = 200.0
-			-- Acceleration of the player
-
-	keys: TUPLE[left, right, up, down: BOOLEAN]
-			-- Booleans for each movement keys, if true, the key is currently held
+	controller: CONTROLLER
+			-- Current state of the user's controls
 
 	current_map: MAP
 			-- Map currently played
@@ -106,30 +103,6 @@ feature -- Access
 													True
 												end
 											end
-		end
-
-	update_player_acceleration
-			-- Will be ported to {PLAYER} when it becomes controllable
-		local
-			l_x_accel: REAL_64
-			l_y_accel: REAL_64
-		do
-			l_x_accel := -current_player.speed.x
-			l_y_accel := -current_player.speed.y
-			if keys.up then
-				l_y_accel := l_y_accel - player_acceleration
-			end
-			if keys.down then
-				l_y_accel := l_y_accel + player_acceleration
-			end
-			if keys.left then
-				l_x_accel := l_x_accel - player_acceleration
-			end
-			if keys.right then
-				l_x_accel := l_x_accel + player_acceleration
-			end
-
-			current_player.set_acceleration(l_x_accel, l_y_accel)
 		end
 
 	update_camera

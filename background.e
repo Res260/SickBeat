@@ -21,14 +21,14 @@ create
 feature {NONE} -- Initialization
 
 	make(a_texture: detachable GAME_TEXTURE; a_context: CONTEXT)
-			-- Initializes `Current' as a {BACKGROUND} that fills the screen
+			-- Initializes `Current' with `a_texture' that fills the screen found in `a_context'
 		do
 			make_drawable(0, 0, a_texture, a_context)
 			movable := False
 		end
 
 	make_movable(a_texture: detachable GAME_TEXTURE; a_size: TUPLE[width, height: INTEGER]; a_context: CONTEXT)
-			-- Initializes `Current' as a {BACKGROUND} of fixed size that can be moved around
+			-- Initializes `Current' with `a_texture' of fixed `a_size' that can be moved around on the `a_context' screen
 		do
 			make(a_texture, a_context)
 			size := a_size
@@ -38,10 +38,10 @@ feature {NONE} -- Initialization
 feature {NONE} -- Implementation
 
 	size: detachable TUPLE[width, height: INTEGER]
-			-- Size of the background. Only used when movable.
+			-- Size of `Current'. Only used when movable.
 
 	draw_movable
-			-- Draws the background by scaling it to `Current' size
+			-- Draws `Current' by scaling it to `Current' size
 		require
 			Is_Movable: movable
 		do
@@ -69,7 +69,7 @@ feature -- Implementation
 		end
 
 	draw
-			-- Draws the background by scaling it to the window size
+			-- Draws `Current' by scaling it to the window size
 		do
 			if movable then
 				draw_movable

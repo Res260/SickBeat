@@ -52,16 +52,12 @@ feature -- Implementation
 	collides_with_box(a_other: BOUNDING_BOX): BOOLEAN
 			-- Whether or not `Current' collides with another {BOUNDING_BOX}
 		do
-			if
-				a_other.lower_corner.x <= upper_corner.x and
-				a_other.upper_corner.x >= lower_corner.x and
-				a_other.upper_corner.y >= lower_corner.y and
-				a_other.lower_corner.y <= upper_corner.y
-			then
-				Result := True
-			else
-				Result := False
-			end
+			Result := (
+						a_other.lower_corner.x <= upper_corner.x and
+						a_other.upper_corner.x >= lower_corner.x and
+						a_other.upper_corner.y >= lower_corner.y and
+						a_other.lower_corner.y <= upper_corner.y
+					)
 		end
 
 	collides_with_arc(a_arc: BOUNDING_ARC): BOOLEAN

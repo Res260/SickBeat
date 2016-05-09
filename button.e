@@ -26,7 +26,7 @@ feature {NONE} -- Initialization
 			a_text: READABLE_STRING_GENERAL; a_color: GAME_COLOR; a_context: CONTEXT;
 			a_action: PROCEDURE[ANY, TUPLE[READABLE_STRING_GENERAL]]
 		)
-			-- Basic creation of a {BUTTON}
+			-- Initializes `Current' with text `a_text' of `a_color' color to draw in `a_context's screen to do `a_action' when clicked
 		do
 			make_text(a_text, a_color, a_context)
 			button_action := a_action
@@ -36,22 +36,25 @@ feature {NONE} -- Initialization
 feature {NONE} -- Implementation
 
 	button_action: PROCEDURE[ANY, TUPLE[READABLE_STRING_GENERAL]]
-			-- Procedure called by the button when a click happens on the button
+			-- Procedure called by the button when a click happens on `Current'
 
 feature -- Access
 
 	change(a_x, a_y, a_font_size: INTEGER)
-			-- Updates the bounding box
+			-- Changes `Current's coordinates to (`a_x', `a_x') and `Current's font size to `a_font_size'
 		do
 			Precursor(a_x, a_y, a_font_size)
 			lower_corner.x := x
 			lower_corner.y := y
 			upper_corner.x := x + width
 			upper_corner.y := y + height
+		ensure
+			Lower_Corner_Set: lower_corner.x = x and lower_corner.y = y
+			Upper_Corner_Set: upper_corner.x = x + width and upper_corner.y = y + height
 		end
 
 	do_click
-			-- Procedure called when a click happens on the button
+			-- Called when a click happens on `Current'
 		do
 			button_action(text)
 		end

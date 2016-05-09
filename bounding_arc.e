@@ -169,6 +169,7 @@ feature -- Access
 			-- Thickness of the arc
 
 	draw_box(a_context: CONTEXT)
+			-- Draws a minimalistic version of `Current' when `a_context' is in debugging mode
 		do
 			update_minimal_bounding_box
 			if a_context.debugging then

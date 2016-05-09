@@ -2,7 +2,7 @@ note
 	description: "The loading screen while textures and sounds are loading."
 	author: "Émilio G!"
 	date: "2016-04-25"
-	revision: "16w12a"
+	revision: "16w13a"
 
 class
 	MENU_LOADING_SCREEN
@@ -15,6 +15,7 @@ inherit
 		end
 create
 	make,
+	make_multiplayer,
 	make_as_main
 
 feature {NONE} -- Initialization
@@ -32,7 +33,16 @@ feature {NONE} -- Initialization
 			add_button("Génération des images en cours", agent useless_action)
 		end
 
+	make_multiplayer(a_context: CONTEXT; a_network_engine: NETWORK_ENGINE)
+		do
+			make(a_context)
+			network_engine := a_network_engine
+		end
+
 feature --Implementation
+
+	network_engine: detachable NETWORK_ENGINE
+		--The game's network engine.
 
 	thread_sounds:MENU_LOADING_SCREEN_SOUNDS_THREAD
 		--Thread that generates sounds for the game.
@@ -58,7 +68,11 @@ feature --Implementation
 			buttons[1].set_text ("Génération des sons terminée")
 			thread_images.join
 			buttons[2].set_text ("Génération des images terminée")
-			create {GAME_ENGINE} next_menu.make(context)
+			if(attached network_engine as at_network_engine) then
+				create {GAME_ENGINE} next_menu.make_multiplayer(context, at_network_engine)
+			else
+				create {GAME_ENGINE} next_menu.make(context)
+			end
 		end
 
 	stop_menu_from_thread

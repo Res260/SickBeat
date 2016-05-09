@@ -27,12 +27,13 @@ inherit
 
 create
 	make,
+	make_multiplayer,
 	make_as_main
 
 feature {NONE} -- Initialization
 
 	make(a_context: CONTEXT)
-			-- Initialize all the attributs
+			-- Initialize all the attributes
 		do
 			Precursor(a_context)
 			context_core := a_context
@@ -62,6 +63,12 @@ feature {NONE} -- Initialization
 															add_entity_to_world(a_wave)
 														end
 												   )
+		end
+
+	make_multiplayer(a_context: CONTEXT; a_network_engine: NETWORK_ENGINE)
+			-- Initialize all the attributes for a multiplayer game.
+		do
+			make(a_context)
 		end
 
 feature {NONE} -- Implementation
@@ -107,7 +114,7 @@ feature {NONE} -- Implementation
 				io.put_string("Ticks: " + tick_display.out + "%N")
 			end
 
-			
+
 
 			on_redraw(a_timestamp)
 

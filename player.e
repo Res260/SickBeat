@@ -1,8 +1,8 @@
 note
 	description: "Special {ENTITY} controlled by the user."
 	author: "Guillaume Jean"
-	date: "27 March 2016"
-	revision: "16w09a"
+	date: "2016-05-03"
+	revision: "16w12a"
 	legal: "See notice at end of class."
 
 class

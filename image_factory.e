@@ -1,8 +1,8 @@
 note
 	description: "Class to make images. In progress."
 	author: "Émilio G!"
-	date: "16-04-26"
-	revision: "16w12a"
+	date: "2016-05-03"
+	revision: "16w12b"
 	legal: "See notice at end of class."
 
 class

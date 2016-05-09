@@ -46,6 +46,8 @@ feature {NONE} -- Implementation
 		do
 			play_menu_sound_click
 			io.put_string("Multiplayer clicked!%N")
+			create {MENU_MULTIPLAYER} next_menu.make(context)
+			continue_to_next
 		end
 
 	return_action(a_string: READABLE_STRING_GENERAL)

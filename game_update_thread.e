@@ -76,7 +76,6 @@ feature -- Implementation
 
 				game_core.increment_ticks
 
-				game_core.update_player_acceleration
 				game_core.update_camera
 				game_core.update_everything(l_update_time_difference)
 				game_core.physics.check_all

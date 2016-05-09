@@ -18,6 +18,7 @@ feature {NONE} -- Initialization
 	make(a_position: TUPLE[x, y: INTEGER])
 		do
 			position := a_position
+			create buttons
 			make_box(position.x.to_double, position.y.to_double, position.x.to_double, position.y.to_double)
 		end
 
@@ -36,6 +37,9 @@ feature -- Access
 
 	position: TUPLE[x, y: INTEGER] assign set_position
 			-- Position of `Current'
+
+	buttons: TUPLE[left, right, mouse_wheel: BOOLEAN]
+			-- Current state of the mouse buttons
 
 	set_position(a_new_position: TUPLE[x, y: INTEGER])
 		do

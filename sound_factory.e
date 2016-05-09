@@ -91,7 +91,7 @@ feature --Access
 			until
 				i > max_frequency
 			loop
-				l_wave := sound_generator.create_sine_wave(90, i)
+				l_wave := sound_generator.create_sine_wave(55, i)
 				sound_generator.repeat_wave_from_duration (l_wave, 4)
 				sound_generator.fade (l_wave, 0, 0.01, 0, 1)
 				sound_generator.fade (l_wave, 0.01, 1, 1, 0)

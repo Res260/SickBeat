@@ -48,7 +48,7 @@ feature -- Access
 			lower_corner.y := y
 			upper_corner.x := x + width
 			upper_corner.y := y + height
-		ensure
+		ensure then
 			Lower_Corner_Set: lower_corner.x = x and lower_corner.y = y
 			Upper_Corner_Set: upper_corner.x = x + width and upper_corner.y = y + height
 		end

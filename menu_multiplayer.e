@@ -41,7 +41,7 @@ feature {NONE}
 			play_menu_sound_click
 			io.put_string("Host clicked!%N")
 			network_engine.initiate_server
-			create {MENU_LOADING_SCREEN} next_menu.make_multiplayer(context, network_engine)
+			create {MENU_LOADING_SCREEN} next_menu.make_multiplayer_host(context, network_engine)
 			continue_to_next
 		end
 

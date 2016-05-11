@@ -7,17 +7,7 @@ note
 deferred class
 	GAME_CORE
 
-feature {NONE} -- Initialization
-
-	make(a_context: CONTEXT)
-		do
-			context := a_context
-		end
-
 feature {NONE} -- Implementation
-
-	context: CONTEXT
-			-- Context of the current application
 
 	frame_display: INTEGER
 			-- Number of frames in the past second
@@ -33,9 +23,6 @@ feature {NONE} -- Implementation
 
 	second_counter: REAL_64
 			-- Time since last frame
-
-	current_player: PLAYER
-			-- {PLAYER} currently being controlled by the user
 
 	controller: CONTROLLER
 			-- Current state of the user's controls
@@ -103,12 +90,6 @@ feature -- Access
 													True
 												end
 											end
-		end
-
-	update_camera
-			-- Update `context.camera's position
-		do
-			context.camera.move_at_entity(current_player, context.window)
 		end
 
 	increment_ticks

@@ -15,7 +15,7 @@ inherit
 		end
 create
 	make,
-	make_multiplayer,
+	make_multiplayer_host,
 	make_as_main
 
 feature {NONE} -- Initialization
@@ -24,6 +24,7 @@ feature {NONE} -- Initialization
 			-- Initialization of `Current'
 		do
 			Precursor(a_context)
+			is_host := False
 			set_title("SickBeat - Waiting for miracles")
 			create thread_sounds.make
 			create thread_images.make(context.image_factory)
@@ -33,13 +34,17 @@ feature {NONE} -- Initialization
 			add_button("Génération des images en cours", agent useless_action)
 		end
 
-	make_multiplayer(a_context: CONTEXT; a_network_engine: NETWORK_ENGINE)
+	make_multiplayer_host(a_context: CONTEXT; a_network_engine: NETWORK_ENGINE)
 		do
 			make(a_context)
 			network_engine := a_network_engine
+			is_host := True
 		end
 
 feature --Implementation
+
+	is_host:BOOLEAN
+		--True if the client hosts a server.
 
 	network_engine: detachable NETWORK_ENGINE
 		--The game's network engine.
@@ -68,8 +73,12 @@ feature --Implementation
 			buttons[1].set_text ("Génération des sons terminée")
 			thread_images.join
 			buttons[2].set_text ("Génération des images terminée")
-			if(attached network_engine as at_network_engine) then
-				create {GAME_ENGINE} next_menu.make_multiplayer(context, at_network_engine)
+			if(attached network_engine as la_network_engine) then
+				if(is_host) then
+					create {GAME_ENGINE} next_menu.make_multiplayer_host(context, la_network_engine, create {GAME_NETWORK}.make(context, la_network_engine))
+				else
+					create {GAME_ENGINE} next_menu.make_multiplayer(context, la_network_engine)
+				end
 			else
 				create {GAME_ENGINE} next_menu.make(context)
 			end

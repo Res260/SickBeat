@@ -18,15 +18,12 @@ inherit
 			on_stop
 		end
 	GAME_CORE
-		rename
-			context as context_core,
-			make as make_core
-		end
 	MATH_UTILITY
 
 create
 	make,
 	make_multiplayer,
+	make_multiplayer_host,
 	make_as_main
 
 feature {NONE} -- Initialization
@@ -35,7 +32,6 @@ feature {NONE} -- Initialization
 			-- Initialize all the attributes
 		do
 			Precursor(a_context)
-			context_core := a_context
 			create controller.make(mouse)
 			create background.make_movable(context.ressource_factory.game_background, [3840, 2160], context)
 			create current_map.make(background, context)
@@ -71,8 +67,15 @@ feature {NONE} -- Initialization
 			-- Initialize all the attributes for a multiplayer game.
 		do
 			make(a_context)
+			network_engine := a_network_engine
 		end
 
+	make_multiplayer_host(a_context: CONTEXT; a_network_engine: NETWORK_ENGINE; a_game_network:GAME_NETWORK)
+		do
+			game_network := a_game_network
+			make_multiplayer(a_context, a_network_engine)
+		end
+		
 feature {NONE} -- Implementation
 
 	game_update_mutex: MUTEX
@@ -140,7 +143,7 @@ feature {NONE} -- Implementation
 				io.put_string("Ticks: " + tick_display.out + "%N")
 			end
 
-
+			update_camera
 
 			on_redraw(a_timestamp)
 
@@ -186,18 +189,27 @@ feature {NONE} -- Implementation
 			end
 		end
 
+	update_camera
+			-- Update `context.camera's position
+		do
+			context.camera.move_at_entity(current_player, context.window)
+		end
+
 feature -- Access
 
 	renderer: RENDER_ENGINE
 			-- Object rendering engine
 
-	network: NETWORK_ENGINE
-			-- `network'
-		attribute check False then end end --| Remove line when `network' is initialized in creation procedure.
+	network_engine: detachable NETWORK_ENGINE
+
+	game_network: detachable GAME_NETWORK
 
 	hud_items: LIST[HUD_ITEM]
 			-- `hud_items'
 		attribute check False then end end --| Remove line when `hud_items' is initialized in creation procedure.
+
+	current_player: PLAYER
+			-- {PLAYER} currently being controlled by the user
 
 invariant
 note

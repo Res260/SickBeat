@@ -75,8 +75,7 @@ feature -- Implementation
 				l_update_time_difference := (last_tick - l_previous_tick) / 1000
 
 				game_core.increment_ticks
-
-				game_core.update_camera
+				
 				game_core.update_everything(l_update_time_difference)
 				game_core.physics.check_all
 

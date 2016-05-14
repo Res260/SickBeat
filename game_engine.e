@@ -32,12 +32,11 @@ feature {NONE} -- Initialization
 			-- Initialize all the attributes
 		do
 			Precursor(a_context)
-			create controller.make(mouse)
 			create background.make_movable(context.ressource_factory.game_background, [3840, 2160], context)
 			create current_map.make(background, context)
 			create renderer.make(current_map, context)
 			create physics.make
-			create current_player.make(controller, context)
+			create current_player.make(mouse, "local", context)
 			create {LINKED_LIST[ENTITY]} entities.make
 			create {ARRAYED_LIST[HUD_ITEM]} hud_items.make(0)
 			create {ARRAYED_LIST[DRAWABLE]} drawables.make(0)
@@ -48,9 +47,9 @@ feature {NONE} -- Initialization
 			last_frame := 0
 			create game_update_mutex.make
 			create game_update_thread.make(game_update_mutex, Current)
-			controller.mouse_update_actions.extend(agent current_player.on_click)
-			controller.mouse_wheel_actions.extend(agent current_player.on_mouse_wheel)
-			controller.number_actions.extend(agent current_player.set_color_index)
+			current_player.controller.mouse_update_actions.extend(agent current_player.on_click)
+			current_player.controller.mouse_wheel_actions.extend(agent current_player.on_mouse_wheel)
+			current_player.controller.number_actions.extend(agent current_player.set_color_index)
 			current_player.collision_actions.extend(agent (a_physic_object: PHYSIC_OBJECT)
 														do
 															io.put_string("BOOM!")
@@ -68,14 +67,21 @@ feature {NONE} -- Initialization
 		do
 			make(a_context)
 			network_engine := a_network_engine
+			if(attached network_engine as la_network_engine) then
+				la_network_engine.initiate_client_thread(current)
+			end
 		end
 
 	make_multiplayer_host(a_context: CONTEXT; a_network_engine: NETWORK_ENGINE; a_game_network:GAME_NETWORK)
 		do
+			a_network_engine.initiate_server(a_game_network)
 			game_network := a_game_network
 			make_multiplayer(a_context, a_network_engine)
+			if(attached game_network as la_game_network) then
+				la_game_network.launch
+			end
 		end
-		
+
 feature {NONE} -- Implementation
 
 	game_update_mutex: MUTEX
@@ -91,31 +97,31 @@ feature {NONE} -- Implementation
 			context.window.key_pressed_actions.extend(agent on_key_press)
 			context.window.key_pressed_actions.extend(
 					agent (a_timestamp: NATURAL_32; a_game_key: GAME_KEY_STATE)
-						do controller.on_key_pressed(a_game_key) end
+						do current_player.controller.on_key_pressed(a_game_key) end
 				)
 			context.window.key_released_actions.extend(
 					agent (a_timestamp: NATURAL_32; a_game_key: GAME_KEY_STATE)
-						do controller.on_key_release (a_game_key) end
+						do current_player.controller.on_key_release (a_game_key) end
 				)
 			context.window.keyboard_focus_lost_actions.extend(
 					agent (a_timestamp: NATURAL_32)
-						do controller.clear_keyboard end
+						do current_player.controller.clear_keyboard end
 				)
 			context.window.mouse_button_pressed_actions.extend(
 					agent (a_timestamp: NATURAL_32; a_mouse_state: GAME_MOUSE_BUTTON_PRESSED_STATE; a_clicks: NATURAL_8)
-						do controller.on_mouse_update(a_mouse_state) end
+						do current_player.controller.on_mouse_update(a_mouse_state) end
 				)
 			context.window.mouse_button_released_actions.extend(
 					agent (a_timestamp: NATURAL_32; a_mouse_state: GAME_MOUSE_BUTTON_RELEASED_STATE; a_clicks: NATURAL_8)
-						do controller.on_mouse_update(a_mouse_state) end
+						do current_player.controller.on_mouse_update(a_mouse_state) end
 				)
 			context.window.mouse_motion_actions.extend(
 					agent (a_timestamp: NATURAL_32; a_mouse_state: GAME_MOUSE_MOTION_STATE; a_delta_x, a_delta_y: INTEGER)
-						do controller.on_mouse_update(a_mouse_state) end
+						do current_player.controller.on_mouse_update(a_mouse_state) end
 				)
 			context.window.mouse_wheel_move_actions.extend(
 					agent (a_timestamp: NATURAL_32; a_mouse_state: GAME_MOUSE_EVENTS_STATE; a_delta_x, a_delta_y: INTEGER)
-						do controller.on_mouse_wheel(a_delta_x, a_delta_y) end
+						do current_player.controller.on_mouse_wheel(a_delta_x, a_delta_y) end
 				)
 			game_library.iteration_actions.extend(agent on_tick)
 		end

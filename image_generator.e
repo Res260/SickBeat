@@ -177,7 +177,7 @@ feature --Access
 			l_x_difference, l_y_difference:INTEGER_32
 			l_lowest_x, l_highest_x:INTEGER_32
 			l_lowest_y, l_highest_y:INTEGER_32
-			i, j:INTEGER_32
+			i:INTEGER_32
 		do
 			create l_position
 			l_slope := get_slope(a_x_1, a_y_1, a_x_2, a_y_2)

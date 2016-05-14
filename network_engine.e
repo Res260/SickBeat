@@ -8,6 +8,9 @@ note
 class
 	NETWORK_ENGINE
 
+inherit
+	GAME_LIBRARY_SHARED
+
 create
 	make
 
@@ -17,7 +20,6 @@ feature{NONE} -- Initialization
 			-- Initialitation for `Current'.
 		do
 			continue_listening_server := False
-			create{LINKED_LIST[STRING]} users.make
 		end
 
 feature {NONE} -- Implementation
@@ -30,27 +32,38 @@ feature {NONE} -- Implementation
 
 feature -- Access
 
+	client_port: INTEGER = 42065
+			-- The client's port.
+
+	server_port: INTEGER = 42066
+			-- The server's port.
+
 	has_error:BOOLEAN
 			-- True if an error occured in `Current'.
 
 	continue_listening_server: BOOLEAN
 			-- The token to continue listening for communications.
 
-	users: LIST[STRING]
-			-- List of connected users.
+	continue_client_loop: BOOLEAN
+			-- The token to continue to run as a client.
 
-	server_matcher: detachable KMP_MATCHER
-			-- The regex manager for the server.
-	initiate_server
-			-- Initiates a server connection using port 42069.
+	server_matcher: detachable RX_PCRE_REGULAR_EXPRESSION
+			-- The regex matcher for the server.
+
+	game_network: detachable GAME_NETWORK
+			-- The server's game manager.
+
+	initiate_server(a_game_network: GAME_NETWORK)
+			-- Initiates a server connection using `server_port'.
 		local
 			l_socket:NETWORK_DATAGRAM_SOCKET
 		do
-			create l_socket.make_bound (42066)
+			game_network := a_game_network
+			create l_socket.make_bound (server_port)
 			l_socket.set_non_blocking
-			create server_matcher.make_empty
+			create server_matcher.make
 			if(attached server_matcher as la_server_matcher) then
-				la_server_matcher.set_pattern ("{(.*)}")
+				la_server_matcher.compile("{(.*)}")
 			end
 			if(l_socket.is_bound) then
 				has_error := False
@@ -68,10 +81,10 @@ feature -- Access
 	run_as_server
 			-- Listen to incoming communications
 		local
-			l_communication: STRING
 			l_packet:PACKET
 		do
-			if (attached server_socket as la_server_socket and attached server_matcher as la_server_matcher) then
+			if (attached server_socket as la_server_socket and attached server_matcher as la_server_matcher
+				and attached game_network as la_game_network) then
 
 				from
 					continue_listening_server := True
@@ -84,7 +97,7 @@ feature -- Access
 					loop
 						l_packet := la_server_socket.received(5000, 0)
 						if(attached la_server_socket.peer_address as la_peer_address) then
-							handle_communication(la_peer_address.host_address.host_address, create{STRING}.make_from_c (l_packet.data.item), la_server_matcher)
+							handle_communication_server(la_peer_address.host_address.host_address, create{STRING}.make_from_c (l_packet.data.item), la_server_matcher, la_game_network)
 						else
 							print("peer_address n'existe pas!")
 						end
@@ -98,32 +111,109 @@ feature -- Access
 			end
 		end
 
-	handle_communication(a_from, a_communication: STRING; a_server_matcher:KMP_MATCHER)
+	handle_communication_server(a_from, a_communication: STRING; a_server_matcher:RX_PCRE_REGULAR_EXPRESSION; a_game_network: GAME_NETWORK)
+			-- Calls a feature based on what the server received (`a_communication').
 		local
 			l_message: STRING
-			l_matcher:KMP_MATCHER
 		do
 			print("Traitement d'une communication provenant de " + a_from + ": " + a_communication)
 			l_message := get_message_from_communication(a_communication, a_server_matcher)
-			print("%NMessage: " + l_message)
-			if(a_communication.starts_with ("SICK_NEW_PLAYER{} ")) then
+			if(a_communication.starts_with ("SICK_NEW_PLAYER{}")) then
+				a_game_network.add_player (a_from)
+			elseif(a_communication.starts_with ("SICK_PLAYER_POSITION{ ")) then
 
 			end
 		end
 
-	get_message_from_communication(a_communication: STRING; a_matcher: KMP_MATCHER): STRING
-		local
-			l_found: BOOLEAN
+	get_message_from_communication(a_communication: STRING; a_matcher: RX_PCRE_REGULAR_EXPRESSION): STRING
+			-- Using `a_matcher', get the message from `a_communication'.
 		do
-			a_matcher.set_text (a_communication)
-			l_found := a_matcher.search_for_pattern
-			a_matcher.find_matching_indices
+			a_matcher.match(a_communication)
 			Result := ""
-			if(attached a_matcher.matching_indices as la_matching_indices and attached a_matcher.lengths as la_lengths) then
-				if(la_matching_indices.count > 0) then
-					Result := a_communication.substring (la_matching_indices[1], la_matching_indices[1] + la_lengths[1] - 1)
+			if a_matcher.has_matched and a_matcher.match_count > 0 then
+				Result := a_matcher.captured_substring (1)
+			end
+		end
+
+	game_engine: detachable GAME_ENGINE
+			-- The client's game engine.
+
+	client_socket: detachable NETWORK_DATAGRAM_SOCKET
+			-- The client's socket.
+
+	client_thread:detachable FLEXIBLE_THREAD
+			-- The client's thread to process network packets.
+
+	initiate_client_thread(a_game_engine: GAME_ENGINE)
+			--Starts the network job for the client.
+		local
+			l_socket: NETWORK_DATAGRAM_SOCKET
+		do
+			game_engine := a_game_engine
+			create l_socket.make_targeted ("127.0.0.1", server_port)
+			client_socket := l_socket
+			create client_thread.make(agent run_as_client)
+			if(attached client_thread as la_client_thread) then
+				la_client_thread.launch
+			end
+		end
+
+	run_as_client
+			-- Threaded method to update the game according to the server's informations.
+		local
+			l_previous_tick: REAL_64
+			l_update_time_difference: REAL_64
+			l_time_difference: REAL_64
+			l_execution_time: REAL_64
+		do
+			if(attached game_engine as la_game_engine and attached client_socket as la_client_socket) then
+				send_sick_new_player
+				send_sick_new_player
+				send_sick_new_player
+				from
+					continue_client_loop := True
+				until
+					continue_client_loop = False
+				loop
+					l_previous_tick := last_tick
+					last_tick := game_library.time_since_create.to_real_64
+
+					send_player_things
+
+					l_execution_time := game_library.time_since_create.to_real_64 - last_tick
+					l_time_difference := milliseconds_per_tick - l_execution_time - 0.5
+					if l_time_difference > 0 then
+						if(attached client_thread as la_client_thread) then
+							la_client_thread.sleep((l_time_difference * 1000000).truncated_to_integer_64)
+						end
+					end
 				end
 			end
+		end
+
+	send_sick_new_player
+			-- Sends SICK_NEW_PLAYER{} to the server
+		do
+			if(attached client_socket as la_client_socket) then
+				la_client_socket.put_string ("SICK_NEW_PLAYER{}")
+			end
+		end
+
+	send_player_thing
+		do
+
+		end
+
+	last_tick: REAL_64
+			-- Time of last update in milliseconds
+
+	ticks_per_seconds: NATURAL_32 = 120
+			-- Ticks executed per second
+
+	milliseconds_per_tick: REAL_64
+			-- Fraction of seconds per tick
+		once("PROCESS")
+			Result := 1000 / ticks_per_seconds
 		end
 
 note

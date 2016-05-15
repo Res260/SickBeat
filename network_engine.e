@@ -64,7 +64,6 @@ feature -- Access
 		do
 			game_network := a_game_network
 			create l_socket.make_server_by_port (server_port)
-			l_socket.set_non_blocking
 			create server_matcher.make
 			if(attached server_matcher as la_server_matcher) then
 				la_server_matcher.compile("{(.*)}")
@@ -76,6 +75,7 @@ feature -- Access
 				if(attached thread_server_listening_connexions as la_thread_server_listening) then
 					la_thread_server_listening.launch
 				end
+--				run_as_server
 			else
 				has_error := True
 				-- Todo deal with this
@@ -92,10 +92,11 @@ feature -- Access
 				until
 					continue_listening_server = False
 				loop
-					la_server_socket.listen (1)
+					la_server_socket.listen (3)
 					la_server_socket.accept
 					if attached la_server_socket.accepted as la_client_socket then
-						if attached la_client_socket.address as la_address then
+						if attached la_client_socket.peer_address as la_address then
+							print(la_address.host_address.host_address)
 							start_server_receive_updates(la_client_socket)
 							la_game_network.add_player (la_address.host_address.host_address)
 						else
@@ -112,12 +113,27 @@ feature -- Access
 			until
 				false
 			loop
---				print("server_listen_updates")
---				if attached {PLAYER} a_socket.retrieved as la_player then
---					io.put_string("Player recu:%N" + la_player.height.to_hex_string + "%N")
---				end
+				print("server_listen_updates")
+				receive_player(a_socket)
 			end
 			print("Kappa2")
+		end
+
+	receive_player(a_socket:NETWORK_STREAM_SOCKET)
+			-- Reçoit un {LIVRE} du `a_socket' et affiche ces informations
+		local
+			l_retry:BOOLEAN		-- Par défaut, l_retry sera à `False'
+		do
+			if not l_retry then		-- Si la clause 'rescue' n'a pas été utilisé, reçoit le livre
+				if attached {PLAYER} a_socket.retrieved as la_player then
+					io.put_string("Livre recu:%N%N")
+				end
+			else	-- Si la clause 'rescue' a été utilisé, affiche un message d'erreur
+				io.put_string("Le message recu n'est pas un livre valide.%N")
+			end
+		rescue	-- Permet d'attraper un exception
+			l_retry := True
+			retry
 		end
 
 	start_server_receive_updates(a_socket: NETWORK_STREAM_SOCKET)
@@ -229,27 +245,27 @@ feature -- Access
 			l_execution_time: REAL_64
 		do
 			if(attached game_engine as la_game_engine and attached client_socket as la_client_socket) then
-				send_sick_new_player
-				send_sick_new_player
-				send_sick_new_player
-				from
-					continue_client_loop := True
-				until
-					continue_client_loop = False
-				loop
-					l_previous_tick := last_tick
-					last_tick := game_library.time_since_create.to_real_64
+--				send_sick_new_player
+--				send_sick_new_player
+--				send_sick_new_player
+--				from
+--					continue_client_loop := True
+--				until
+--					continue_client_loop = False
+--				loop
+--					l_previous_tick := last_tick
+--					last_tick := game_library.time_since_create.to_real_64
 
---					send_player_things
+----					send_player_things
 
-					l_execution_time := game_library.time_since_create.to_real_64 - last_tick
-					l_time_difference := milliseconds_per_tick - l_execution_time - 0.5
-					if l_time_difference > 0 then
-						if(attached client_thread as la_client_thread) then
-							la_client_thread.sleep((l_time_difference * 1000000).truncated_to_integer_64)
-						end
-					end
-				end
+--					l_execution_time := game_library.time_since_create.to_real_64 - last_tick
+--					l_time_difference := milliseconds_per_tick - l_execution_time - 0.5
+--					if l_time_difference > 0 then
+--						if(attached client_thread as la_client_thread) then
+--							la_client_thread.sleep((l_time_difference * 1000000).truncated_to_integer_64)
+--						end
+--					end
+--				end
 			end
 		end
 
@@ -259,11 +275,6 @@ feature -- Access
 			if(attached client_socket as la_client_socket) then
 				la_client_socket.put_string ("SICK_NEW_PLAYER{}")
 			end
-		end
-
-	send_player_thing
-		do
-
 		end
 
 	last_tick: REAL_64

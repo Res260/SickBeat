@@ -23,16 +23,16 @@ create
 
 feature {NONE} -- Initialization
 
-	make(a_mutex: MUTEX; a_game_core: GAME_CORE)
+	make(a_mutex: MUTEX; a_game_core: GAME_ENGINE)
 			-- Initializes `Current'
 		do
 			make_thread
 			must_stop := False
 			game_update_mutex := a_mutex
-			game_core := a_game_core
+			game_engine := a_game_core
 		end
 
-	make_multiplayer(a_mutex: MUTEX; a_game_core: GAME_CORE; a_network_engine: NETWORK_ENGINE)
+	make_multiplayer(a_mutex: MUTEX; a_game_core: GAME_ENGINE; a_network_engine: NETWORK_ENGINE)
 		do
 			make(a_mutex, a_game_core)
 			network_engine := a_network_engine
@@ -53,13 +53,13 @@ feature {NONE} -- Implementation
 	game_update_mutex: MUTEX
 			-- Mutex used to share ressources
 
-	game_core: GAME_CORE
+	game_engine: GAME_ENGINE
 			-- Where the ressources are
 
 	last_tick: REAL_64
 			-- Time of last update in milliseconds
 
-	ticks_per_seconds: NATURAL_32 = 120
+	ticks_per_seconds: NATURAL_32 = 60
 			-- Ticks executed per second
 
 	milliseconds_per_tick: REAL_64
@@ -97,10 +97,10 @@ feature -- Implementation
 				last_tick := game_library.time_since_create.to_real_64
 				l_update_time_difference := (last_tick - l_previous_tick) / 1000
 
-				game_core.increment_ticks
+				game_engine.increment_ticks
 
-				game_core.update_everything(l_update_time_difference)
-				game_core.physics.check_all
+				game_engine.update_everything(l_update_time_difference)
+				game_engine.physics.check_all
 
 				game_update_mutex.unlock
 
@@ -128,8 +128,7 @@ feature -- Implementation
 					last_tick := game_library.time_since_create.to_real_64
 					l_update_time_difference := (last_tick - l_previous_tick) / 1000
 
-					game_core.increment_ticks
-					print("allo")
+					game_engine.increment_ticks
 
 					l_execution_time := game_library.time_since_create.to_real_64 - last_tick
 					l_time_difference := milliseconds_per_tick - l_execution_time - 0.5

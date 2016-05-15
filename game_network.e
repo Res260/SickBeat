@@ -37,15 +37,6 @@ feature
 			create current_map.make(l_background, a_context)
 			time_since_last_frame := 0
 			last_frame := 0
---			controller.mouse_update_actions.extend(agent current_player.on_click)
---			controller.mouse_wheel_actions.extend(agent current_player.on_mouse_wheel)
---			controller.number_actions.extend(agent current_player.set_color_index)
---			current_player.collision_actions.extend(agent (a_physic_object: PHYSIC_OBJECT)
---														do
---															io.put_string("BOOM!")
---														end
---												   )
---			current_player.launch_wave_event.extend(agent (a_wave:WAVE) do add_entity_to_world(a_wave) end )
 			make_thread
 		end
 
@@ -59,7 +50,7 @@ feature
 	last_tick: REAL_64
 			-- Time of last update in milliseconds
 
-	ticks_per_seconds: NATURAL_32 = 120
+	ticks_per_seconds: NATURAL_32 = 60
 			-- Ticks executed per second
 
 	milliseconds_per_tick: REAL_64
@@ -118,7 +109,6 @@ feature
 					physics.check_all
 				controllers_mutex.unlock
 				entities_mutex.unlock
-
 				l_execution_time := game_library.time_since_create.to_real_64 - last_tick
 				l_time_difference := milliseconds_per_tick - l_execution_time - 0.5
 				if l_time_difference > 0 then

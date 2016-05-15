@@ -75,7 +75,7 @@ feature --Implementation
 			buttons[2].set_text ("Génération des images terminée")
 			if(attached network_engine as la_network_engine) then
 				if(is_host) then
-					create {GAME_ENGINE} next_menu.make_multiplayer_host(context, la_network_engine, create {GAME_NETWORK}.make(context, la_network_engine))
+					create {GAME_ENGINE} next_menu.make_multiplayer_host(context, la_network_engine)
 				else
 					create {GAME_ENGINE} next_menu.make_multiplayer(context, la_network_engine)
 				end

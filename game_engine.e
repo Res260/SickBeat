@@ -70,14 +70,14 @@ feature {NONE} -- Initialization
 			network_engine := a_network_engine
 		end
 
-	make_multiplayer_host(a_context: CONTEXT; a_network_engine: NETWORK_ENGINE; a_game_network:GAME_NETWORK)
+	make_multiplayer_host(a_context: CONTEXT; a_network_engine: NETWORK_ENGINE)
 		do
-			a_network_engine.initiate_server(a_game_network)
-			game_network := a_game_network
-			make_multiplayer(a_context, a_network_engine)
-			if(attached game_network as la_game_network) then
+			create game_network.make(a_context, a_network_engine)
+			if attached game_network as la_game_network then
+				a_network_engine.initiate_server(la_game_network)
 				la_game_network.launch
 			end
+			make_multiplayer(a_context, a_network_engine)
 		end
 
 feature {NONE} -- Implementation
@@ -127,6 +127,7 @@ feature {NONE} -- Implementation
 	on_tick(a_timestamp: NATURAL_32)
 			-- Method run on every iteration (should be 60 times per second)
 		do
+			print("??")
 			game_update_mutex.lock
 
 			if last_frame <= 0 then
@@ -150,7 +151,7 @@ feature {NONE} -- Implementation
 			update_camera
 
 			on_redraw(a_timestamp)
-
+			print("Send player")
 			if attached network_engine as la_network_engine then
 				if attached la_network_engine.client_socket as la_client_socket then
 					la_client_socket.independent_store (current_player)

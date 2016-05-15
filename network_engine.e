@@ -92,7 +92,7 @@ feature -- Access
 				until
 					continue_listening_server = False
 				loop
-					la_server_socket.listen (5)
+					la_server_socket.listen (1)
 					la_server_socket.accept
 					if attached la_server_socket.accepted as la_client_socket then
 						if attached la_client_socket.address as la_address then
@@ -112,9 +112,10 @@ feature -- Access
 			until
 				false
 			loop
-				if attached {PLAYER} a_socket.retrieved as la_player then
-					io.put_string("Player recu:%N" + la_player.height.to_hex_string + "%N")
-				end
+--				print("server_listen_updates")
+--				if attached {PLAYER} a_socket.retrieved as la_player then
+--					io.put_string("Player recu:%N" + la_player.height.to_hex_string + "%N")
+--				end
 			end
 			print("Kappa2")
 		end
@@ -123,6 +124,7 @@ feature -- Access
 		do
 			threads_server_receive_updates.extend (create {FLEXIBLE_THREAD}.make (agent server_listen_updates(a_socket)))
 			threads_server_receive_updates[threads_server_receive_updates.count].launch
+			print("saluuuut")
 		end
 
 	run_as_server
@@ -201,7 +203,7 @@ feature -- Access
 			create l_addr_factory
 			l_address:= l_addr_factory.create_from_name (a_host)
 			if l_address = Void then
-				io.put_string ("Erroe: Address " + a_host + " invalid%N")
+				io.put_string ("Error: Address " + a_host + " invalid%N")
 			else
 				create l_socket.make_client_by_address_and_port (l_address, server_port)
 				if l_socket.invalid_address then

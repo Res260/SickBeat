@@ -120,16 +120,22 @@ feature -- Implementation
 			l_execution_time: REAL_64
 		do
 			if attached network_engine as la_network_engine then
-				l_previous_tick := last_tick
-				last_tick := game_library.time_since_create.to_real_64
-				l_update_time_difference := (last_tick - l_previous_tick) / 1000
+				from
+				until
+					must_stop
+				loop
+					l_previous_tick := last_tick
+					last_tick := game_library.time_since_create.to_real_64
+					l_update_time_difference := (last_tick - l_previous_tick) / 1000
 
-				game_core.increment_ticks
+					game_core.increment_ticks
+					print("allo")
 
-				l_execution_time := game_library.time_since_create.to_real_64 - last_tick
-				l_time_difference := milliseconds_per_tick - l_execution_time - 0.5
-				if l_time_difference > 0 then
-					sleep((l_time_difference * 1000000).truncated_to_integer_64)
+					l_execution_time := game_library.time_since_create.to_real_64 - last_tick
+					l_time_difference := milliseconds_per_tick - l_execution_time - 0.5
+					if l_time_difference > 0 then
+						sleep((l_time_difference * 1000000).truncated_to_integer_64)
+					end
 				end
 			end
 		end

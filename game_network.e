@@ -69,7 +69,7 @@ feature
 		end
 
 	controllers_mutex: MUTEX
-			-- The mutex for the controllers.
+		-- The mutex for the controllers.
 
 	entities_mutex: MUTEX
 		-- The mutex for the entities.

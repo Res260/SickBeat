@@ -1,8 +1,8 @@
 note
 	description: "Threaded loop part of the {GAME_ENGINE}"
-	author: "Guillaume Jean"
-	date: "19 April 2016"
-	revision: "16w11a"
+	author: "Guillaume Jean and Émilio G!"
+	date: "2016-05-14"
+	revision: "16w15a"
 	legal: "See notice at end of class."
 
 class
@@ -18,7 +18,8 @@ inherit
 	GAME_LIBRARY_SHARED
 
 create
-	make
+	make,
+	make_multiplayer
 
 feature {NONE} -- Initialization
 
@@ -31,7 +32,20 @@ feature {NONE} -- Initialization
 			game_core := a_game_core
 		end
 
+	make_multiplayer(a_mutex: MUTEX; a_game_core: GAME_CORE; a_network_engine: NETWORK_ENGINE)
+		do
+			make(a_mutex, a_game_core)
+			network_engine := a_network_engine
+			is_multiplayer := True
+			if attached network_engine as la_network_engine then
+				la_network_engine.connect_client("127.0.0.1")
+			end
+		end
+
 feature {NONE} -- Implementation
+
+	network_engine: detachable NETWORK_ENGINE
+			-- The application's network engine.
 
 	must_stop: BOOLEAN
 			-- Whether or not `Current' should stop running
@@ -58,6 +72,15 @@ feature -- Implementation
 
 	execute
 			-- Executed when the thread is launched
+		do
+			if is_multiplayer then
+				execute_multiplayer
+			else
+				execute_single_player
+			end
+		end
+
+	execute_single_player
 		local
 			l_previous_tick: REAL_64
 			l_update_time_difference: REAL_64
@@ -75,7 +98,7 @@ feature -- Implementation
 				l_update_time_difference := (last_tick - l_previous_tick) / 1000
 
 				game_core.increment_ticks
-				
+
 				game_core.update_everything(l_update_time_difference)
 				game_core.physics.check_all
 
@@ -89,7 +112,32 @@ feature -- Implementation
 			end
 		end
 
+	execute_multiplayer
+		local
+			l_previous_tick: REAL_64
+			l_update_time_difference: REAL_64
+			l_time_difference: REAL_64
+			l_execution_time: REAL_64
+		do
+			if attached network_engine as la_network_engine then
+				l_previous_tick := last_tick
+				last_tick := game_library.time_since_create.to_real_64
+				l_update_time_difference := (last_tick - l_previous_tick) / 1000
+
+				game_core.increment_ticks
+
+				l_execution_time := game_library.time_since_create.to_real_64 - last_tick
+				l_time_difference := milliseconds_per_tick - l_execution_time - 0.5
+				if l_time_difference > 0 then
+					sleep((l_time_difference * 1000000).truncated_to_integer_64)
+				end
+			end
+		end
+
 feature -- Access
+
+	is_multiplayer: BOOLEAN
+			-- True if updating a multiplayer game.
 
 	stop_thread
 			-- Stop the thread

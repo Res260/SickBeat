@@ -26,10 +26,10 @@ create
 
 feature {NONE} -- Initialization
 
-	make(a_controller: CONTROLLER; a_context: CONTEXT)
+	make(a_mouse: MOUSE; a_source: STRING; a_context: CONTEXT)
 			-- Initialize `Current'
 		do
-			controller := a_controller
+			create controller.make (a_mouse, a_source)
 			x_real := a_context.window.width / 2
 			y_real := a_context.window.height / 2
 			make_entity(x_real, y_real, a_context)

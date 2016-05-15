@@ -12,9 +12,10 @@ create
 
 feature {NONE} -- Initialization
 
-	make(a_mouse: MOUSE)
-			-- Initializes `Current' with an existing mouse
+	make(a_mouse: MOUSE; a_source: STRING)
+			-- Initializes `Current' with an existing `a_mouse' and with an `a_source'.
 		do
+			source := a_source
 			create keys
 			create number_actions
 			create mouse_update_actions
@@ -23,6 +24,9 @@ feature {NONE} -- Initialization
 		end
 
 feature -- Access
+
+	source: STRING
+			--The source of the controller (like an IP address).
 
 	keys: TUPLE[up, down, left, right: BOOLEAN]
 			-- Boolean representing whether or not movement keys are currently pressed

@@ -24,8 +24,8 @@ feature {NONE} -- Implementation
 	second_counter: REAL_64
 			-- Time since last frame
 
-	controller: CONTROLLER
-			-- Current state of the user's controls
+--	controller: CONTROLLER
+--			-- Current state of the user's controls
 
 	current_map: MAP
 			-- Map currently played
@@ -36,13 +36,13 @@ feature {NONE} -- Implementation
 	time_since_last_frame: REAL_64
 			-- Time since last update in seconds
 
-	entities: LIST[ENTITY]
-			-- List of all entities to update every tick
-
 	drawables: LIST[DRAWABLE]
 			-- List of all objects to render every frame
 
 feature -- Access
+
+	entities: LIST[ENTITY]
+			-- List of all entities to update every tick
 
 	physics: PHYSICS_ENGINE
 			-- Physics handling object

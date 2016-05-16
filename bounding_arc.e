@@ -151,6 +151,12 @@ feature -- Implementation
 			Result := a_sphere.collides_with_arc(Current)
 		end
 
+	collides_with_plane(a_plane: BOUNDING_PLANE): BOOLEAN
+			-- Check if `Current' collides with `a_plane'
+		do
+			Result := a_plane.collides_with_arc(Current)
+		end
+
 feature -- Access
 
 	center: TUPLE[x, y: REAL_64]

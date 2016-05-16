@@ -16,10 +16,10 @@ create
 
 feature {NONE} -- Initialization
 
-	make(a_text: READABLE_STRING_GENERAL; a_color: GAME_COLOR; a_context: CONTEXT)
-			-- Initialization of `Current' with a string and a color
+	make(a_text: READABLE_STRING_GENERAL; a_color: GAME_COLOR;)
+			-- Initialization of `Current' with a_text text and a_color color
 		do
-			make_drawable(0, 0, Void, a_context)
+			make_drawable(0, 0, Void)
 			text := a_text
 			text_color := a_color
 		end
@@ -34,7 +34,7 @@ feature -- Access
 	text: READABLE_STRING_GENERAL assign set_text
 			-- String of the text used when drawing
 
-	change(a_x, a_y, a_font_size: INTEGER)
+	change(a_x, a_y, a_font_size: INTEGER; a_context: CONTEXT)
 			-- Change `Current's position to specified x, y and font_size
 			-- Recreates the text {GAME_TEXTURE}
 		require
@@ -45,13 +45,13 @@ feature -- Access
 		do
 			x := a_x
 			y := a_y
-			l_font := context.ressource_factory.menu_font(a_font_size)
+			l_font := a_context.ressource_factory.menu_font(a_font_size)
 			create l_text_surface.make(text, l_font, text_color)
 			if l_text_surface.is_open then
-				create texture.make_from_surface(context.renderer, l_text_surface)
+				create texture.make_from_surface(a_context.renderer, l_text_surface)
 			end
 		ensure
-			Texture_Set: attached texture as la_texture and then la_texture.height = context.ressource_factory.menu_font(a_font_size).text_dimension(text).height
+			Texture_Set: attached texture as la_texture and then la_texture.height = a_context.ressource_factory.menu_font(a_font_size).text_dimension(text).height
 			Text_Moved: x = a_x and y = a_y
 		end
 

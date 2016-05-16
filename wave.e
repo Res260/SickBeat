@@ -27,16 +27,19 @@ create
 
 feature {NONE} -- Initialization
 
-	make(a_x, a_y, a_direction, a_angle: REAL_64; a_center_speed: TUPLE[x, y: REAL_64]; a_color: GAME_COLOR; a_source: ENTITY; a_context: CONTEXT; a_texture:GAME_TEXTURE; a_sound:SOUND)
+	make(a_x, a_y, a_direction, a_angle: REAL_64; a_center_speed: TUPLE[x, y: REAL_64]; a_color: GAME_COLOR; a_source: ENTITY; a_texture:GAME_TEXTURE; a_sound:SOUND)
 			-- Initialize `Current' with a direction, angle, maximum radius, and color
 		do
-			context := a_context
-			make_entity(a_x, a_y, a_context)
+			make_entity(a_x, a_y)
 			direction := a_direction
 			angle := a_angle
 			create wave_texture.share_from_other (a_texture)
 			create color.make_from_other(a_color)
-			radius := a_source.width / 2
+			if attached {PLAYER} a_source as la_player_source then
+				radius := la_player_source.radius
+			else
+				radius := a_source.width / 2
+			end
 			energy := initial_energy
 			center_speed := a_center_speed
 			source := a_source
@@ -110,8 +113,8 @@ feature -- Access
 	color: GAME_COLOR
 			-- Color of `Current'
 
-	draw
-			-- Draw `Current' on `context's renderer
+	draw(a_context: CONTEXT)
+			-- Draw `Current' on `a_context's renderer
 		require else
 			Still_Alive: not dead
 		local
@@ -119,21 +122,21 @@ feature -- Access
 			l_width_destination:INTEGER_32
 			l_height_destination:INTEGER_32
 		do
-			l_previous_color := context.renderer.drawing_color
+			l_previous_color := a_context.renderer.drawing_color
 
 			color.set_alpha(alpha)
-			context.renderer.set_drawing_color(color)
+			a_context.renderer.set_drawing_color(color)
 
 			l_width_destination := (radius * 2).rounded
 			l_height_destination := (radius * 2).rounded
 			wave_texture.set_additionnal_alpha (alpha)
-			context.renderer.draw_sub_texture_with_scale_rotation_and_mirror (wave_texture,
+			a_context.renderer.draw_sub_texture_with_scale_rotation_and_mirror (wave_texture,
 					0, 0,
 					wave_texture.width, wave_texture.height,
-					x_real.rounded - context.camera.position.x - (l_width_destination // 2), y_real.rounded - context.camera.position.y - (l_height_destination // 2),
+					x_real.rounded - a_context.camera.position.x - (l_width_destination // 2), y_real.rounded - a_context.camera.position.y - (l_height_destination // 2),
 					l_width_destination, l_height_destination, l_width_destination // 2, l_height_destination // 2, (direction - (angle / 2)) * To_Degrees, False, False)
-			draw_box(context)
-			context.renderer.set_drawing_color(l_previous_color)
+			draw_box(a_context)
+			a_context.renderer.set_drawing_color(l_previous_color)
 		end
 
 	update(a_timediff: REAL_64)

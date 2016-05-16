@@ -149,6 +149,15 @@ feature -- Access
 				Result := ((((a_value - a_min) / a_max).rounded) * a_max) + a_min
 			end
 		end
+
+	check_normalization(a_vector: TUPLE[x, y: REAL_64]): BOOLEAN
+			-- Verifies if `a_vector' is normalized
+		local
+			l_magnitude: REAL_64
+		do
+			l_magnitude := sqrt(a_vector.x ^ 2 + a_vector.y ^ 2)
+			Result := l_magnitude = 1 or l_magnitude = 0
+		end
 note
 	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007 | Copyright (c) 2016 Émilio Gonzalez and Guillaume Jean"
 	source: "[file: LICENSE]"

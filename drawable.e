@@ -10,19 +10,13 @@ deferred class
 
 feature {NONE} -- Initialization
 
-	make_drawable(a_x, a_y: INTEGER; a_texture: detachable GAME_TEXTURE; a_context: CONTEXT)
+	make_drawable(a_x, a_y: INTEGER; a_texture: detachable GAME_TEXTURE)
 			-- Initializes the {DRAWABLE} with the width and height of the {GAME_TEXTURE}
 		do
 			x := a_x
 			y := a_y
 			texture := a_texture
-			context := a_context
 		end
-
-feature {NONE} -- Implementation
-
-	context: CONTEXT
-			-- Current application's context
 
 feature -- Access
 
@@ -59,12 +53,12 @@ feature -- Access
 			-- Texture to draw
 			-- It is detachable to let children exist if something needs to happen before having it
 
-	draw
-			-- Draws `Current's texture if it exists
+	draw(a_context: CONTEXT)
+			-- Draws `Current's texture (if it exists) on `a_context's renderer
 			-- Must draw the texture at position - context.camera.position
 		do
 			if attached texture as la_texture then
-				context.renderer.draw_texture(la_texture, x - context.camera.position.x, y - context.camera.position.y)
+				a_context.renderer.draw_texture(la_texture, x - a_context.camera.position.x, y - a_context.camera.position.y)
 			end
 		end
 note

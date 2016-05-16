@@ -13,11 +13,11 @@ create
 
 feature -- Initialization
 
-	make(a_map: MAP; a_context: CONTEXT)
-			-- Initialize `Current' with the map
+	make(a_background: BACKGROUND; a_context: CONTEXT)
+			-- Initialize `Current' with `a_background' to draw behind everything else on `a_context's screen
 		do
 			context := a_context
-			current_map := a_map
+			current_background := a_background
 		end
 
 feature {NONE} -- Implementation
@@ -25,8 +25,8 @@ feature {NONE} -- Implementation
 	context: CONTEXT
 			-- Current context of the application
 
-	current_map: MAP
-			-- Map used to draw the background
+	current_background: BACKGROUND
+			-- Background of the application
 
 feature -- Access
 
@@ -35,10 +35,10 @@ feature -- Access
 		do
 			context.renderer.clear
 
-			current_map.background.draw
+			current_background.draw(context)
 
 			across a_drawables as la_drawables loop
-				la_drawables.item.draw
+				la_drawables.item.draw(context)
 			end
 
 			context.window.update

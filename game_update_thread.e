@@ -76,8 +76,8 @@ feature -- Implementation
 
 				game_core.increment_ticks
 
-				game_core.update_camera
 				game_core.update_everything(l_update_time_difference)
+				game_core.update_camera
 				game_core.physics.check_all
 
 				game_update_mutex.unlock

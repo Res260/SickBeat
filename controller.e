@@ -18,6 +18,7 @@ feature {NONE} -- Initialization
 			create keys
 			create number_actions
 			create mouse_update_actions
+			create mouse_button_update_actions
 			create mouse_wheel_actions
 			mouse := a_mouse
 		end
@@ -36,6 +37,9 @@ feature -- Access
 	mouse_update_actions: ACTION_SEQUENCE[TUPLE[MOUSE]]
 			-- Actions ran when the user updates `mouse's state
 
+	mouse_button_update_actions: ACTION_SEQUENCE[TUPLE[MOUSE]]
+			-- Actions ran when a button changes in the `mouse's state
+
 	mouse_wheel_actions: ACTION_SEQUENCE[TUPLE[delta_x, delta_y: INTEGER]]
 			-- Actions ran when the user scrolls the mouse wheel
 
@@ -46,9 +50,15 @@ feature -- Access
 		end
 
 	on_mouse_update(a_mouse_state: GAME_MOUSE_STATE)
-			-- Handles the client/server side of mouse_pressed
+			-- Handles the client/server side of mouse_motion
 		do
 			mouse_update_actions.call(mouse)
+		end
+
+	on_mouse_button_update(a_mouse_state: GAME_MOUSE_STATE)
+			-- Handles the client/server side of mouse clicks
+		do
+			mouse_button_update_actions.call(mouse)
 		end
 
 	on_key_pressed(a_key_state: GAME_KEY_STATE)

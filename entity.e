@@ -14,12 +14,12 @@ inherit
 
 feature {NONE} -- Initialization
 
-	make_entity(a_x, a_y: REAL_64; a_context: CONTEXT)
+	make_entity(a_x, a_y: REAL_64)
 			-- Initialize `Current' with the REAL x and y converted to integers
 		do
 			x_real := a_x
 			y_real := a_y
-			make_drawable(x, y, Void, a_context)
+			make_drawable(x, y, Void)
 		end
 
 feature -- Access
@@ -30,7 +30,7 @@ feature -- Access
 			-- Real Y coordinate
 
 	update(a_timediff: REAL_64)
-			-- Ran every game tick for every {ENTITY}.
+			-- Updates the state of `Current'.
 			-- a_timediff is in seconds.
 		do
 		end

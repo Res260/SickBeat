@@ -27,6 +27,8 @@ feature {NONE} -- Implementation
 --	controller: CONTROLLER
 --			-- Current state of the user's controls
 
+	score: INTEGER
+
 	current_map: MAP
 			-- Map currently played
 

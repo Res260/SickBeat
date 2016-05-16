@@ -72,12 +72,9 @@ feature {NONE} -- Initialization
 
 	make_multiplayer_host(a_context: CONTEXT; a_network_engine: NETWORK_ENGINE)
 		do
-			create game_network.make(a_context, a_network_engine)
-			if attached game_network as la_game_network then
-				a_network_engine.initiate_server(la_game_network)
-				la_game_network.launch
-			end
-			make_multiplayer(a_context, a_network_engine)
+			a_network_engine.initiate_server
+			network_engine := a_network_engine
+			make(a_context)
 		end
 
 feature {NONE} -- Implementation
@@ -127,7 +124,6 @@ feature {NONE} -- Implementation
 	on_tick(a_timestamp: NATURAL_32)
 			-- Method run on every iteration (should be 60 times per second)
 		do
-			print("??")
 			game_update_mutex.lock
 
 			if last_frame <= 0 then
@@ -150,13 +146,12 @@ feature {NONE} -- Implementation
 
 			update_camera
 
+			score := score + 1
+
 			on_redraw(a_timestamp)
-			print("Send player")
---			if attached network_engine as la_network_engine then
---				if attached la_network_engine.client_socket as la_client_socket then
---					la_client_socket.independent_store (current_player)
---				end
---			end
+			if attached network_engine as la_network_engine then
+				la_network_engine.set_self_score(score.to_hex_string)
+			end
 
 			game_update_mutex.unlock
 		end
@@ -216,8 +211,6 @@ feature -- Access
 			-- Object rendering engine
 
 	network_engine: detachable NETWORK_ENGINE
-
-	game_network: detachable GAME_NETWORK
 
 	hud_items: LIST[HUD_ITEM]
 			-- `hud_items'

@@ -29,7 +29,7 @@ feature {NONE} -- Initialization
 			make_thread
 			must_stop := False
 			game_update_mutex := a_mutex
-			game_engine := a_game_core
+			game_core := a_game_core
 		end
 
 	make_multiplayer(a_mutex: MUTEX; a_game_core: GAME_ENGINE; a_network_engine: NETWORK_ENGINE)
@@ -53,7 +53,7 @@ feature {NONE} -- Implementation
 	game_update_mutex: MUTEX
 			-- Mutex used to share ressources
 
-	game_engine: GAME_ENGINE
+	game_core: GAME_CORE
 			-- Where the ressources are
 
 	last_tick: REAL_64
@@ -91,52 +91,52 @@ feature -- Implementation
 			until
 				must_stop
 			loop
-				game_update_mutex.lock
-
-				l_previous_tick := last_tick
-				last_tick := game_library.time_since_create.to_real_64
-				l_update_time_difference := (last_tick - l_previous_tick) / 1000
-
-				game_engine.increment_ticks
-
-				game_engine.update_everything(l_update_time_difference)
-				game_engine.physics.check_all
-
-				game_update_mutex.unlock
-
-				l_execution_time := game_library.time_since_create.to_real_64 - last_tick
-				l_time_difference := milliseconds_per_tick - l_execution_time - 0.5
-				if l_time_difference > 0 then
-					sleep((l_time_difference * 1000000).truncated_to_integer_64)
-				end
+				on_tick_singleplayer
 			end
 		end
 
-	execute_multiplayer
+	on_tick_singleplayer
 		local
 			l_previous_tick: REAL_64
 			l_update_time_difference: REAL_64
 			l_time_difference: REAL_64
 			l_execution_time: REAL_64
 		do
+			game_update_mutex.lock
+
+			l_previous_tick := last_tick
+			last_tick := game_library.time_since_create.to_real_64
+			l_update_time_difference := (last_tick - l_previous_tick) / 1000
+
+			game_core.increment_ticks
+
+			game_core.update_everything(l_update_time_difference)
+			game_core.physics.check_all
+
+			game_update_mutex.unlock
+
+			l_execution_time := game_library.time_since_create.to_real_64 - last_tick
+			l_time_difference := milliseconds_per_tick - l_execution_time - 0.5
+			if l_time_difference > 0 then
+				sleep((l_time_difference * 1000000).truncated_to_integer_64)
+			end
+		end
+
+	execute_multiplayer
+		do
 			if attached network_engine as la_network_engine then
 				from
 				until
 					must_stop
 				loop
-					l_previous_tick := last_tick
-					last_tick := game_library.time_since_create.to_real_64
-					l_update_time_difference := (last_tick - l_previous_tick) / 1000
-
-					game_engine.increment_ticks
-
-					l_execution_time := game_library.time_since_create.to_real_64 - last_tick
-					l_time_difference := milliseconds_per_tick - l_execution_time - 0.5
-					if l_time_difference > 0 then
-						sleep((l_time_difference * 1000000).truncated_to_integer_64)
-					end
+					on_tick_singleplayer
+					on_thick_multiplayer(la_network_engine)
 				end
 			end
+		end
+
+	on_thick_multiplayer(a_network_engine: NETWORK_ENGINE)
+		do
 		end
 
 feature -- Access

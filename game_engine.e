@@ -66,8 +66,10 @@ feature {NONE} -- Initialization
 			-- Initialize all the attributes for a multiplayer game.
 		do
 			make(a_context)
-			create game_update_thread.make_multiplayer(game_update_mutex, Current, a_network_engine)
 			network_engine := a_network_engine
+			if attached network_engine as la_network_engine then
+				create game_update_thread.make_multiplayer(game_update_mutex, Current, la_network_engine)
+			end
 		end
 
 	make_multiplayer_host(a_context: CONTEXT; a_network_engine: NETWORK_ENGINE)

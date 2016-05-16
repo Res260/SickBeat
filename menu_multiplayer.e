@@ -49,7 +49,7 @@ feature {NONE}
 		do
 			play_menu_sound_click
 			io.put_string("Join clicked!%N")
---			create {GAME_ENGINE} next_menu.make_multiplayer(context, void)
+			create {MENU_LOADING_SCREEN} next_menu.make_multiplayer(context, "127.0.0.1")
 			return_menu
 		end
 

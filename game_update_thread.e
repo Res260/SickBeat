@@ -37,9 +37,6 @@ feature {NONE} -- Initialization
 			make(a_mutex, a_game_core)
 			network_engine := a_network_engine
 			is_multiplayer := True
-			if attached network_engine as la_network_engine then
-				la_network_engine.connect_client("127.0.0.1")
-			end
 		end
 
 feature {NONE} -- Implementation

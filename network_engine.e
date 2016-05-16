@@ -78,7 +78,8 @@ feature -- Access
 				la_server_socket.accept
 				if attached la_server_socket.accepted as la_client_socket then
 					if attached la_client_socket.peer_address as la_address then
-						start_server_receive_updates(la_client_socket)
+						client_socket := la_client_socket
+						run
 					else
 						print("%Nla_client_socket.address not attached%N")
 					end
@@ -100,6 +101,7 @@ feature -- Access
 
 	run
 		do
+			print("%NDÉBUT RUN%N")
 			if attached client_socket as la_client_socket then
 				if attached la_client_socket.address as la_address then
 					from
@@ -107,9 +109,14 @@ feature -- Access
 					until
 						continue_network = false
 					loop
-						la_client_socket.put_string (self_score)
+						la_client_socket.put_string (self_score + "%N")
 						la_client_socket.read_line
 						friend_score := la_client_socket.last_string
+						print("%NMON SCORE: " + self_score)
+						print("%NSON SCORE: " + friend_score)
+						if attached thread_connexion as la_thread then
+							la_thread.sleep (100000000)
+						end
 					end
 				end
 			end
@@ -146,6 +153,10 @@ feature -- Access
 					else
 						client_socket := l_socket
 						print("%NCONNECTED!!%N")
+						create thread_connexion.make (agent run)
+						if attached thread_connexion as la_thread then
+							la_thread.launch
+						end
 					end
 				end
 			end

@@ -15,6 +15,7 @@ inherit
 		end
 create
 	make,
+	make_multiplayer,
 	make_multiplayer_host,
 	make_as_main
 
@@ -32,6 +33,17 @@ feature {NONE} -- Initialization
 			thread_images.stop_actions.extend (agent stop_menu_from_thread)
 			add_button("Génération des sons en cours", agent useless_action)
 			add_button("Génération des images en cours", agent useless_action)
+		end
+
+	make_multiplayer(a_context: CONTEXT; a_host: STRING)
+		local
+			l_thread: FLEXIBLE_THREAD
+		do
+			make(a_context)
+			create network_engine.make
+			if attached network_engine as la_network_engine then
+				la_network_engine.connect_client (a_host)
+			end
 		end
 
 	make_multiplayer_host(a_context: CONTEXT; a_network_engine: NETWORK_ENGINE)

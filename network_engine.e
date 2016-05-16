@@ -19,7 +19,7 @@ feature{NONE} -- Initialization
 	make
 			-- Initialitation for `Current'.
 		do
-			create {LINKED_LIST[FLEXIBLE_THREAD]} threads_server_receive_updates.make
+			create {LINKED_LIST[SERVER_RECEIVE_UPDATES_THREAD]} threads_server_receive_updates.make
 			continue_listening_server := False
 		end
 
@@ -31,7 +31,7 @@ feature {NONE} -- Implementation
 	thread_server_listening_connexions: detachable FLEXIBLE_THREAD
 			-- The thread that listen to incoming connexions.
 
-	threads_server_receive_updates: LIST[FLEXIBLE_THREAD]
+	threads_server_receive_updates: LIST[SERVER_RECEIVE_UPDATES_THREAD]
 			-- The thread that receive updates from the players.
 
 feature -- Access
@@ -96,9 +96,8 @@ feature -- Access
 					la_server_socket.accept
 					if attached la_server_socket.accepted as la_client_socket then
 						if attached la_client_socket.peer_address as la_address then
-							print(la_address.host_address.host_address)
-							start_server_receive_updates(la_client_socket)
 							la_game_network.add_player (la_address.host_address.host_address)
+							start_server_receive_updates(la_client_socket)
 						else
 							print("%Nla_client_socket.address not attached%N")
 						end
@@ -107,38 +106,9 @@ feature -- Access
 			end
 		end
 
-	server_listen_updates(a_socket: NETWORK_STREAM_SOCKET)
-		do
-			from
-			until
-				false
-			loop
-				print("server_listen_updates")
-				receive_player(a_socket)
-			end
-			print("Kappa2")
-		end
-
-	receive_player(a_socket:NETWORK_STREAM_SOCKET)
-			-- Reçoit un {LIVRE} du `a_socket' et affiche ces informations
-		local
-			l_retry:BOOLEAN		-- Par défaut, l_retry sera à `False'
-		do
-			if not l_retry then		-- Si la clause 'rescue' n'a pas été utilisé, reçoit le livre
-				if attached {PLAYER} a_socket.retrieved as la_player then
-					io.put_string("Livre recu:%N%N")
-				end
-			else	-- Si la clause 'rescue' a été utilisé, affiche un message d'erreur
-				io.put_string("Le message recu n'est pas un livre valide.%N")
-			end
-		rescue	-- Permet d'attraper un exception
-			l_retry := True
-			retry
-		end
-
 	start_server_receive_updates(a_socket: NETWORK_STREAM_SOCKET)
 		do
-			threads_server_receive_updates.extend (create {FLEXIBLE_THREAD}.make (agent server_listen_updates(a_socket)))
+			threads_server_receive_updates.extend (create {SERVER_RECEIVE_UPDATES_THREAD}.make (a_socket))
 			threads_server_receive_updates[threads_server_receive_updates.count].launch
 			print("saluuuut")
 		end

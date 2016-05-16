@@ -152,11 +152,11 @@ feature {NONE} -- Implementation
 
 			on_redraw(a_timestamp)
 			print("Send player")
-			if attached network_engine as la_network_engine then
-				if attached la_network_engine.client_socket as la_client_socket then
-					la_client_socket.independent_store (current_player)
-				end
-			end
+--			if attached network_engine as la_network_engine then
+--				if attached la_network_engine.client_socket as la_client_socket then
+--					la_client_socket.independent_store (current_player)
+--				end
+--			end
 
 			game_update_mutex.unlock
 		end

@@ -85,7 +85,7 @@ feature --Implementation
 		end
 
 	stop_menu_from_thread
-			--Might change
+			-- Might change
 		do
 			return_menu
 		end

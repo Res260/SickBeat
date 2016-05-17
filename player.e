@@ -26,13 +26,14 @@ create
 
 feature {NONE} -- Initialization
 
-	make(a_mouse: MOUSE; a_source: STRING; a_context: CONTEXT)
-			-- Initialize `Current'
+	make(a_position: TUPLE[x, y: REAL_64]; a_controller: CONTROLLER; a_context: CONTEXT)
+			-- Initialize `Current' at position `a_position' to move following `a_controller's controls
+			-- Gathers textures and the waves' angle from `a_context'
 		do
-			create controller.make (a_mouse, a_source)
-			x_real := a_context.window.width / 2
-			y_real := a_context.window.height / 2
-			make_entity(x_real, y_real, a_context)
+			controller := a_controller
+			x_real := a_position.x
+			y_real := a_position.y
+			make_entity(x_real, y_real)
 			make_sphere(x_real, y_real, radius)
 			create max_speed
 			create acceleration
@@ -48,14 +49,14 @@ feature {NONE} -- Initialization
 						create {GAME_COLOR}.make(0, 0, 255, 255),	-- Blue
 						create {GAME_COLOR}.make(255, 255, 255, 255)-- White
 					  ]
-			textures := context.image_factory.get_player_texture_tuple
-			arc_textures := context.image_factory.get_arcs_texture_tuple
+			textures := a_context.image_factory.get_player_texture_tuple
+			arc_textures := a_context.image_factory.get_arcs_texture_tuple
 			current_texture := textures.red
 			current_color := colors.white
 			current_arc := arc_textures.red
 			radius := current_texture.width / 2
 			bounding_radius := radius
-			normal_angle := context.image_factory.player_arc_angle
+			normal_angle := a_context.image_factory.player_arc_angle
 		end
 
 feature {NONE} -- Implementation
@@ -114,7 +115,7 @@ feature -- Access
 		end
 
 	on_click(a_mouse: MOUSE)
-			-- Mouse update listener for `Current'
+			-- Mouse update listener for `Current' updating with `a_mouse'
 		local
 			l_wave: WAVE
 			l_direction: REAL_64
@@ -123,33 +124,32 @@ feature -- Access
 			l_speed: TUPLE[x, y: REAL_64]
 		do
 			if a_mouse.buttons.left then
-				l_x := a_mouse.position.x - x_real.rounded + context.camera.position.x
-				l_y := a_mouse.position.y - y_real.rounded + context.camera.position.y
+				l_x := a_mouse.position.x - x_real.rounded
+				l_y := a_mouse.position.y - y_real.rounded
 				if l_x /= 0 or l_y /= 0 then
 					l_direction := atan2(l_x, l_y)
 					create l_speed
-					l_speed.x := speed.x * 1
-					l_speed.y := speed.y * 1
+					l_speed.x := speed.x
+					l_speed.y := speed.y
 					if attached {GAME_COLOR} colors.at(color_index + 1) as la_color then
-						create l_wave.make(x_real, y_real, l_direction, normal_angle, l_speed, la_color, Current, context, current_arc, create{SOUND}.make_from_other (sound_factory.sounds_list[1]))
+						create l_wave.make(x_real, y_real, l_direction, normal_angle, l_speed, la_color, Current, current_arc, create{SOUND}.make_from_other (sound_factory.sounds_list[1]))
 						launch_wave_event.call(l_wave)
 					end
 				end
 			end
 		end
 
-	draw
-			-- Draw `Current' using `context's renderer and offsetting by `context.camera's position
+	draw(a_context: CONTEXT)
+			-- Draw `Current' using `a_context's renderer and offsetting by `a_context.camera's position
 		local
 			l_previous_color: GAME_COLOR
 		do
-			l_previous_color := context.renderer.drawing_color
-			context.renderer.set_drawing_color(current_color)
-			--context.renderer.draw_filled_rectangle(x - 25 - context.camera.position.x, y - 25 - context.camera.position.y, 50, 50)
-			context.renderer.draw_texture(current_texture, x - (current_texture.width // 2) - context.camera.position.x, y - (current_texture.height // 2) - context.camera.position.y)
-			draw_collision(context)
+			l_previous_color := a_context.renderer.drawing_color
+			a_context.renderer.set_drawing_color(current_color)
+			a_context.renderer.draw_texture(current_texture, x - (current_texture.width // 2) - a_context.camera.position.x, y - (current_texture.height // 2) - a_context.camera.position.y)
+			draw_collision(a_context)
 
-			context.renderer.set_drawing_color(l_previous_color)
+			a_context.renderer.set_drawing_color(l_previous_color)
 		end
 
 	update_acceleration

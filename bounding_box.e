@@ -72,6 +72,12 @@ feature -- Implementation
 			Result := a_sphere.collides_with_box(Current)
 		end
 
+	collides_with_plane(a_plane: BOUNDING_PLANE): BOOLEAN
+			-- Check if `Current' collides with `a_plane'
+		do
+			Result := a_plane.collides_with_box(Current)
+		end
+
 feature -- Access
 
 	upper_corner: TUPLE[x, y: REAL_64]
@@ -114,6 +120,12 @@ feature -- Access
 			upper_corner.y := a_upper_corner.y
 			box_center.x := (lower_corner.x + upper_corner.x) / 2
 			box_center.y := (lower_corner.y + upper_corner.y) / 2
+			if box_center.x.is_nan then
+				box_center.x := 0
+			end
+			if box_center.y.is_nan then
+				box_center.y := 0
+			end
 		ensure
 			Corners_Set: lower_corner ~ a_lower_corner and upper_corner ~ a_upper_corner
 			Center_Set: box_center.x >= lower_corner.x and box_center.x <= upper_corner.x and box_center.y >= lower_corner.y and box_center.y <= upper_corner.y

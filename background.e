@@ -20,17 +20,17 @@ create
 
 feature {NONE} -- Initialization
 
-	make(a_texture: detachable GAME_TEXTURE; a_context: CONTEXT)
-			-- Initializes `Current' with `a_texture' that fills the screen found in `a_context'
+	make(a_texture: detachable GAME_TEXTURE)
+			-- Initializes `Current' with `a_texture' to draw whenever `draw' is called
 		do
-			make_drawable(0, 0, a_texture, a_context)
+			make_drawable(0, 0, a_texture)
 			movable := False
 		end
 
-	make_movable(a_texture: detachable GAME_TEXTURE; a_size: TUPLE[width, height: INTEGER]; a_context: CONTEXT)
+	make_movable(a_texture: detachable GAME_TEXTURE; a_size: TUPLE[width, height: INTEGER])
 			-- Initializes `Current' with `a_texture' of fixed `a_size' that can be moved around on the `a_context' screen
 		do
-			make(a_texture, a_context)
+			make(a_texture)
 			size := a_size
 			movable := True
 		end
@@ -40,14 +40,14 @@ feature {NONE} -- Implementation
 	size: detachable TUPLE[width, height: INTEGER]
 			-- Size of `Current'. Only used when movable.
 
-	draw_movable
+	draw_movable(a_context: CONTEXT)
 			-- Draws `Current' by scaling it to `Current' size
 		require
 			Is_Movable: movable
 		do
 			if attached texture as la_texture and attached size as la_size then
-				context.renderer.draw_sub_texture_with_scale(la_texture, 0, 0, la_texture.width, la_texture.height,
-								x - context.camera.position.x, y - context.camera.position.y, la_size.width, la_size.height)
+				a_context.renderer.draw_sub_texture_with_scale(la_texture, 0, 0, la_texture.width, la_texture.height,
+								x - a_context.camera.position.x, y - a_context.camera.position.y, la_size.width, la_size.height)
 			end
 		end
 
@@ -68,15 +68,15 @@ feature -- Implementation
 			Y_Moved: y = a_y
 		end
 
-	draw
-			-- Draws `Current' by scaling it to the window size
+	draw(a_context: CONTEXT)
+			-- Draws `Current' by scaling it to the `a_context's window size
 		do
 			if movable then
-				draw_movable
+				draw_movable(a_context)
 			else
 				if attached texture as la_texture then
-					context.renderer.draw_sub_texture_with_scale(la_texture, 0, 0, la_texture.width, la_texture.height,
-							-context.camera.position.x, -context.camera.position.y, context.window.width, context.window.height)
+					a_context.renderer.draw_sub_texture_with_scale(la_texture, 0, 0, la_texture.width, la_texture.height,
+							-a_context.camera.position.x, -a_context.camera.position.y, a_context.window.width, a_context.window.height)
 				end
 			end
 		end

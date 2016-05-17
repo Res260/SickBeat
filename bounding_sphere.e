@@ -104,6 +104,12 @@ feature -- Implementation
 			Result := l_center_distance <= l_radius_distance ^ 2
 		end
 
+	collides_with_plane(a_plane: BOUNDING_PLANE): BOOLEAN
+			-- Check if `Current' collides with `a_plane'
+		do
+			Result := a_plane.collides_with_sphere(Current)
+		end
+
 feature -- Access
 
 	center: TUPLE[x, y: REAL_64]

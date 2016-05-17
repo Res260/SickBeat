@@ -52,9 +52,6 @@ feature -- Access
 
 	make_all_textures
 			-- Stores the player textures in the tuple and the arcs.
-		local
-			l_loading_texture:GAME_TEXTURE
-			l_end_color:GAME_COLOR
 		once("PROCESS")
 			player_textures.black := make_player_texture(
 				create{GAME_COLOR}.make (0, 0, 0, 255),

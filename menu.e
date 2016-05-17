@@ -16,7 +16,7 @@ inherit
 feature {NONE} -- Initialization
 
 	make(a_context: CONTEXT)
-			-- Basic creation of a {MENU}
+			-- Initializes `Current' with `a_context' to gather global information
 		require
 			Ressource_Factory_Has_No_Error: not a_context.ressource_factory.has_error
 		do
@@ -27,7 +27,7 @@ feature {NONE} -- Initialization
 			exit_requested := False
 			is_main_menu := False
 			create mouse.make(0, 0)
-			create background.make(context.ressource_factory.menu_background, context)
+			create background.make(context.ressource_factory.menu_background)
 			create {LINKED_LIST[BUTTON]} buttons.make
 			update_buttons_dimension
 			sound_manager.create_audio_source
@@ -107,14 +107,14 @@ feature {NONE} -- Implementation
 		do
 			context.renderer.clear
 
-			background.draw
+			background.draw(context)
 
 			if attached title as la_title then
-				la_title.draw
+				la_title.draw(context)
 			end
 
 			across buttons as la_buttons loop
-				la_buttons.item.draw
+				la_buttons.item.draw(context)
 			end
 
 			context.window.update
@@ -147,7 +147,7 @@ feature {NONE} -- Implementation
 			-- Handles the mouse_motion event
 			-- Updates the internal mouse position
 		do
-			mouse.position := [a_mouse_state.x - context.camera.position.x, a_mouse_state.y - context.camera.position.y]
+			mouse.position := [a_mouse_state.x + context.camera.position.x, a_mouse_state.y + context.camera.position.y]
 		end
 
 feature {NONE} -- Basic Operations
@@ -175,7 +175,7 @@ feature {NONE} -- Basic Operations
 	on_pressed(a_timestamp: NATURAL_32; a_mouse_state: GAME_MOUSE_BUTTON_PRESSED_STATE; a_nb_clicks: NATURAL_8)
 			-- Whenever a mouse button is pressed in the `window'
 		do
-			mouse.position := [a_mouse_state.x - context.camera.position.x, a_mouse_state.y - context.camera.position.y]
+			mouse.position := [a_mouse_state.x + context.camera.position.x, a_mouse_state.y + context.camera.position.y]
 			if a_mouse_state.is_left_button_pressed then
 				mouse.buttons.left := True
 				pressed_button := check_button_collision
@@ -189,7 +189,7 @@ feature {NONE} -- Basic Operations
 	on_released(a_timestamp: NATURAL_32; a_mouse_state: GAME_MOUSE_BUTTON_RELEASED_STATE; a_nb_clicks: NATURAL_8)
 			-- Whenever a mouse button is released in the `window'
 		do
-			mouse.position := [a_mouse_state.x - context.camera.position.x, a_mouse_state.y - context.camera.position.y]
+			mouse.position := [a_mouse_state.x + context.camera.position.x, a_mouse_state.y + context.camera.position.y]
 			if a_mouse_state.is_left_button_released then
 				mouse.buttons.left := False
 				released_button := check_button_collision
@@ -298,7 +298,7 @@ feature -- Access
 	set_title(a_title: READABLE_STRING_GENERAL)
 			-- Set `Current's title's texture and dimension
 		do
-			create title.make(a_title, text_color, context)
+			create title.make(a_title, text_color)
 			update_buttons_dimension
 		end
 
@@ -307,7 +307,7 @@ feature -- Access
 		local
 			l_button: BUTTON
 		do
-			create l_button.make(a_button_name, text_color, context, a_action)
+			create l_button.make(a_button_name, text_color, a_action)
 			buttons.extend(l_button)
 			update_buttons_dimension
 		ensure
@@ -334,10 +334,10 @@ feature -- Access
 			l_left_margin_title := context.window.width // 30
 			l_y := context.window.height // 2
 			if attached title as la_title then
-				la_title.change(l_left_margin_title, l_y - l_title_font.text_dimension(la_title.text).height - l_height_between, l_title_font_size)
+				la_title.change(l_left_margin_title, l_y - l_title_font.text_dimension(la_title.text).height - l_height_between, l_title_font_size, context)
 			end
 			across buttons as la_buttons loop
-				la_buttons.item.change(l_left_margin, l_y, l_button_font_size)
+				la_buttons.item.change(l_left_margin, l_y, l_button_font_size, context)
 				if attached la_buttons.item.texture as la_texture then
 					l_y := l_y + la_texture.height + l_height_between
 				end

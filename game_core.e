@@ -24,10 +24,11 @@ feature {NONE} -- Implementation
 	second_counter: REAL_64
 			-- Time since last frame
 
---	controller: CONTROLLER
---			-- Current state of the user's controls
+	controller: CONTROLLER
+			-- Current state of the user's controls
 
 	score: INTEGER
+			-- Score of the local player
 
 	current_map: MAP
 			-- Map currently played

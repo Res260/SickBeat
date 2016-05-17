@@ -32,11 +32,12 @@ feature {NONE} -- Initialization
 			-- Initialize all the attributes
 		do
 			Precursor(a_context)
-			create background.make_movable(context.ressource_factory.game_background, [3840, 2160], context)
-			create current_map.make(background, context)
-			create renderer.make(current_map, context)
+			create controller.make(mouse)
+			create background.make_movable(context.ressource_factory.game_background, [3840, 2160])
+			create current_map.make([3840.0, 2160.0])
+			create renderer.make(background, context)
 			create physics.make
-			create current_player.make(mouse, "local", context)
+			create current_player.make([context.window.width / 2, context.window.height / 2], controller, context)
 			create {LINKED_LIST[ENTITY]} entities.make
 			create {ARRAYED_LIST[HUD_ITEM]} hud_items.make(0)
 			create {ARRAYED_LIST[DRAWABLE]} drawables.make(0)
@@ -47,9 +48,9 @@ feature {NONE} -- Initialization
 			last_frame := 0
 			create game_update_mutex.make
 			create game_update_thread.make(game_update_mutex, Current)
-			current_player.controller.mouse_update_actions.extend(agent current_player.on_click)
-			current_player.controller.mouse_wheel_actions.extend(agent current_player.on_mouse_wheel)
-			current_player.controller.number_actions.extend(agent current_player.set_color_index)
+			controller.mouse_button_update_actions.extend(agent current_player.on_click)
+			controller.mouse_wheel_actions.extend(agent current_player.on_mouse_wheel)
+			controller.number_actions.extend(agent current_player.set_color_index)
 			current_player.collision_actions.extend(agent (a_physic_object: PHYSIC_OBJECT)
 														do
 															io.put_string("BOOM!")
@@ -60,6 +61,11 @@ feature {NONE} -- Initialization
 															add_entity_to_world(a_wave)
 														end
 												   )
+			current_map.spawn_enemies_actions.extend(agent (a_enemy: ENEMY)
+														do
+															add_entity_to_world(a_enemy)
+														end
+													)
 		end
 
 	make_multiplayer(a_context: CONTEXT; a_network_engine: NETWORK_ENGINE)
@@ -106,11 +112,11 @@ feature {NONE} -- Implementation
 				)
 			context.window.mouse_button_pressed_actions.extend(
 					agent (a_timestamp: NATURAL_32; a_mouse_state: GAME_MOUSE_BUTTON_PRESSED_STATE; a_clicks: NATURAL_8)
-						do current_player.controller.on_mouse_update(a_mouse_state) end
+						do controller.on_mouse_button_update(a_mouse_state) end
 				)
 			context.window.mouse_button_released_actions.extend(
 					agent (a_timestamp: NATURAL_32; a_mouse_state: GAME_MOUSE_BUTTON_RELEASED_STATE; a_clicks: NATURAL_8)
-						do current_player.controller.on_mouse_update(a_mouse_state) end
+						do controller.on_mouse_button_update(a_mouse_state) end
 				)
 			context.window.mouse_motion_actions.extend(
 					agent (a_timestamp: NATURAL_32; a_mouse_state: GAME_MOUSE_MOTION_STATE; a_delta_x, a_delta_y: INTEGER)

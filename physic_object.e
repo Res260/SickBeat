@@ -1,8 +1,8 @@
 note
 	description: "Abstract object that can interact with the world."
 	author: "Guillaume Jean"
-	date: "5 March 2016"
-	revision: "16w10a"
+	date: "10 May 2016"
+	revision: "16w14a"
 	legal: "See notice at end of class."
 
 deferred class
@@ -54,6 +54,11 @@ feature -- Access
 
 	collides_with_sphere(a_sphere: BOUNDING_SPHERE): BOOLEAN
 			-- Whether or not `Current' collides with `a_sphere'
+		deferred
+		end
+
+	collides_with_plane(a_plane: BOUNDING_PLANE): BOOLEAN
+			-- Whether or not `Current' collides with `a_plane'
 		deferred
 		end
 

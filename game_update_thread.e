@@ -78,11 +78,6 @@ feature -- Implementation
 		end
 
 	execute_single_player
-		local
-			l_previous_tick: REAL_64
-			l_update_time_difference: REAL_64
-			l_time_difference: REAL_64
-			l_execution_time: REAL_64
 		do
 			from
 			until

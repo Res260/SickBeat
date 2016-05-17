@@ -36,8 +36,6 @@ feature {NONE} -- Initialization
 		end
 
 	make_multiplayer(a_context: CONTEXT; a_host: STRING)
-		local
-			l_thread: FLEXIBLE_THREAD
 		do
 			make(a_context)
 			create network_engine.make

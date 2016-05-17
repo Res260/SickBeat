@@ -23,12 +23,12 @@ create
 feature {NONE} -- Initialization
 
 	make(
-			a_text: READABLE_STRING_GENERAL; a_color: GAME_COLOR; a_context: CONTEXT;
+			a_text: READABLE_STRING_GENERAL; a_color: GAME_COLOR;
 			a_action: PROCEDURE[ANY, TUPLE[READABLE_STRING_GENERAL]]
 		)
 			-- Initializes `Current' with text `a_text' of `a_color' color to draw in `a_context's screen to do `a_action' when clicked
 		do
-			make_text(a_text, a_color, a_context)
+			make_text(a_text, a_color)
 			button_action := a_action
 			make_box(0, 0, 0, 0)
 		end
@@ -40,10 +40,10 @@ feature {NONE} -- Implementation
 
 feature -- Access
 
-	change(a_x, a_y, a_font_size: INTEGER)
+	change(a_x, a_y, a_font_size: INTEGER; a_context: CONTEXT)
 			-- Changes `Current's coordinates to (`a_x', `a_x') and `Current's font size to `a_font_size'
 		do
-			Precursor(a_x, a_y, a_font_size)
+			Precursor(a_x, a_y, a_font_size, a_context)
 			lower_corner.x := x
 			lower_corner.y := y
 			upper_corner.x := x + width

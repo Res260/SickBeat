@@ -1,8 +1,8 @@
 note
 	description: "Core attributes of the game."
-	author: "Guillaume Jean"
-	date: "19 April 2016"
-	revision: "16w11a"
+	author: "Guillaume Jean and Émilio Gonzalez"
+	date: "2016-05-16"
+	revision: "16w15a"
 
 deferred class
 	GAME_CORE
@@ -24,10 +24,8 @@ feature {NONE} -- Implementation
 	second_counter: REAL_64
 			-- Time since last frame
 
---	controller: CONTROLLER
---			-- Current state of the user's controls
-
 	score: INTEGER
+			-- The player's score
 
 	current_map: MAP
 			-- Map currently played
@@ -51,7 +49,7 @@ feature -- Access
 
 	update_everything(a_time_difference: REAL_64)
 			-- Updates every {ENTITY} in `entities'
-			-- Clears every {WAVE} that is no longer visible in the screen
+			-- Clears every {WAVE} that are no longer visible in the screen
 		local
 			l_to_remove: LINKED_LIST[ENTITY]
 		do
@@ -75,22 +73,17 @@ feature -- Access
 				entities.prune(l_to_remove.item)
 				drawables.prune(l_to_remove.item)
 				physics.physic_objects.prune(l_to_remove.item)
+				if attached {WAVE} l_to_remove.item as la_wave then
+					la_wave.close
+				end
 				l_to_remove.forth
 			end
 		ensure
 			Entities_Out_Of_Bounds_Deleted: across entities as la_entities all
-												if attached {WAVE} la_entities.item as la_wave then
-													not la_wave.dead
-												else
-													True
-												end
+												attached {WAVE} la_entities.item as la_wave implies not la_wave.dead
 											end
 			Drawables_Out_Of_Bounds_Deleted: across drawables as la_drawables all
-												if attached {WAVE} la_drawables.item as la_wave then
-													not la_wave.dead
-												else
-													True
-												end
+												attached {WAVE} la_drawables.item as la_wave implies not la_wave.dead
 											end
 		end
 
@@ -105,7 +98,7 @@ feature -- Access
 feature -- Basic Operations
 
 	add_entity_to_world(a_entity: ENTITY)
-			-- Adds an entity to the world
+			-- Adds an `a_entity' to the world
 		do
 --			if attached {TOURELLE} a_entity as la_tourelle then
 --				la_tourelle.launch_wave_event(agent add_entity_to_world)

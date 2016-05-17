@@ -1,8 +1,8 @@
 note
 	description: "The loading screen while textures and sounds are loading."
 	author: "Émilio G!"
-	date: "2016-04-25"
-	revision: "16w13a"
+	date: "2016-05-16"
+	revision: "16w15a"
 
 class
 	MENU_LOADING_SCREEN
@@ -36,8 +36,6 @@ feature {NONE} -- Initialization
 		end
 
 	make_multiplayer(a_context: CONTEXT; a_host: STRING)
-		local
-			l_thread: FLEXIBLE_THREAD
 		do
 			make(a_context)
 			create network_engine.make

@@ -13,11 +13,12 @@ create
 
 feature -- Initialization
 
-	make(a_map: MAP; a_context: CONTEXT)
+	make(a_map: MAP; a_hud_items: LIST[HUD_ITEM]; a_context: CONTEXT)
 			-- Initialize `Current' with the map
 		do
 			context := a_context
 			current_map := a_map
+			hud_items := a_hud_items
 		end
 
 feature {NONE} -- Implementation
@@ -27,6 +28,9 @@ feature {NONE} -- Implementation
 
 	current_map: MAP
 			-- Map used to draw the background
+
+	hud_items: LIST[HUD_ITEM]
+			-- HUD items to render after everything else
 
 feature -- Access
 
@@ -39,6 +43,10 @@ feature -- Access
 
 			across a_drawables as la_drawables loop
 				la_drawables.item.draw
+			end
+
+			across hud_items as la_items loop
+				la_items.item.draw
 			end
 
 			context.window.update

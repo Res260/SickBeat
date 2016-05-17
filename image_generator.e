@@ -1,8 +1,8 @@
 note
 	description: "Class that generates images using GAME_PIXEL_READER_WRITER"
 	author: "Émilio Gonzalez and Guillaume Jean"
-	date: "2016-04-26"
-	revision: "16w12a"
+	date: "2016-05-17"
+	revision: "16w15a"
 	legal: "See notice at end of class."
 
 class
@@ -16,7 +16,7 @@ feature --Initialization
 feature --Access
 
 	make_pixels_transparent(a_pixels: GAME_PIXEL_READER_WRITER)
-			--Loops every pixels in a_pixels and makes it transparent.
+			--Loops every pixels in `a_pixels' and makes it transparent.
 		do
 			across 1 |..| a_pixels.width as l_i loop
 				across 1 |..| a_pixels.height as l_j loop
@@ -27,9 +27,9 @@ feature --Access
 
 	make_circle(a_pixels:GAME_PIXEL_READER_WRITER; a_outside_color, a_inside_color: GAME_COLOR;
 		  a_border_color:detachable GAME_COLOR; a_border_thickness: INTEGER_32)
-			--Makes a circle fading from a_outside_color to a_inside_color that is as large
-			-- as a_pixels can handle. Also makes a a_border_color border of a_border_thickness pixels thick.
-			-- If you do not wish to have a border, simply set a_border_thickness to 0 and a_border_color
+			--Makes a circle fading from `a_outside_color' to `a_inside_color' that is as large
+			-- as `a_pixels' can handle. Also makes a `a_border_color' border of `a_border_thickness' pixels thick.
+			-- If you do not wish to have a border, simply set `a_border_thickness' to 0 and `a_border_color'
 			-- can be void.
 		require
 			Pixels_Dimentions_Valid: a_pixels.width = a_pixels.height
@@ -79,7 +79,7 @@ feature --Access
 		end
 
 	make_circle_border(a_pixels:GAME_PIXEL_READER_WRITER; a_radius:INTEGER_32; a_color:GAME_COLOR; a_resolution: INTEGER_32)
-			--Makes a one pixel large border (color a_color) of a circle with a radius of a_radius. a_resolution represents
+			--Makes a one pixel large border (color `a_color') of a circle with a radius of `a_radius'. `a_resolution' represents
 			--the number of pixels that will be drawn.
 		require
 			Pixels_Dimentions_Valid: a_pixels.width = a_pixels.height
@@ -126,8 +126,8 @@ feature --Access
 
 	make_arc(a_pixels:GAME_PIXEL_READER_WRITER; a_color:GAME_COLOR; a_center: TUPLE[x, y: REAL_64]; a_start_angle, a_end_angle,
 		a_radius: REAL_64; a_resolution: INTEGER)
-			-- Creates an arc centered on a_center with a radius of a_radius at a rasoultion of
-			-- a_resolution from a_start_angle rad to a_end_angle rad.
+			-- Creates an arc centered on `a_center' with a radius of `a_radius' at a resolution of
+			-- `a_resolution' from `a_start_angle' rad to `a_end_angle' rad.
 		require
 			Start_Angle_Smaller: a_start_angle < a_end_angle
 		local
@@ -167,7 +167,7 @@ feature --Access
 		end
 
 	draw_line_between_two_points(a_pixels:GAME_PIXEL_READER_WRITER; a_color:GAME_COLOR; a_x_1, a_y_1, a_x_2, a_y_2: INTEGER_32)
-			-- Draws in a_pixels a line from (a_x_1, a_y_1) to (a_x_2, a_y_2) of color a_color.
+			-- Draws in a_pixels a line from (`a_x_1', `a_y_1') to (`a_x_2', `a_y_2') of color `a_color'.
 		require
 			Position1_Valid: a_x_1 >= 0 and a_y_1 >= 0 and a_x_1 <= a_pixels.width and a_y_1 <= a_pixels.height
 			Position2_Valid: a_x_2 >= 0 and a_y_2 >= 0 and a_x_2 <= a_pixels.width and a_y_2 <= a_pixels.height
@@ -224,7 +224,7 @@ feature --Access
 feature{NONE}
 
 	get_slope(a_x_1, a_y_1, a_x_2, a_y_2:INTEGER_32):REAL_64
-			--Returns the slope from two points.
+			--Returns the slope from two points (`a_x_1', `a_y_1') and (`a_x_2', `a_y_2').
 		local
 			l_slope: REAL_64
 		do
@@ -242,7 +242,7 @@ feature{NONE}
 		end
 
 	get_capped_position(a_pixels:GAME_PIXEL_READER_WRITER; a_position:TUPLE[x, y:INTEGER_32]):TUPLE[x,y:INTEGER_32]
-			-- Caps positions to a_pixels positions if it is out of bound and returns a TUPLE
+			-- Caps positions to `a_pixels' positions if it is out of bound and returns a TUPLE
 		do
 			create Result
 			if(a_position.x > a_pixels.width) then

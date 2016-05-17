@@ -1,8 +1,8 @@
 note
-	description: "Summary description for {NETWORK_ENGINE}."
+	description: "The network manager for the game."
 	author: "Émilio Gonzalez"
-	date: "16-05-03"
-	revision: "16w13a"
+	date: "16-05-17"
+	revision: "16w15a"
 	legal: "See notice at end of class."
 
 class
@@ -21,7 +21,7 @@ feature{NONE} -- Initialization
 		do
 			continue_listening_server := False
 			self_score := "-1"
-			friend_score := "-2"
+			friend_score := "-1"
 		end
 
 feature {NONE} -- Implementation
@@ -30,6 +30,9 @@ feature {NONE} -- Implementation
 			-- The server's socket (if any).
 
 	thread_connexion: detachable FLEXIBLE_THREAD
+			-- The thread that listen for incoming connexions (if it's a host)
+			-- and runs the `run' method after. It is the same thread for the host
+			-- and the client.
 
 feature -- Access
 
@@ -45,14 +48,17 @@ feature -- Access
 	continue_network: BOOLEAN
 			-- The token to continue to run as a client.
 
-	self_score: STRING
+	self_score: STRING assign set_self_score
+			-- The score of the local player
 
 	set_self_score(a_score:STRING)
+			-- Sets `self_score' to `a_score'
 		do
 			self_score := a_score
 		end
 
 	friend_score: STRING
+			-- The score of the one you're connected with
 
 	initiate_server
 			-- Initiates a server connection using `server_port'.
@@ -71,23 +77,9 @@ feature -- Access
 			end
 		end
 
-	listen_new_connexions
-		do
-			if attached server_socket as la_server_socket then
-				la_server_socket.listen (1)
-				la_server_socket.accept
-				if attached la_server_socket.accepted as la_client_socket then
-					if attached la_client_socket.peer_address as la_address then
-						client_socket := la_client_socket
-						run
-					else
-						print("%Nla_client_socket.address not attached%N")
-					end
-				end
-			end
-		end
-
 	listen_server
+			-- Listen for incoming TCP connexions and accept them.
+			-- Puts the new socket in client_socket.
 		do
 			if attached server_socket as la_server_socket then
 				la_server_socket.listen (1)
@@ -100,32 +92,47 @@ feature -- Access
 		end
 
 	run
+			-- Runs the loop to listen for the friend's score and send him your score.
+		local
+			l_rescue:BOOLEAN
 		do
-			print("%NDÉBUT RUN%N")
-			if attached client_socket as la_client_socket then
-				if attached la_client_socket.address as la_address then
-					from
-						continue_network := true
-					until
-						continue_network = false
-					loop
-						la_client_socket.put_string (self_score + "%N")
-						la_client_socket.read_line
-						friend_score := la_client_socket.last_string
-						print("%NMON SCORE: " + self_score)
-						print("%NSON SCORE: " + friend_score)
-						if attached thread_connexion as la_thread then
-							la_thread.sleep (100000000)
+			if not l_rescue then
+				print("%NDÉBUT RUN%N")
+				if attached client_socket as la_client_socket then
+					if attached la_client_socket.peer_address as la_address then
+						from
+							continue_network := true
+						until
+							not continue_network
+						loop
+							la_client_socket.put_string (self_score + "%N")
+							la_client_socket.read_line
+							friend_score := la_client_socket.last_string
+							print("%NMON SCORE: " + self_score)
+							print("%NSON SCORE: " + friend_score)
+							if attached thread_connexion as la_thread then
+								la_thread.sleep (100000000)
+							end
 						end
 					end
 				end
+			else
+				stop_connexion
 			end
+
+		rescue
+			l_rescue := True
+			retry
 		end
 
-	start_server_receive_updates(a_socket: NETWORK_STREAM_SOCKET)
+	stop_connexion
 		do
-			client_socket := a_socket
-			print("saluuuut")
+			continue_listening_server := False
+			if attached client_socket as la_client_socket then
+				friend_score := "-1"
+				la_client_socket.close
+				client_socket := Void
+			end
 		end
 
 	client_socket: detachable NETWORK_STREAM_SOCKET
@@ -160,12 +167,6 @@ feature -- Access
 					end
 				end
 			end
-		end
-
-	update_score(a_ip, a_score: STRING)
-		do
---			print(a_ip + ": " + a_score)
-			print("%NSALUT")
 		end
 
 note

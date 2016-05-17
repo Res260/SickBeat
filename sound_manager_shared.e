@@ -10,7 +10,7 @@ deferred class
 
 feature
 	sound_manager:SOUND_MANAGER
-		once
+		once("PROCESS")
 			create Result.make
 		end
 note

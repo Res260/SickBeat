@@ -13,11 +13,12 @@ create
 
 feature -- Initialization
 
-	make(a_background: BACKGROUND; a_context: CONTEXT)
-			-- Initialize `Current' with `a_background' to draw behind everything else on `a_context's screen
+	make(a_background: BACKGROUND; a_hud_items: LIST[HUD_ITEM]; a_context: CONTEXT)
+			-- Initialize `Current' with `a_background' to draw behind everything else and `a_hud_items' on top of `a_context's screen
 		do
 			context := a_context
 			current_background := a_background
+			hud_items := a_hud_items
 		end
 
 feature {NONE} -- Implementation
@@ -27,6 +28,9 @@ feature {NONE} -- Implementation
 
 	current_background: BACKGROUND
 			-- Background of the application
+
+	hud_items: LIST[HUD_ITEM]
+			-- HUD items to render after everything else
 
 feature -- Access
 
@@ -39,6 +43,10 @@ feature -- Access
 
 			across a_drawables as la_drawables loop
 				la_drawables.item.draw(context)
+			end
+
+			across hud_items as la_items loop
+				la_items.item.draw(context)
 			end
 
 			context.window.update

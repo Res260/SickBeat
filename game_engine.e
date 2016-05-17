@@ -1,8 +1,8 @@
 note
 	description: "{MENU} implementing game specific mechanics and rendering. This needs to be a {MENU} so the menus can naviguate to it."
-	author: "Guillaume Jean"
-	date: "22 March 2016"
-	revision: "16w08a"
+	author: "Guillaume Jean and Émilio G!"
+	date: "2016-05-17"
+	revision: "16w15a"
 	legal: "See notice at end of class."
 
 class
@@ -29,17 +29,18 @@ create
 feature {NONE} -- Initialization
 
 	make(a_context: CONTEXT)
-			-- Initialize all the attributes
+			-- Initialize all the attributes and sets `context' with `a_context'
 		do
 			Precursor(a_context)
 			create controller.make(mouse)
 			create background.make_movable(context.ressource_factory.game_background, [3840, 2160])
 			create current_map.make([3840.0, 2160.0])
-			create renderer.make(background, context)
+			create {ARRAYED_LIST[HUD_ITEM]}hud_items.make(1)
+			hud_items.extend (create {HUD_SCORE}.make(score, 20, 20, "localhost", context))
+			create renderer.make(background, hud_items, context)
 			create physics.make
 			create current_player.make([context.window.width / 2, context.window.height / 2], controller, context)
 			create {LINKED_LIST[ENTITY]} entities.make
-			create {ARRAYED_LIST[HUD_ITEM]} hud_items.make(0)
 			create {ARRAYED_LIST[DRAWABLE]} drawables.make(0)
 			entities.extend(current_player)
 			drawables.extend(current_player)
@@ -69,7 +70,7 @@ feature {NONE} -- Initialization
 		end
 
 	make_multiplayer(a_context: CONTEXT; a_network_engine: NETWORK_ENGINE)
-			-- Initialize all the attributes for a multiplayer game.
+			-- Initialize all the attributes for a multiplayer game (sets `network_engine' to `a_network_engine') where you join a game.
 		do
 			make(a_context)
 			network_engine := a_network_engine
@@ -79,6 +80,8 @@ feature {NONE} -- Initialization
 		end
 
 	make_multiplayer_host(a_context: CONTEXT; a_network_engine: NETWORK_ENGINE)
+			-- Initializes all the attributes for a multiplayer game (sets `network_engine' to `a_network_engine')
+			-- where you are the host
 		do
 			a_network_engine.initiate_server
 			network_engine := a_network_engine
@@ -132,6 +135,28 @@ feature {NONE} -- Implementation
 	on_tick(a_timestamp: NATURAL_32)
 			-- Method run on every iteration (should be 60 times per second)
 		do
+			if attached network_engine as la_network_engine then
+				la_network_engine.set_self_score(score.out)
+				if hud_items.count >= 2 then
+					if attached {HUD_SCORE} hud_items[2] as la_friend_score then
+						if attached {INTEGER} la_friend_score.value as la_value then
+							if la_value >= 0 then
+								la_friend_score.update_value (la_network_engine.friend_score.to_integer)
+							else
+								hud_items.go_i_th (2)
+								hud_items.remove
+							end
+						end
+					end
+				else
+					if attached la_network_engine.client_socket as la_client_socket then
+						if attached la_client_socket.peer_address as la_address then
+							hud_items.extend (create {HUD_SCORE}.make (-1, 20, 50, la_address.host_address.host_address, context))
+						end
+					end
+				end
+			end
+
 			game_update_mutex.lock
 
 			if last_frame <= 0 then
@@ -154,12 +179,7 @@ feature {NONE} -- Implementation
 
 			update_camera
 
-			score := score + 1
-
 			on_redraw(a_timestamp)
-			if attached network_engine as la_network_engine then
-				la_network_engine.set_self_score(score.to_hex_string)
-			end
 
 			game_update_mutex.unlock
 		end
@@ -167,6 +187,9 @@ feature {NONE} -- Implementation
 	on_stop
 			-- Close the game_update_thread
 		do
+			if attached network_engine as la_network_engine then
+				la_network_engine.stop_connexion
+			end
 			if attached game_update_thread as la_game_update_thread then
 				la_game_update_thread.stop_thread
 				la_game_update_thread.join
@@ -197,6 +220,10 @@ feature {NONE} -- Implementation
 			-- Pauses the game when pressing the Escape key
 			-- Toggles debugging mode whem pressing F3
 		do
+			score := score + 1
+			if attached {HUD_INFORMATION} hud_items[1] as la_hud_score then
+				la_hud_score.update_value (score)
+			end
 			if not a_key_state.is_repeat then
 				if a_key_state.is_escape then
 					create {MENU_PAUSE} next_menu.make(context)
@@ -219,10 +246,10 @@ feature -- Access
 			-- Object rendering engine
 
 	network_engine: detachable NETWORK_ENGINE
+			-- The network engine for multiplayer score.
 
 	hud_items: LIST[HUD_ITEM]
-			-- `hud_items'
-		attribute check False then end end --| Remove line when `hud_items' is initialized in creation procedure.
+			-- List of hud items to draw.
 
 	current_player: PLAYER
 			-- {PLAYER} currently being controlled by the user

@@ -1,8 +1,8 @@
 note
 	description: "Abstract class used to make {MENU}s."
-	author: "Guillaume Jean"
-	date: "12 April 2016"
-	revision: "16w10a"
+	author: "Guillaume Jean and Émilio G!"
+	date: "2016-05-17"
+	revision: "16w15a"
 	legal: "See notice at end of class."
 
 deferred class
@@ -29,6 +29,7 @@ feature {NONE} -- Initialization
 			create mouse.make(0, 0)
 			create background.make(context.ressource_factory.menu_background)
 			create {LINKED_LIST[BUTTON]} buttons.make
+			create {LINKED_LIST[TEXTBOX]} textboxes.make
 			update_buttons_dimension
 			sound_manager.create_audio_source
 			menu_audio_source := sound_manager.last_audio_source
@@ -38,7 +39,7 @@ feature {NONE} -- Initialization
 		end
 
 	make_as_main(a_context: CONTEXT)
-			-- Creation of a {MENU} that makes it the main one
+			-- Creation of `Current' that makes it the main one
 		do
 			make(a_context)
 			is_main_menu := True
@@ -66,9 +67,6 @@ feature {NONE} -- Implementation
 			menu_audio_source.play
 		end
 
-	context: CONTEXT
-			-- Context of the application
-
 	set_events
 			-- Set the event handlers for `Current'
 		require
@@ -81,6 +79,15 @@ feature {NONE} -- Implementation
 			context.window.mouse_button_pressed_actions.extend(agent on_pressed)
 			context.window.mouse_button_released_actions.extend(agent on_released)
 			context.window.mouse_motion_actions.extend(agent on_mouse_motion)
+			context.window.key_pressed_actions.extend(
+					agent (a_timestamp: NATURAL_32; a_game_key: GAME_KEY_STATE)
+						do
+							across textboxes as la_textbox loop
+								la_textbox.item.on_key_pressed(a_game_key)
+							end
+							on_redraw(a_timestamp)
+						end
+				)
 		end
 
 	on_iteration(a_timestamp: NATURAL_32)
@@ -117,6 +124,10 @@ feature {NONE} -- Implementation
 				la_buttons.item.draw(context)
 			end
 
+			across textboxes as la_textboxes loop
+				la_textboxes.item.draw
+			end
+
 			context.window.update
 		end
 
@@ -144,8 +155,8 @@ feature {NONE} -- Implementation
 		end
 
 	on_mouse_motion(a_timestamp: NATURAL_32; a_mouse_state: GAME_MOUSE_MOTION_STATE; a_delta_x, a_delta_y: INTEGER)
-			-- Handles the mouse_motion event
-			-- Updates the internal mouse position
+			-- Handles the mouse_motion (`a_mouse_state') event
+			-- Updates `mouse''s position
 		do
 			mouse.position := [a_mouse_state.x + context.camera.position.x, a_mouse_state.y + context.camera.position.y]
 		end
@@ -208,6 +219,9 @@ feature {NONE} -- Basic Operations
 
 feature -- Access
 
+	context: CONTEXT
+			-- Context of the application
+
 	is_main_menu: BOOLEAN
 			-- Whether or not `Current' is the main menu
 
@@ -234,6 +248,9 @@ feature -- Access
 
 	buttons: LIST[BUTTON]
 			-- List of `Current's buttons
+
+	textboxes: LIST[TEXTBOX]
+			-- List of `Current's textboxes
 
 	next_menu: detachable MENU
 			-- Menu ran when `Current' stops
@@ -343,6 +360,17 @@ feature -- Access
 				end
 			end
 		end
+
+	add_textbox(a_button_reference: BUTTON)
+		-- Add a textbox to `Current's screen
+			local
+				l_textbox: TEXTBOX
+			do
+				create l_textbox.make (a_button_reference.upper_corner.x.rounded + 5, a_button_reference.y, 400, 30, 5, context)
+				textboxes.extend(l_textbox)
+			ensure
+				Textbox_List_Is_Bigger: old textboxes.count + 1 = textboxes.count
+			end
 
 	text_color: GAME_COLOR
 			-- The color used to draw the `buttons' and the `title'

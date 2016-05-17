@@ -1,8 +1,8 @@
 note
 	description: "The multiplayer menu to display."
 	author: "Émilio Gonzalez"
-	date: "2016-05-03"
-	revision: "16w13a"
+	date: "2016-05-17"
+	revision: "16w15a"
 
 class
 	MENU_MULTIPLAYER
@@ -28,6 +28,7 @@ feature {NONE} -- Initialization
 			add_button("Host", agent host_action)
 			add_button("Join", agent join_action)
 			add_button("Return", agent return_action)
+			add_textbox(buttons[2])
 		end
 
 feature {NONE}
@@ -46,10 +47,15 @@ feature {NONE}
 
 	join_action(a_string: READABLE_STRING_GENERAL)
 			-- Action played when the user clicks the join button.
+		local
+			l_ip: STRING
 		do
 			play_menu_sound_click
 			io.put_string("Join clicked!%N")
-			create {MENU_LOADING_SCREEN} next_menu.make_multiplayer(context, "127.0.0.1")
+			l_ip := textboxes[1].text.text.to_string_8
+			l_ip.right_adjust
+			l_ip.left_adjust
+			create {MENU_LOADING_SCREEN} next_menu.make_multiplayer(context, l_ip)
 			return_menu
 		end
 

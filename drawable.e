@@ -11,7 +11,7 @@ deferred class
 feature {NONE} -- Initialization
 
 	make_drawable(a_x, a_y: INTEGER; a_texture: detachable GAME_TEXTURE)
-			-- Initializes the {DRAWABLE} with the width and height of the {GAME_TEXTURE}
+			-- Initializes `Current' with the width and height of `a_texture'
 		do
 			x := a_x
 			y := a_y

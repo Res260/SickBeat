@@ -24,7 +24,7 @@ create
 feature {NONE} -- Initialization
 
 	make(a_mutex: MUTEX; a_game_core: GAME_ENGINE)
-			-- Initializes `Current'
+			-- Initializes `Current' by setting `game_core' with `a_game_core' and `game_update_mutex' with `a_mutex'
 		do
 			make_thread
 			must_stop := False
@@ -33,6 +33,7 @@ feature {NONE} -- Initialization
 		end
 
 	make_multiplayer(a_mutex: MUTEX; a_game_core: GAME_ENGINE; a_network_engine: NETWORK_ENGINE)
+			-- Initializes `Current' with `a_network_engine' for the multiplayer
 		do
 			make(a_mutex, a_game_core)
 			network_engine := a_network_engine
@@ -78,6 +79,7 @@ feature -- Implementation
 		end
 
 	execute_single_player
+			-- Method executed for every tick of a single player game
 		do
 			from
 			until
@@ -88,6 +90,7 @@ feature -- Implementation
 		end
 
 	on_tick_singleplayer
+			-- The actual action executed for any game
 		local
 			l_previous_tick: REAL_64
 			l_update_time_difference: REAL_64
@@ -115,6 +118,7 @@ feature -- Implementation
 		end
 
 	execute_multiplayer
+			-- executed for a multiplayer game
 		do
 			if attached network_engine as la_network_engine then
 				from
@@ -122,12 +126,13 @@ feature -- Implementation
 					must_stop
 				loop
 					on_tick_singleplayer
-					on_thick_multiplayer(la_network_engine)
+					on_tick_multiplayer(la_network_engine)
 				end
 			end
 		end
 
-	on_thick_multiplayer(a_network_engine: NETWORK_ENGINE)
+	on_tick_multiplayer(a_network_engine: NETWORK_ENGINE)
+			-- If a multiplayer game requires special treatement, it goes here
 		do
 		end
 

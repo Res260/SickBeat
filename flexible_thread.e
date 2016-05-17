@@ -1,8 +1,8 @@
 note
 	description: "Class to make a thread based on a feature"
 	author: "Émilio G!"
-	date: "2016-05-03"
-	revision: "16w13a"
+	date: "2016-05-17"
+	revision: "16w15a"
 
 class
 	FLEXIBLE_THREAD
@@ -21,7 +21,7 @@ create
 feature {NONE}
 
 	make(a_procedure: PROCEDURE[ANY, TUPLE])
-			-- Initialization for `Current'
+			-- Initialization for `Current' with `a_procedure' that will be called when the `Current' is launched
 		do
 			procedure := a_procedure
 			make_thread

@@ -1,8 +1,8 @@
 note
 	description: "Class that manages sounds/musics for the game."
 	author: "Émilio G!"
-	date: "16-02-29"
-	revision: "16w08a"
+	date: "16-05-17"
+	revision: "16w15a"
 	legal: "See notice at end of class."
 
 class
@@ -23,11 +23,16 @@ feature {NONE}
 			audio_library.enable_sound
 			audio_library.launch_in_thread
 			audio_library.disable_print_on_error
+			create audio_sources_mutex.make
 		end
 
 feature -- Access
 
-	sound_on:BOOLEAN --boolean (doesnt work for now) that is true when sound is on.
+	sound_on:BOOLEAN
+		--boolean (doesnt work for now) that is true when sound is on.
+
+	audio_sources_mutex: MUTEX
+		-- The mutex to add and remove audio sources.
 
 	toggle_sound
 		--toggle if sound plays or not
@@ -38,13 +43,23 @@ feature -- Access
 	create_audio_source
 		--creates and adds an audio source in audio_library
 		do
-			audio_library.sources_add
+			audio_sources_mutex.lock
+				audio_library.sources_add
+			audio_sources_mutex.unlock
 		end
 
 	last_audio_source:AUDIO_SOURCE
 		--returns the last audio source added by `Current'.create_audio_source
 		do
 			Result := audio_library.last_source_added
+		end
+
+	remove_source(a_source:AUDIO_SOURCE)
+			--Removes `a_source' from the audio_library sources
+		do
+			audio_sources_mutex.lock
+				audio_library.sources_prune (a_source)
+			audio_sources_mutex.unlock
 		end
 
 	set_master_volume(a_new_volume: REAL_32)
@@ -58,14 +73,8 @@ feature -- Access
 			end
 		end
 
-	run
-			--do `Current's job... nothing to see here for now.
-		do
-
-		end
-
 	clear_ressources
-			--called at the end of the program to clear allocated ressources
+			-- called at the end of the program to clear allocated ressources
 		do
 			audio_library.stop_thread
 			audio_library.quit_library

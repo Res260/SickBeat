@@ -131,23 +131,21 @@ feature {NONE} -- Implementation
 		do
 			if attached network_engine as la_network_engine then
 				la_network_engine.set_self_score(score.out)
-				if la_network_engine.friend_score /= "-1" then
-					if hud_items.count >= 2 then
-						if attached {HUD_SCORE} hud_items[2] as la_friend_score then
-							la_friend_score.update_value (la_network_engine.friend_score.to_integer)
-						end
-					else
-						if attached la_network_engine.client_socket as la_client_socket then
-							if attached la_client_socket.peer_address as la_address then
-								hud_items.extend (create {HUD_SCORE}.make (0, 20, 50, la_address.host_address.host_address, context))
+				if hud_items.count >= 2 then
+					if attached {HUD_SCORE} hud_items[2] as la_friend_score then
+						if attached {INTEGER} la_friend_score.value as la_value then
+							if la_value >= 0 then
+								la_friend_score.update_value (la_network_engine.friend_score.to_integer)
+							else
+								hud_items.go_i_th (2)
+								hud_items.remove
 							end
 						end
 					end
 				else
-					if hud_items.count >= 2 then
-						if attached {HUD_SCORE} hud_items[2] as la_friend_score then
-							hud_items.go_i_th(2)
-							hud_items.remove
+					if attached la_network_engine.client_socket as la_client_socket then
+						if attached la_client_socket.peer_address as la_address then
+							hud_items.extend (create {HUD_SCORE}.make (-1, 20, 50, la_address.host_address.host_address, context))
 						end
 					end
 				end

@@ -80,7 +80,31 @@ feature -- Access
 				create{GAME_COLOR}.make (255, 255, 255, 255)
 				)
 
---			ennemy_textures.black := make_ennemy_texture (a_texture_color_begin, a_texture_color_end, a_texture_border_color: GAME_COLOR)
+			ennemy_textures.black := make_ennemy_texture (
+						create {GAME_COLOR}.make (30, 30, 30, 255),
+						create {GAME_COLOR}.make (60, 60, 60, 255),
+						create {GAME_COLOR}.make (0, 0, 0, 255)
+						)
+			ennemy_textures.red := make_ennemy_texture (
+						create {GAME_COLOR}.make (255, 0, 0, 255),
+						create {GAME_COLOR}.make (255, 140, 140, 255),
+						create {GAME_COLOR}.make (200, 0, 0, 255)
+						)
+			ennemy_textures.green := make_ennemy_texture (
+						create {GAME_COLOR}.make (0, 255, 0, 255),
+						create {GAME_COLOR}.make (140, 255, 140, 255),
+						create {GAME_COLOR}.make (0, 200, 0, 255)
+						)
+			ennemy_textures.blue := make_ennemy_texture (
+						create {GAME_COLOR}.make (0, 0, 255, 255),
+						create {GAME_COLOR}.make (140, 140, 255, 255),
+						create {GAME_COLOR}.make (0, 0, 200, 255)
+						)
+			ennemy_textures.white := make_ennemy_texture (
+						create {GAME_COLOR}.make (200, 200, 200, 255),
+						create {GAME_COLOR}.make (255, 255, 255, 255),
+						create {GAME_COLOR}.make (170, 170, 170, 255)
+						)
 
 			arc_textures.black := make_arc(create{GAME_COLOR}.make (0, 0, 0, 255))
 			arc_textures.red := make_arc(create{GAME_COLOR}.make (255, 0, 0, 255))

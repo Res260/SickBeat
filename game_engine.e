@@ -32,9 +32,11 @@ feature {NONE} -- Initialization
 			-- Initialize all the attributes and sets `context' with `a_context'
 		do
 			Precursor(a_context)
+			make_core
 			create controller.make(mouse)
 			create background.make_movable(context.ressource_factory.game_background, [3840, 2160])
 			create current_map.make([3840.0, 2160.0])
+			current_map.start_spawning
 			create {ARRAYED_LIST[HUD_ITEM]}hud_items.make(2)
 			score := 0
 			hud_items.extend (create {HUD_SCORE}.make(score, 20, 20, "localhost", context))
@@ -56,7 +58,7 @@ feature {NONE} -- Initialization
 			controller.number_actions.extend(agent current_player.set_color_index)
 			current_player.collision_actions.extend(agent (a_physic_object: PHYSIC_OBJECT)
 														do
-															io.put_string("BOOM!")
+															--io.put_string("BOOM!")
 														end
 												   )
 			current_player.launch_wave_event.extend(agent (a_wave:WAVE)
@@ -75,6 +77,7 @@ feature {NONE} -- Initialization
 			-- Initialize all the attributes for a multiplayer game (sets `network_engine' to `a_network_engine') where you join a game.
 		do
 			make(a_context)
+			current_map.stop_spawning
 			network_engine := a_network_engine
 			if attached network_engine as la_network_engine then
 				create game_update_thread.make_multiplayer(game_update_mutex, Current, la_network_engine)
@@ -88,6 +91,7 @@ feature {NONE} -- Initialization
 			a_network_engine.initiate_server
 			network_engine := a_network_engine
 			make(a_context)
+			current_map.stop_spawning
 		end
 
 feature {NONE} -- Implementation
@@ -188,8 +192,7 @@ feature {NONE} -- Implementation
 				tick_display := tick_counter
 				frame_counter := 0
 				tick_counter := 0
-				io.put_string("Frames: " + frame_display.out + "%N")
-				io.put_string("Ticks: " + tick_display.out + "%N")
+				io.put_string("Frames: " + frame_display.out + " Ticks: " + tick_display.out + " Entities: " + entities.count.out + "     %R")
 			end
 
 			update_camera
@@ -202,6 +205,7 @@ feature {NONE} -- Implementation
 	on_stop
 			-- Close the game_update_thread
 		do
+			io.put_string("%N")
 			if attached network_engine as la_network_engine then
 				la_network_engine.stop_connexion
 			end

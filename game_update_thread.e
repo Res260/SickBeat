@@ -107,6 +107,7 @@ feature -- Implementation
 
 			game_core.update_everything(l_update_time_difference)
 			game_core.physics.check_all
+			game_core.clear_dead_entities
 
 			game_update_mutex.unlock
 

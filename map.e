@@ -8,6 +8,10 @@ note
 class
 	MAP
 
+inherit
+	MATH_UTILITY
+	GAME_LIBRARY_SHARED
+
 create
 	make
 
@@ -16,6 +20,7 @@ feature {NONE} -- Initialization
 	make(a_size: TUPLE[width, height: REAL_64])
 			-- Initialize `Current' with `a_size' used to create the map boundaries
 		do
+			size := a_size
 			side_boxes := [
 					create {BOUNDING_PLANE}.make_plane([1.0, 0.0], 0),
 					create {BOUNDING_PLANE}.make_plane([-1.0, 0.0], a_size.width),
@@ -24,26 +29,48 @@ feature {NONE} -- Initialization
 				]
 			spawn_enemy_cooldown := 0
 			create spawn_enemies_actions
+			create random_generator.set_seed(game_library.time_since_create.as_integer_32)
+			spawn_enemies_actions.extend(agent (a_enemy: ENEMY)
+								do print("Spawning enemy at (" + a_enemy.x_real.out + ", " + a_enemy.y_real.out + ")%N") end)
 		end
 
 feature {NONE} -- Implementation
 
+	size: TUPLE[width, height: REAL_64]
+			-- Size of `Current'
+
 	side_boxes: TUPLE[left, right, top, down: BOUNDING_PLANE]
 			-- Bounding boxes preventing the entitites from moving outside of `Current'
 
-	spawn_enemy_cooldown_max: REAL_64 = 5.0
-			-- Maximum time until spawning an enemy in seconds
+	spawn_enemy_cooldown_interval: REAL_64 = 5.0
+			-- Time between spawning an {ENEMY} in seconds
 
 	spawn_enemy_cooldown: REAL_64
-			-- Time until spawning an enemy in seconds
+			-- Time until spawning the next {ENEMY} in seconds
 
 	should_spawn_enemy: BOOLEAN
-			-- Whether or not `Current' should spawn an enemy on next update
+			-- Whether or not `Current' should spawn an {ENEMY} on next update
+
+	random_generator: RANDOM
+			-- Random number generator to generate the positions of the enemies
 
 feature -- Access
 
 	spawn_enemies_actions: ACTION_SEQUENCE[TUPLE[ENEMY]]
 			-- Actions to execute when creating an enemy
+
+	start_spawning
+			-- Starts the {ENEMY} spawning mechanic
+		do
+			spawn_enemy_cooldown := spawn_enemy_cooldown_interval
+		end
+
+	stop_spawning
+			-- Stops the {ENEMY} spawning mechanic
+		do
+			spawn_enemy_cooldown := 0.0
+			should_spawn_enemy := False
+		end
 
 	is_entity_in_boundaries(a_entity: ENTITY): BOOLEAN
 			-- Checks if `a_entity' is inside the side_boxes
@@ -58,16 +85,24 @@ feature -- Access
 
 	update(a_timediff: REAL_64)
 			-- Updates `Current's state
-			-- Spawns new {ENEMY}s from time to time
+			-- Spawns new {ENEMY}s every `spawn_enemy_cooldown_interval' seconds
+		local
+			l_new_enemy_x, l_new_enemy_y: REAL_64
 		do
 			if spawn_enemy_cooldown > 0.0 then
 				spawn_enemy_cooldown := (0.0).max(spawn_enemy_cooldown - a_timediff)
 				if spawn_enemy_cooldown ~ 0.0 then
 					should_spawn_enemy := True
+					spawn_enemy_cooldown := spawn_enemy_cooldown_interval
 				end
 			end
 			if should_spawn_enemy then
-				spawn_enemies_actions.call(create {ENEMY}.make([0.0, 0.0]))
+				random_generator.forth
+				l_new_enemy_x := random_generator.double_item * size.width
+				random_generator.forth
+				l_new_enemy_y := random_generator.double_item * size.height
+				spawn_enemies_actions.call(create {ENEMY}.make([l_new_enemy_x, l_new_enemy_y]))
+				should_spawn_enemy := False
 			end
 		end
 

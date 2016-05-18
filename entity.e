@@ -20,18 +20,35 @@ feature {NONE} -- Initialization
 			x_real := a_x
 			y_real := a_y
 			make_drawable(x, y, Void)
+			dead := False
+			create death_actions
 		end
 
 feature -- Access
 
+	death_actions: ACTION_SEQUENCE[TUPLE[ENTITY]]
+			-- Actions to do when `Current' dies
+
+	dead: BOOLEAN
+			-- Whether or not `Current' is dead and should be removed
+
 	x_real: REAL_64 assign set_x_real
 			-- Real X coordinate
+
 	y_real: REAL_64 assign set_y_real
 			-- Real Y coordinate
 
 	update(a_timediff: REAL_64)
-			-- Updates the state of `Current'.
-			-- a_timediff is in seconds.
+			-- Updates the state of `Current'; `a_timediff' is in seconds.
+			-- Calls `death_actions' if `Current' is `dead'
+		do
+			if dead then
+				death_actions.call(Current)
+			end
+		end
+
+	kill
+			-- Do stuff when `Current' is removed from the world to cleanup
 		do
 		end
 

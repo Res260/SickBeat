@@ -22,6 +22,7 @@ feature{NONE}
 		do
 			create pixel_format
 			create player_textures
+			create ennemy_textures
 			create arc_textures
 			pixel_format.set_rgba8888
 			renderer := a_renderer
@@ -38,6 +39,11 @@ feature{NONE}
 
 	player_textures:TUPLE[black, red, green, blue, white:GAME_TEXTURE]
 		-- The player's textures
+
+	ennemy_texture_dimension: INTEGER_32 = 20
+
+	ennemy_textures:TUPLE[black, red, green, blue, white:GAME_TEXTURE]
+		-- The ennemies' textures
 
 	arc_textures:TUPLE[black, red, green, blue, white: GAME_TEXTURE]
 		-- The arcs textures
@@ -74,6 +80,8 @@ feature -- Access
 				create{GAME_COLOR}.make (255, 255, 255, 255)
 				)
 
+--			ennemy_textures.black := make_ennemy_texture (a_texture_color_begin, a_texture_color_end, a_texture_border_color: GAME_COLOR)
+
 			arc_textures.black := make_arc(create{GAME_COLOR}.make (0, 0, 0, 255))
 			arc_textures.red := make_arc(create{GAME_COLOR}.make (255, 0, 0, 255))
 			arc_textures.green := make_arc(create{GAME_COLOR}.make (0, 255, 0, 255))
@@ -101,6 +109,19 @@ feature -- Access
 			l_pixels := make_transparent_texture(player_texture_dimension, player_texture_dimension)
 			image_generator.make_circle(l_pixels, a_texture_color_begin,
 				a_texture_color_end, void, 0
+				)
+			Result := make_texture_from_pixels(l_pixels)
+		end
+
+	make_ennemy_texture(a_texture_color_begin, a_texture_color_end, a_texture_border_color:GAME_COLOR): GAME_TEXTURE
+			-- Makes an ennemy's texture of color `a_texture_color_begin' to `a_texture_color_end'
+			-- and with a border of color `a_texture_border_color'
+		local
+			l_pixels:GAME_PIXEL_READER_WRITER
+		do
+			l_pixels := make_transparent_texture(player_texture_dimension, player_texture_dimension)
+			image_generator.make_circle(l_pixels, a_texture_color_begin,
+				a_texture_color_end, a_texture_border_color, 2
 				)
 			Result := make_texture_from_pixels(l_pixels)
 		end

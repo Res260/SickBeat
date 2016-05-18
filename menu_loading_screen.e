@@ -41,6 +41,9 @@ feature {NONE} -- Initialization
 			create network_engine.make
 			if attached network_engine as la_network_engine then
 				la_network_engine.connect_client (a_host)
+				if not attached la_network_engine.client_socket then
+					return_menu
+				end
 			end
 		end
 
@@ -98,12 +101,6 @@ feature --Implementation
 			-- Might change
 		do
 			return_menu
-		end
-
-	useless_action(a_string: READABLE_STRING_GENERAL)
-			-- Action played when the user clicks the useless button
-		do
-			play_menu_sound_click
 		end
 note
 	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007 | Copyright (c) 2016 Émilio Gonzalez and Guillaume Jean"

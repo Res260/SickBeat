@@ -144,29 +144,36 @@ feature -- Access
 			l_addr_factory:INET_ADDRESS_FACTORY
 			l_socket: NETWORK_STREAM_SOCKET
 			l_address:detachable INET_ADDRESS
+			l_rescue: BOOLEAN
 		do
-			create l_addr_factory
-			l_address:= l_addr_factory.create_from_name (a_host)
-			if l_address = Void then
-				io.put_string ("Error: Address " + a_host + " invalid%N")
-			else
-				create l_socket.make_client_by_address_and_port (l_address, server_port)
-				if l_socket.invalid_address then
-					io.put_string ("Can't connect to " + a_host + ":" + server_port.to_hex_string +".%N")
+			if not l_rescue then
+				create l_addr_factory
+				l_address:= l_addr_factory.create_from_name (a_host)
+				if l_address = Void then
+					io.put_string ("Error: Address " + a_host + " invalid%N")
 				else
-					l_socket.connect
-					if not l_socket.is_connected then
+					create l_socket.make_client_by_address_and_port (l_address, server_port)
+					if l_socket.invalid_address then
 						io.put_string ("Can't connect to " + a_host + ":" + server_port.to_hex_string +".%N")
 					else
-						client_socket := l_socket
-						print("%NCONNECTED!!%N")
-						create thread_connexion.make (agent run)
-						if attached thread_connexion as la_thread then
-							la_thread.launch
+						l_socket.set_connect_timeout (1000)
+						l_socket.connect
+						if not l_socket.is_connected then
+							io.put_string ("Can't connect to " + a_host + ":" + server_port.to_hex_string +".%N")
+						else
+							client_socket := l_socket
+							print("%NCONNECTED!!%N")
+							create thread_connexion.make (agent run)
+							if attached thread_connexion as la_thread then
+								la_thread.launch
+							end
 						end
 					end
 				end
 			end
+		rescue
+			l_rescue := True
+			retry
 		end
 
 	is_connected: BOOLEAN

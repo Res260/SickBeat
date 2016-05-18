@@ -41,14 +41,17 @@ feature -- Attributes
 
 feature -- Methods
 
+	on_text_input(a_text: STRING_32)
+			-- Action called when text is entered by the user
+		do
+			add_text (a_text)
+		end
+
 	on_key_pressed(a_key_state: GAME_KEY_STATE)
+			-- Action called when a key is entered by the user
 		do
 			if a_key_state.is_backspace then
 				sub_text
-			else
-				if a_key_state.unicode_out.count = 1 then
-					add_text (a_key_state.unicode_out)
-				end
 			end
 		end
 

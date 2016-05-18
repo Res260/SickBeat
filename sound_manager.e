@@ -24,6 +24,7 @@ feature {NONE}
 			audio_library.launch_in_thread
 			audio_library.disable_print_on_error
 			create audio_sources_mutex.make
+			set_master_volume(1)
 		end
 
 feature -- Access
@@ -33,6 +34,9 @@ feature -- Access
 
 	audio_sources_mutex: MUTEX
 		-- The mutex to add and remove audio sources.
+
+	master_volume: REAL_32
+		-- The volume (in %) of every audio source.
 
 	toggle_sound
 		--toggle if sound plays or not
@@ -62,15 +66,17 @@ feature -- Access
 			audio_sources_mutex.unlock
 		end
 
-	set_master_volume(a_new_volume: REAL_32)
+	set_master_volume(a_new_volume: REAL_64)
 		--sets the master volume to a_new_volume
 		--side effect on audio_library sources
 		require
 			New_Volume_Valid: a_new_volume >= 0 and a_new_volume <= 1
 		do
+			master_volume := a_new_volume.truncated_to_real
 			across audio_library.sources as la_source loop
-				la_source.item.set_gain (a_new_volume)
+				la_source.item.set_gain (a_new_volume.truncated_to_real)
 			end
+			print("%NNEW MASTER VOLUME: " + master_volume.out + "%N")
 		end
 
 	clear_ressources

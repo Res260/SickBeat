@@ -35,8 +35,10 @@ feature {NONE} -- Initialization
 			create controller.make(mouse)
 			create background.make_movable(context.ressource_factory.game_background, [3840, 2160])
 			create current_map.make([3840.0, 2160.0])
-			create {ARRAYED_LIST[HUD_ITEM]}hud_items.make(1)
+			create {ARRAYED_LIST[HUD_ITEM]}hud_items.make(2)
+			score := 0
 			hud_items.extend (create {HUD_SCORE}.make(score, 20, 20, "localhost", context))
+			hud_items.extend (create {HUD_SCORE}.make(-1, 20, 40, "", context))
 			create renderer.make(background, hud_items, context)
 			create physics.make
 			create current_player.make([context.window.width / 2, context.window.height / 2], controller, context)
@@ -135,25 +137,38 @@ feature {NONE} -- Implementation
 	on_tick(a_timestamp: NATURAL_32)
 			-- Method run on every iteration (should be 60 times per second)
 		do
-			if attached network_engine as la_network_engine then
-				la_network_engine.set_self_score(score.out)
-				if hud_items.count >= 2 then
-					if attached {HUD_SCORE} hud_items[2] as la_friend_score then
-						if attached {INTEGER} la_friend_score.value as la_value then
-							if la_value >= 0 then
-								la_friend_score.update_value (la_network_engine.friend_score.to_integer)
-							else
-								hud_items.go_i_th (2)
-								hud_items.remove
-							end
-						end
+--			if attached network_engine as la_network_engine then
+--				la_network_engine.set_self_score(score.out)
+--				if hud_items.count >= 2 then
+--					if attached {HUD_SCORE} hud_items[2] as la_friend_score then
+--						if attached {INTEGER} la_friend_score.value as la_value then
+--							if la_value >= 0 then
+--								la_friend_score.update_value(la_network_engine.friend_score.to_integer)
+--							else
+--								hud_items.prune(la_friend_score)
+--							end
+--						end
+--					end
+--				else
+--					if attached la_network_engine.client_socket as la_client_socket then
+--						if attached la_client_socket.peer_address as la_address then
+--							hud_items.extend (create {HUD_SCORE}.make (-1, 20, 50, la_address.host_address.host_address, context))
+--						end
+--					end
+--				end
+--			end
+
+			if attached {HUD_SCORE} hud_items.at(2) as la_other_score then
+				if attached network_engine as la_network_engine then
+					la_network_engine.set_self_score(score.out)
+					if la_network_engine.is_connected then
+						la_other_score.update_value(la_network_engine.friend_score.to_integer)
+						la_other_score.should_draw := True
+					else
+						la_other_score.should_draw := False
 					end
 				else
-					if attached la_network_engine.client_socket as la_client_socket then
-						if attached la_client_socket.peer_address as la_address then
-							hud_items.extend (create {HUD_SCORE}.make (-1, 20, 50, la_address.host_address.host_address, context))
-						end
-					end
+					la_other_score.should_draw := False
 				end
 			end
 

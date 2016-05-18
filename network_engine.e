@@ -169,6 +169,25 @@ feature -- Access
 			end
 		end
 
+	is_connected: BOOLEAN
+			-- Checks whether or not `client_socket' is connected
+		local
+			l_retry: BOOLEAN
+		do
+			if not l_retry then
+				if attached client_socket as la_client then
+					Result := attached la_client.receive(1, la_client.c_peekmsg) as la_packet and then la_packet.count > 0
+				else
+					Result := False
+				end
+			else
+				Result := False
+			end
+		rescue
+			l_retry := True
+			retry
+		end
+
 note
 	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007 | Copyright (c) 2016 Émilio Gonzalez and Guillaume Jean"
 	source: "[file: LICENSE]"

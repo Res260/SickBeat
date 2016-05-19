@@ -29,8 +29,8 @@ create
 feature {NONE} -- Initialization
 
 	make(a_x, a_y, a_direction, a_angle: REAL_64; a_center_speed: TUPLE[x, y: REAL_64];
-			a_color: GAME_COLOR; a_source: ENTITY; a_texture:GAME_TEXTURE; a_sound:SOUND)
-			-- Initialize `Current' with a direction, angle, maximum radius, and color
+			a_color: GAME_COLOR; a_source: ENTITY; a_texture:GAME_TEXTURE;)
+			-- Initialize `Current' with a direction, angle, maximum radius, color and a sound
 		do
 			make_entity(a_x, a_y)
 			direction := a_direction
@@ -46,11 +46,11 @@ feature {NONE} -- Initialization
 			center_speed := a_center_speed
 			source := a_source
 			make_bounding_arc(a_x, a_y, a_direction, a_angle, radius)
-			sound_manager.create_audio_source
-			audio_source := sound_manager.last_audio_source
-			sound := a_sound
-			audio_source.queue_sound (sound)
-			audio_source.play
+--			sound_manager.create_audio_source
+--			audio_source := sound_manager.last_audio_source
+--			sound := a_sound
+--			audio_source.queue_sound (sound)
+--			audio_source.play
 			collision_actions.extend(agent (a_physic_object: PHYSIC_OBJECT)
 										do
 											if not attached {WAVE} a_physic_object then
@@ -63,10 +63,10 @@ feature {NONE} -- Initialization
 
 feature -- Access
 
-	audio_source:AUDIO_SOURCE
+--	audio_source:AUDIO_SOURCE
 			-- Audio source to play the wave's sound.
 
-	sound:SOUND
+--	sound:SOUND
 			-- The sound to be played when the wave is alive.
 
 	wave_texture:GAME_TEXTURE
@@ -161,7 +161,7 @@ feature -- Access
 	kill
 			-- Remove `Current's audio_source to prevent overloading the sound_manager
 		do
-			sound_manager.remove_source(audio_source)
+--			sound_manager.remove_source(audio_source)
 		end
 note
 	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007 | Copyright (c) 2016 Émilio Gonzalez and Guillaume Jean"

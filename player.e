@@ -49,7 +49,7 @@ feature {NONE} -- Initialization
 						create {GAME_COLOR}.make(0, 0, 255, 255),	-- Blue
 						create {GAME_COLOR}.make(255, 255, 255, 255)-- White
 					  ]
-			textures := a_context.image_factory.get_ennemy_texture_tuple
+			textures := a_context.image_factory.get_player_texture_tuple
 			arc_textures := a_context.image_factory.get_arcs_texture_tuple
 			current_texture := textures.red
 			current_color := colors.white
@@ -132,7 +132,8 @@ feature -- Access
 					l_speed.x := speed.x
 					l_speed.y := speed.y
 					if attached {GAME_COLOR} colors.at(color_index + 1) as la_color then
-						create l_wave.make(x_real, y_real, l_direction, normal_angle, l_speed, la_color, Current, current_arc, create{SOUND}.make_from_other (sound_factory.sounds_list[1]))
+--						create l_wave.make(x_real, y_real, l_direction, normal_angle, l_speed, la_color, Current, current_arc, create{SOUND}.make_from_other (sound_factory.sounds_list[1]))
+						create l_wave.make(x_real, y_real, l_direction, normal_angle, l_speed, la_color, Current, current_arc)
 						launch_wave_event.call(l_wave)
 					end
 				end

@@ -130,6 +130,11 @@ feature -- Basic Operations
 	add_ennemy_to_world(a_ennemy: ENNEMY)
 			-- Adds a `a_ennemy' to the `ennemies'
 		do
+			a_ennemy.launch_wave_event.extend(agent (a_wave:WAVE)
+				do
+					add_entity_to_world(a_wave)
+				end
+			   )
 			ennemies.extend (a_ennemy)
 			entities.extend(a_ennemy)
 			drawables.extend(a_ennemy)

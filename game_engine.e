@@ -35,7 +35,7 @@ feature {NONE} -- Initialization
 			make_core
 			create controller.make(mouse)
 			create background.make_movable(context.ressource_factory.game_background, [3840, 2160])
-			create current_map.make([3840.0, 2160.0], a_context.image_factory.get_ennemy_texture_tuple)
+			create current_map.make([3840.0, 2160.0], a_context.image_factory.get_ennemy_texture_tuple, a_context.image_factory.get_arcs_texture_tuple)
 			current_map.start_spawning
 			create {ARRAYED_LIST[HUD_ITEM]}hud_items.make(2)
 			score := 0

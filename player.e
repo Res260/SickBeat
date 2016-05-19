@@ -38,8 +38,8 @@ feature {NONE} -- Initialization
 			create max_speed
 			create acceleration
 			create speed
-			max_speed.x := 75
-			max_speed.y := 75
+			max_speed.x := 750
+			max_speed.y := 750
 			create launch_wave_event
 			color_index := 4
 			colors := [
@@ -61,7 +61,7 @@ feature {NONE} -- Initialization
 
 feature {NONE} -- Implementation
 
-	acceleration_input: REAL_64 = 200.0
+	acceleration_input: REAL_64 = 1000.0
 			-- Acceleration of the player given by the inputs
 
 	max_speed: TUPLE[x, y: REAL_64]
@@ -132,7 +132,8 @@ feature -- Access
 					l_speed.x := speed.x
 					l_speed.y := speed.y
 					if attached {GAME_COLOR} colors.at(color_index + 1) as la_color then
-						create l_wave.make(x_real, y_real, l_direction, normal_angle, l_speed, la_color, Current, current_arc, create{SOUND}.make_from_other (sound_factory.sounds_list[1]))
+--						create l_wave.make(x_real, y_real, l_direction, normal_angle, l_speed, la_color, Current, current_arc, create{SOUND}.make_from_other (sound_factory.sounds_list[1]))
+						create l_wave.make(x_real, y_real, l_direction, normal_angle, l_speed, la_color, Current, current_arc)
 						launch_wave_event.call(l_wave)
 					end
 				end
@@ -141,15 +142,10 @@ feature -- Access
 
 	draw(a_context: CONTEXT)
 			-- Draw `Current' using `a_context's renderer and offsetting by `a_context.camera's position
-		local
-			l_previous_color: GAME_COLOR
 		do
-			l_previous_color := a_context.renderer.drawing_color
 			a_context.renderer.set_drawing_color(current_color)
 			a_context.renderer.draw_texture(current_texture, x - (current_texture.width // 2) - a_context.camera.position.x, y - (current_texture.height // 2) - a_context.camera.position.y)
 			draw_collision(a_context)
-
-			a_context.renderer.set_drawing_color(l_previous_color)
 		end
 
 	update_acceleration

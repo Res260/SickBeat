@@ -80,10 +80,19 @@ feature {NONE} -- Implementation
 			context.window.mouse_button_released_actions.extend(agent on_released)
 			context.window.mouse_motion_actions.extend(agent on_mouse_motion)
 			context.window.key_pressed_actions.extend(
-					agent (a_timestamp: NATURAL_32; a_game_key: GAME_KEY_STATE)
+					agent (a_timestamp: NATURAL_32; a_key_state: GAME_KEY_STATE)
 						do
 							across textboxes as la_textbox loop
-								la_textbox.item.on_key_pressed(a_game_key)
+								la_textbox.item.on_key_pressed(a_key_state)
+							end
+							on_redraw(a_timestamp)
+						end
+				)
+			context.window.text_input_actions.extend(
+					agent (a_timestamp: NATURAL_32; a_text: STRING_32)
+						do
+							across textboxes as la_textbox loop
+								la_textbox.item.on_text_input(a_text)
 							end
 							on_redraw(a_timestamp)
 						end
@@ -254,6 +263,12 @@ feature -- Access
 
 	next_menu: detachable MENU
 			-- Menu ran when `Current' stops
+
+	useless_action(a_string: READABLE_STRING_GENERAL)
+			-- Action played when the user clicks the useless button
+		do
+			play_menu_sound_click
+		end
 
 	start
 			-- Start the execution of `Current's loop

@@ -54,7 +54,6 @@ feature {NONE} -- Implementation
 			-- Action played when the user clicks the Play button
 		do
 			io.put_string("Play clicked!%N")
-			sound_manager.set_master_volume (1)
 			play_menu_sound_click
 			create {MENU_PLAY} next_menu.make(context)
 			continue_to_next
@@ -65,6 +64,8 @@ feature {NONE} -- Implementation
 		do
 			play_menu_sound_click
 			io.put_string("Options clicked!%N")
+			create {MENU_OPTIONS} next_menu.make(context)
+			continue_to_next
 		end
 
 	exit_action(a_string: READABLE_STRING_GENERAL)

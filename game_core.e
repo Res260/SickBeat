@@ -7,7 +7,18 @@ note
 deferred class
 	GAME_CORE
 
+feature {NONE} -- Initialization
+
+	make_core
+			-- Initializes `Current's specific features
+		do
+			create {LINKED_LIST[ENTITY]} dead_entities.make
+		end
+
 feature {NONE} -- Implementation
+
+	dead_entities: LIST[ENTITY]
+			-- List of entities to kill on next iteration
 
 	frame_display: INTEGER
 			-- Number of frames in the past second
@@ -47,47 +58,51 @@ feature -- Access
 	entities: LIST[ENTITY]
 			-- List of all entities to update every tick
 
+	ennemies: LIST[ENNEMY]
+			-- List of ennemies
+
 	physics: PHYSICS_ENGINE
 			-- Physics handling object
 
+	current_player: PLAYER
+			-- {PLAYER} currently being controlled by the user
+
 	update_everything(a_time_difference: REAL_64)
 			-- Updates every {ENTITY} in `entities'
-			-- Clears every {WAVE} that are no longer visible in the screen
-		local
-			l_to_remove: LINKED_LIST[ENTITY]
 		do
-			create l_to_remove.make
+			current_map.update (a_time_difference)
 			across entities as la_entities loop
 				la_entities.item.update(a_time_difference)
-				if attached {WAVE} la_entities.item as la_wave then
-					if la_wave.dead then
-						l_to_remove.extend(la_wave)
-					end
-				end
 			end
+			across ennemies as la_ennemies loop
+				la_ennemies.item.update_state(current_player)
+			end
+		end
+
+	clear_dead_entities
+			-- Deletes every dead {ENTITY}
+		do
 			from
-				l_to_remove.start
+				dead_entities.start
 				entities.start
 				drawables.start
 				physics.physic_objects.start
 			until
-				l_to_remove.exhausted
+				dead_entities.exhausted
 			loop
-				entities.prune(l_to_remove.item)
-				drawables.prune(l_to_remove.item)
-				physics.physic_objects.prune(l_to_remove.item)
-				if attached {WAVE} l_to_remove.item as la_wave then
-					la_wave.close
-				end
-				l_to_remove.forth
+				dead_entities.item.kill
+				entities.prune(dead_entities.item)
+				drawables.prune(dead_entities.item)
+				physics.physic_objects.prune(dead_entities.item)
+				dead_entities.forth
 			end
+			dead_entities.wipe_out
 		ensure
-			Entities_Out_Of_Bounds_Deleted: across entities as la_entities all
-												attached {WAVE} la_entities.item as la_wave implies not la_wave.dead
-											end
-			Drawables_Out_Of_Bounds_Deleted: across drawables as la_drawables all
-												attached {WAVE} la_drawables.item as la_wave implies not la_wave.dead
-											end
+			Dead_Entities_Deleted: across old dead_entities as la_dead all
+				not entities.has(la_dead.item) and
+				not drawables.has(la_dead.item) and
+				not physics.physic_objects.has(la_dead.item)
+			end
 		end
 
 	increment_ticks
@@ -109,5 +124,34 @@ feature -- Basic Operations
 			entities.extend(a_entity)
 			drawables.extend(a_entity)
 			physics.physic_objects.extend(a_entity)
+			a_entity.death_actions.extend(agent remove_entity_from_world)
+		end
+
+	add_ennemy_to_world(a_ennemy: ENNEMY)
+			-- Adds a `a_ennemy' to the `ennemies'
+		do
+			a_ennemy.launch_wave_event.extend(agent (a_wave:WAVE)
+				do
+					add_entity_to_world(a_wave)
+				end
+			   )
+			ennemies.extend (a_ennemy)
+			entities.extend(a_ennemy)
+			drawables.extend(a_ennemy)
+			physics.physic_objects.extend(a_ennemy)
+			a_ennemy.death_actions.extend(agent remove_ennemy_from_world)
+		end
+
+	remove_entity_from_world(a_entity: ENTITY)
+			-- Removed `a_entity' on the next update
+		do
+			dead_entities.extend(a_entity)
+		end
+
+	remove_ennemy_from_world(a_ennemy: ENNEMY)
+			-- Removes `a_ennemy' on the next update
+		do
+			dead_entities.extend(a_ennemy)
+			ennemies.prune(a_ennemy)
 		end
 end

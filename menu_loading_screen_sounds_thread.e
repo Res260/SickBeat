@@ -43,7 +43,7 @@ feature -- Implementation
 		do
 			io.put_string ("Thread son launché")
 			sound_factory.populate_sounds_list
-			io.put_string ("Sons faits")
+			io.put_string ("Sons faits%N")
 			stop_actions.call
 		end
 note

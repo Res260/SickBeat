@@ -12,7 +12,8 @@ inherit
 	ENTITY
 		redefine
 			update,
-			draw
+			draw,
+			kill
 		end
 	BOUNDING_ARC
 		rename
@@ -27,8 +28,9 @@ create
 
 feature {NONE} -- Initialization
 
-	make(a_x, a_y, a_direction, a_angle: REAL_64; a_center_speed: TUPLE[x, y: REAL_64]; a_color: GAME_COLOR; a_source: ENTITY; a_texture:GAME_TEXTURE; a_sound:SOUND)
-			-- Initialize `Current' with a direction, angle, maximum radius, and color
+	make(a_x, a_y, a_direction, a_angle: REAL_64; a_center_speed: TUPLE[x, y: REAL_64];
+			a_color: GAME_COLOR; a_source: ENTITY; a_texture:GAME_TEXTURE;)
+			-- Initialize `Current' with a direction, angle, maximum radius, color and a sound
 		do
 			make_entity(a_x, a_y)
 			direction := a_direction
@@ -44,11 +46,11 @@ feature {NONE} -- Initialization
 			center_speed := a_center_speed
 			source := a_source
 			make_bounding_arc(a_x, a_y, a_direction, a_angle, radius)
-			sound_manager.create_audio_source
-			audio_source := sound_manager.last_audio_source
-			sound := a_sound
-			audio_source.queue_sound (sound)
-			audio_source.play
+--			sound_manager.create_audio_source
+--			audio_source := sound_manager.last_audio_source
+--			sound := a_sound
+--			audio_source.queue_sound (sound)
+--			audio_source.play
 			collision_actions.extend(agent (a_physic_object: PHYSIC_OBJECT)
 										do
 											if not attached {WAVE} a_physic_object then
@@ -61,14 +63,14 @@ feature {NONE} -- Initialization
 
 feature -- Access
 
-	audio_source:AUDIO_SOURCE
-		-- Audio source to play the wave's sound.
+--	audio_source:AUDIO_SOURCE
+			-- Audio source to play the wave's sound.
 
-	sound:SOUND
-		-- The sound to be played when the wave is alive.
+--	sound:SOUND
+			-- The sound to be played when the wave is alive.
 
 	wave_texture:GAME_TEXTURE
-		-- The wave's game texture
+			-- The wave's game texture
 
 	source: ENTITY
 			-- {ENTITY} which created `Current'
@@ -106,9 +108,6 @@ feature -- Access
 
 	radius: REAL_64
 			-- Radius of `Current's arc
-
-	dead: BOOLEAN
-			-- Whether or not `Current's should be deleted
 
 	color: GAME_COLOR
 			-- Color of `Current'
@@ -153,14 +152,16 @@ feature -- Access
 			center.x := x_real
 			center.y := y_real
 			dead := energy <= 0
+			Precursor(a_timediff)
 		ensure then
 			No_Energy_Equals_Dead: energy <= 0 = dead
 			Energy_Loss_Over_Time: (energy = old energy + (energy_loss * a_timediff)) or (energy = 0)
 		end
 
-	close
+	kill
+			-- Remove `Current's audio_source to prevent overloading the sound_manager
 		do
-			sound_manager.remove_source(audio_source)
+--			sound_manager.remove_source(audio_source)
 		end
 note
 	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007 | Copyright (c) 2016 Émilio Gonzalez and Guillaume Jean"

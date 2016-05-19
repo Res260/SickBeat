@@ -35,7 +35,7 @@ feature {NONE} -- Initialization
 			make_core
 			create controller.make(mouse)
 			create background.make_movable(context.ressource_factory.game_background, [3840, 2160])
-			create current_map.make([3840.0, 2160.0])
+			create current_map.make([3840.0, 2160.0], a_context.image_factory.get_ennemy_texture_tuple)
 			current_map.start_spawning
 			create {ARRAYED_LIST[HUD_ITEM]}hud_items.make(2)
 			score := 0
@@ -52,6 +52,7 @@ feature {NONE} -- Initialization
 			time_since_last_frame := 0
 			last_frame := 0
 			create game_update_mutex.make
+			create {LINKED_LIST[ENNEMY]} ennemies.make
 			create game_update_thread.make(game_update_mutex, Current)
 			controller.mouse_button_update_actions.extend(agent current_player.on_click)
 			controller.mouse_wheel_actions.extend(agent current_player.on_mouse_wheel)
@@ -66,9 +67,9 @@ feature {NONE} -- Initialization
 															add_entity_to_world(a_wave)
 														end
 												   )
-			current_map.spawn_enemies_actions.extend(agent (a_enemy: ENEMY)
+			current_map.spawn_enemies_actions.extend(agent (a_ennemy: ENNEMY)
 														do
-															add_entity_to_world(a_enemy)
+															add_ennemy_to_world(a_ennemy)
 														end
 													)
 		end
@@ -269,9 +270,6 @@ feature -- Access
 
 	hud_items: LIST[HUD_ITEM]
 			-- List of hud items to draw.
-
-	current_player: PLAYER
-			-- {PLAYER} currently being controlled by the user
 
 invariant
 note

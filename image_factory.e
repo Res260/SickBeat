@@ -119,6 +119,12 @@ feature -- Access
 			Result := player_textures
 		end
 
+	get_ennemy_texture_tuple:TUPLE[black, red, green, blue, white: GAME_TEXTURE]
+			-- Returns a tuple containing the ennemies' textures
+		once("PROCESS")
+			Result := ennemy_textures
+		end
+
 	get_arcs_texture_tuple:TUPLE[black, red, green, blue, white: GAME_TEXTURE]
 			-- Returns a tuple containing the arcs' textures
 		once("PROCESS")
@@ -143,7 +149,7 @@ feature -- Access
 		local
 			l_pixels:GAME_PIXEL_READER_WRITER
 		do
-			l_pixels := make_transparent_texture(player_texture_dimension, player_texture_dimension)
+			l_pixels := make_transparent_texture(ennemy_texture_dimension, ennemy_texture_dimension)
 			image_generator.make_circle(l_pixels, a_texture_color_begin,
 				a_texture_color_end, a_texture_border_color, 2
 				)

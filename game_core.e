@@ -58,8 +58,14 @@ feature -- Access
 	entities: LIST[ENTITY]
 			-- List of all entities to update every tick
 
+	ennemies: LIST[ENNEMY]
+			-- List of ennemies
+
 	physics: PHYSICS_ENGINE
 			-- Physics handling object
+
+	current_player: PLAYER
+			-- {PLAYER} currently being controlled by the user
 
 	update_everything(a_time_difference: REAL_64)
 			-- Updates every {ENTITY} in `entities'
@@ -67,6 +73,9 @@ feature -- Access
 			current_map.update (a_time_difference)
 			across entities as la_entities loop
 				la_entities.item.update(a_time_difference)
+			end
+			across ennemies as la_ennemies loop
+				la_ennemies.item.update_state(current_player)
 			end
 		end
 
@@ -118,9 +127,26 @@ feature -- Basic Operations
 			a_entity.death_actions.extend(agent remove_entity_from_world)
 		end
 
+	add_ennemy_to_world(a_ennemy: ENNEMY)
+			-- Adds a `a_ennemy' to the `ennemies'
+		do
+			ennemies.extend (a_ennemy)
+			entities.extend(a_ennemy)
+			drawables.extend(a_ennemy)
+			physics.physic_objects.extend(a_ennemy)
+			a_ennemy.death_actions.extend(agent remove_ennemy_from_world)
+		end
+
 	remove_entity_from_world(a_entity: ENTITY)
 			-- Removed `a_entity' on the next update
 		do
 			dead_entities.extend(a_entity)
+		end
+
+	remove_ennemy_from_world(a_ennemy: ENNEMY)
+			-- Removes `a_ennemy' on the next update
+		do
+			dead_entities.extend(a_ennemy)
+			ennemies.prune(a_ennemy)
 		end
 end

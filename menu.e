@@ -31,8 +31,7 @@ feature {NONE} -- Initialization
 			create {LINKED_LIST[BUTTON]} buttons.make
 			create {LINKED_LIST[TEXTBOX]} textboxes.make
 			update_buttons_dimension
-			sound_manager.create_audio_source
-			menu_audio_source := sound_manager.last_audio_source
+			menu_audio_source := sound_manager.get_audio_source
 			menu_sound := sound_factory.create_sound_menu_click
 		ensure
 			context = a_context
@@ -51,7 +50,7 @@ feature {NONE} -- Implementation
 			-- Whether or not `Current' has started
 			-- Used for on_start
 
-	menu_audio_source: AUDIO_SOURCE
+	menu_audio_source: detachable AUDIO_SOURCE
 			-- Source for the audio sounds of the buttons in `Current'
 
 	menu_sound: SOUND
@@ -60,11 +59,13 @@ feature {NONE} -- Implementation
 	play_menu_sound_click
 			-- Plays the menu sound click
 		do
-			if(menu_audio_source.is_playing) then
-				menu_audio_source.stop
+			if attached menu_audio_source as la_menu_audio_source then
+				if(la_menu_audio_source.is_playing) then
+					la_menu_audio_source.stop
+				end
+				la_menu_audio_source.queue_sound(menu_sound)
+				la_menu_audio_source.play
 			end
-			menu_audio_source.queue_sound(menu_sound)
-			menu_audio_source.play
 		end
 
 	set_events

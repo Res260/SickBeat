@@ -39,7 +39,7 @@ feature --Access
 		local
 			l_wave : CHAIN[INTEGER_16]
 			l_initial_frequency: INTEGER_32
-		once
+		once("PROCESS")
 			l_initial_frequency := 200
 			l_wave:= sound_generator.create_sine_wave(70, l_initial_frequency)
 			sound_generator.repeat_wave_from_duration(l_wave, 0.4)

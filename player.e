@@ -132,8 +132,7 @@ feature -- Access
 					l_speed.x := speed.x
 					l_speed.y := speed.y
 					if attached {GAME_COLOR} colors.at(color_index + 1) as la_color then
---						create l_wave.make(x_real, y_real, l_direction, normal_angle, l_speed, la_color, Current, current_arc, create{SOUND}.make_from_other (sound_factory.sounds_list[1]))
-						create l_wave.make(x_real, y_real, l_direction, normal_angle, l_speed, la_color, Current, current_arc)
+						create l_wave.make(x_real, y_real, l_direction, normal_angle, l_speed, la_color, Current, current_arc, create{SOUND}.make_from_other (sound_factory.sounds_list[1]))
 						launch_wave_event.call(l_wave)
 					end
 				end

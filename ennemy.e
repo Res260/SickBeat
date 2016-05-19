@@ -97,8 +97,7 @@ feature -- Access
 				l_direction := atan2(l_x, l_y)
 				l_speed.x := speed.x
 				l_speed.y := speed.y
---				create l_wave.make(x_real, y_real, l_direction, Pi_2, l_speed, color, Current, arc, create{SOUND}.make_from_other (sound_factory.sounds_list[1]))
-				create l_wave.make(x_real, y_real, l_direction, Pi_2, l_speed, color, Current, arc)
+				create l_wave.make(x_real, y_real, l_direction, Pi_2, l_speed, color, Current, arc, create{SOUND}.make_from_other (sound_factory.sounds_list[1]))
 				launch_wave_event.call(l_wave)
 				shoot_wave_cooldown := shoot_wave_cooldown_interval
 			end

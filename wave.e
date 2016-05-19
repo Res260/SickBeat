@@ -29,7 +29,7 @@ create
 feature {NONE} -- Initialization
 
 	make(a_x, a_y, a_direction, a_angle: REAL_64; a_center_speed: TUPLE[x, y: REAL_64];
-			a_color: GAME_COLOR; a_source: ENTITY; a_texture:GAME_TEXTURE;)
+			a_color: GAME_COLOR; a_source: ENTITY; a_texture:GAME_TEXTURE; a_sound: SOUND)
 			-- Initialize `Current' with a direction, angle, maximum radius, color and a sound
 		do
 			make_entity(a_x, a_y)
@@ -46,11 +46,12 @@ feature {NONE} -- Initialization
 			center_speed := a_center_speed
 			source := a_source
 			make_bounding_arc(a_x, a_y, a_direction, a_angle, radius)
---			sound_manager.create_audio_source
---			audio_source := sound_manager.last_audio_source
---			sound := a_sound
---			audio_source.queue_sound (sound)
---			audio_source.play
+			audio_source := sound_manager.get_audio_source
+			sound := a_sound
+			if attached audio_source as la_audio_source then
+				la_audio_source.queue_sound (sound)
+				la_audio_source.play
+			end
 			collision_actions.extend(agent (a_physic_object: PHYSIC_OBJECT)
 										do
 											if not attached {WAVE} a_physic_object then
@@ -63,11 +64,11 @@ feature {NONE} -- Initialization
 
 feature -- Access
 
---	audio_source:AUDIO_SOURCE
-			-- Audio source to play the wave's sound.
+	audio_source:detachable AUDIO_SOURCE
+			 -- Audio source to play the wave's sound.
 
---	sound:SOUND
-			-- The sound to be played when the wave is alive.
+	sound: SOUND
+			 -- The sound to be played when the wave is alive.
 
 	wave_texture:GAME_TEXTURE
 			-- The wave's game texture
@@ -159,9 +160,11 @@ feature -- Access
 		end
 
 	kill
-			-- Remove `Current's audio_source to prevent overloading the sound_manager
+			-- Replaces `Current's audio_source to allow other waves to play a sound.
 		do
---			sound_manager.remove_source(audio_source)
+			if attached audio_source as la_audio_source then
+				sound_manager.replace_source(la_audio_source)
+			end
 		end
 note
 	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007 | Copyright (c) 2016 Émilio Gonzalez and Guillaume Jean"

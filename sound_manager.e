@@ -18,16 +18,42 @@ feature {NONE}
 
 	make
 		-- Initialization for `Current'. Enables the audio_library.
+		local
+			i: INTEGER
 		do
 			sound_on := True
 			audio_library.enable_sound
 			audio_library.launch_in_thread
 			audio_library.disable_print_on_error
+			create {LINKED_QUEUE[AUDIO_SOURCE]}sources_queue.make
 			create audio_sources_mutex.make
+			from
+				i := 1
+			until
+				i > max_audio_sources
+			loop
+				create_audio_source
+				i := i + 1
+			end
 			set_master_volume(1)
 		end
 
+	create_audio_source
+		--creates and adds an audio source in audio_library
+		do
+			audio_sources_mutex.lock
+				audio_library.sources_add
+				sources_queue.put (audio_library.last_source_added)
+			audio_sources_mutex.unlock
+		end
+
 feature -- Access
+
+	sources_queue: QUEUE[AUDIO_SOURCE]
+		-- Audio source pool.
+
+	max_audio_sources: NATURAL_16 = 16
+		-- Max number of allowed audio sources.
 
 	sound_on:BOOLEAN
 		--boolean (doesnt work for now) that is true when sound is on.
@@ -44,25 +70,33 @@ feature -- Access
 			sound_on := not sound_on
 		end
 
-	create_audio_source
-		--creates and adds an audio source in audio_library
+	can_get_audio_source: BOOLEAN
+		--returns true if you can retrieve an audio_source
+		do
+			Result := False
+			if not sources_queue.is_empty then
+				Result := True
+			end
+		end
+
+	get_audio_source:detachable AUDIO_SOURCE
+		--returns an audio source in sources_queue
 		do
 			audio_sources_mutex.lock
-				audio_library.sources_add
+				if can_get_audio_source then
+					Result := sources_queue.item
+					sources_queue.remove
+				else
+					Result := Void
+				end
 			audio_sources_mutex.unlock
 		end
 
-	last_audio_source:AUDIO_SOURCE
-		--returns the last audio source added by `Current'.create_audio_source
-		do
-			Result := audio_library.last_source_added
-		end
-
-	remove_source(a_source:AUDIO_SOURCE)
-			--Removes `a_source' from the audio_library sources
+	replace_source(a_source:AUDIO_SOURCE)
+			-- Places `a_source' in `sources_queue'
 		do
 			audio_sources_mutex.lock
-				audio_library.sources_prune (a_source)
+				sources_queue.put (a_source)
 			audio_sources_mutex.unlock
 		end
 

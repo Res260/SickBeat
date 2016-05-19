@@ -24,8 +24,7 @@ feature {NONE} -- Initialization
 			-- Initialization of `Current'
 		do
 			Precursor(a_context)
-			sound_manager.create_audio_source
-			menu_audio_source_music := sound_manager.last_audio_source
+			menu_audio_source_music := sound_manager.get_audio_source
 			menu_sound_music := sound_factory.create_menu_music
 			play_menu_music
 			set_title("SickBeat")
@@ -37,7 +36,7 @@ feature {NONE} -- Initialization
 
 feature {NONE} -- Implementation
 
-	menu_audio_source_music: AUDIO_SOURCE
+	menu_audio_source_music: detachable AUDIO_SOURCE
 			-- Source for the music in the background
 
 	menu_sound_music: SOUND
@@ -46,8 +45,10 @@ feature {NONE} -- Implementation
 	play_menu_music
 			-- Plays the menu music
 		do
-			menu_audio_source_music.queue_sound_infinite_loop(menu_sound_music)
-			menu_audio_source_music.play
+			if attached menu_audio_source_music as la_menu_audio_source_music then
+				la_menu_audio_source_music.queue_sound_infinite_loop(menu_sound_music)
+				la_menu_audio_source_music.play
+			end
 		end
 
 	play_action(a_string: READABLE_STRING_GENERAL)

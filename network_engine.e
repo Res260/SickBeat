@@ -151,6 +151,9 @@ feature -- Access
 				io.put_string ("Error: Address " + a_host + " invalid%N")
 			else
 				create l_socket.make_client_by_address_and_port (l_address, server_port)
+				if l_socket.is_valid_peer_address (l_address) then
+
+				end
 				if l_socket.invalid_address then
 					io.put_string ("Can't connect to " + a_host + ":" + server_port.to_hex_string +".%N")
 				else
@@ -167,6 +170,25 @@ feature -- Access
 					end
 				end
 			end
+		end
+
+	is_connected: BOOLEAN
+			-- Checks whether or not `client_socket' is connected
+		local
+			l_retry: BOOLEAN
+		do
+			if not l_retry then
+				if attached client_socket as la_client then
+					Result := attached la_client.receive(1, la_client.c_peekmsg) as la_packet and then la_packet.count > 0
+				else
+					Result := False
+				end
+			else
+				Result := False
+			end
+		rescue
+			l_retry := True
+			retry
 		end
 
 note

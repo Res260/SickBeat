@@ -57,7 +57,7 @@ feature {NONE} -- Implementation
 	last_tick: REAL_64
 			-- Time of last update in milliseconds
 
-	ticks_per_seconds: NATURAL_32 = 60
+	ticks_per_seconds: NATURAL_32 = 90
 			-- Ticks executed per second
 
 	milliseconds_per_tick: REAL_64

@@ -26,7 +26,7 @@ feature {NONE}
 	min_frequency:INTEGER_32 = 120
 		--Minimum frequency for sounds_list
 
-	max_frequency:INTEGER_32 = 11000
+	max_frequency:INTEGER_32 = 9000
 		--Maximum frequency for sounds_list
 
 feature --Access
@@ -83,21 +83,41 @@ feature --Access
 			--populates sounds_list by generating many sounds.
 			--side effect on sounds_list.
 		local
-			i:INTEGER_32
+			i, j:INTEGER_32
 			l_wave:CHAIN[INTEGER_16]
+			l_temp_wave: CHAIN[INTEGER_16]
+			l_amplitude, l_amplitude_decay: REAL_64
+			l_sound_duration, l_sound_duration_decay: REAL_64
 		do
+			l_amplitude := 55
+			l_amplitude_decay := 5
+			l_sound_duration := 3.5
+			l_sound_duration_decay := 0.3
 			from
 				i := min_frequency
 			until
 				i > max_frequency
 			loop
-				l_wave := sound_generator.create_sine_wave(75, i)
-				sound_generator.repeat_wave_from_duration (l_wave, 3.5)
+				l_wave := sound_generator.create_sine_wave(l_amplitude, i)
+				sound_generator.repeat_wave_from_duration (l_wave, l_sound_duration)
+				from
+					j := 1
+				until
+					j > 5
+				loop
+					l_temp_wave := sound_generator.create_sine_wave (l_amplitude - (l_amplitude_decay * j), (i - (i / 6) * j).rounded)
+					sound_generator.add_silence_from_samples (l_temp_wave, l_temp_wave.count)
+					sound_generator.repeat_wave_from_duration (l_temp_wave, l_sound_duration - (l_sound_duration_decay * j))
+					sound_generator.mix (l_wave, l_temp_wave, 0)
+					j := j + 1
+				end
 				sound_generator.fade (l_wave, 0, 0.01, 0, 1)
 				sound_generator.fade (l_wave, 0.01, 1, 1, 0)
 				sounds_list.extend(create{SOUND}.make (l_wave))
-				i := (i * 3)
+				i := (i * 2.5).rounded
 			end
+		ensure
+			Good_Number_Of_Sounds: sounds_list.count = 5
 		end
 
 note

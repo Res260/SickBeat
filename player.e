@@ -33,8 +33,6 @@ feature {NONE} -- Initialization
 			controller := a_controller
 			x_real := a_position.x
 			y_real := a_position.y
-			make_entity(x_real, y_real)
-			make_sphere(x_real, y_real, radius)
 			create max_speed
 			create acceleration
 			create speed
@@ -63,6 +61,8 @@ feature {NONE} -- Initialization
 			current_arc := arc_textures.white
 			current_sound := sounds.white
 			radius := current_texture.width / 2
+			make_entity(x_real, y_real)
+			make_sphere(x_real, y_real, radius)
 			bounding_radius := radius
 			normal_angle := a_context.image_factory.player_arc_angle
 		end

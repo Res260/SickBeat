@@ -52,7 +52,7 @@ feature -- Access
 	sources_queue: QUEUE[AUDIO_SOURCE]
 		-- Audio source pool.
 
-	max_audio_sources: NATURAL_16 = 16
+	max_audio_sources: NATURAL_16 = 32
 		-- Max number of allowed audio sources.
 
 	sound_on:BOOLEAN

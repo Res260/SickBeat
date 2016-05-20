@@ -23,10 +23,10 @@ feature {NONE} -- Initialization
 
 feature {NONE}
 
-	min_frequency:INTEGER_32 = 200
+	min_frequency:INTEGER_32 = 120
 		--Minimum frequency for sounds_list
 
-	max_frequency:INTEGER_32 = 300
+	max_frequency:INTEGER_32 = 11000
 		--Maximum frequency for sounds_list
 
 feature --Access
@@ -91,12 +91,12 @@ feature --Access
 			until
 				i > max_frequency
 			loop
-				l_wave := sound_generator.create_sine_wave(55, i)
-				sound_generator.repeat_wave_from_duration (l_wave, 4)
+				l_wave := sound_generator.create_sine_wave(75, i)
+				sound_generator.repeat_wave_from_duration (l_wave, 3.5)
 				sound_generator.fade (l_wave, 0, 0.01, 0, 1)
 				sound_generator.fade (l_wave, 0.01, 1, 1, 0)
 				sounds_list.extend(create{SOUND}.make (l_wave))
-				i := (i * 1.5).rounded
+				i := (i * 3)
 			end
 		end
 

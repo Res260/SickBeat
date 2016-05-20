@@ -142,26 +142,6 @@ feature {NONE} -- Implementation
 	on_tick(a_timestamp: NATURAL_32)
 			-- Method run on every iteration (should be 60 times per second)
 		do
---			if attached network_engine as la_network_engine then
---				la_network_engine.set_self_score(score.out)
---				if hud_items.count >= 2 then
---					if attached {HUD_SCORE} hud_items[2] as la_friend_score then
---						if attached {INTEGER} la_friend_score.value as la_value then
---							if la_value >= 0 then
---								la_friend_score.update_value(la_network_engine.friend_score.to_integer)
---							else
---								hud_items.prune(la_friend_score)
---							end
---						end
---					end
---				else
---					if attached la_network_engine.client_socket as la_client_socket then
---						if attached la_client_socket.peer_address as la_address then
---							hud_items.extend (create {HUD_SCORE}.make (-1, 20, 50, la_address.host_address.host_address, context))
---						end
---					end
---				end
---			end
 
 			if attached {HUD_SCORE} hud_items.at(2) as la_other_score then
 				if attached network_engine as la_network_engine then

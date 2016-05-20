@@ -42,7 +42,10 @@ feature {NONE} -- Initialization
 		do
 			l_window_builder.is_resizable := True
 			l_window_builder.is_fake_fullscreen := True
+
 			l_window_builder.is_fullscreen := False
+			l_window_builder.set_dimension (800, 600)
+
 			l_window_builder.must_renderer_be_hardware_accelerated := True
 			l_window_builder.must_renderer_be_software_rendering := False
 			l_window_builder.must_renderer_support_texture_target := True

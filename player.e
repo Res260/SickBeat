@@ -49,11 +49,19 @@ feature {NONE} -- Initialization
 						create {GAME_COLOR}.make(0, 0, 255, 255),	-- Blue
 						create {GAME_COLOR}.make(255, 255, 255, 255)-- White
 					  ]
+			sounds := [
+						sound_factory.sounds_list[1],
+						sound_factory.sounds_list[2],
+						sound_factory.sounds_list[3],
+						sound_factory.sounds_list[4],
+						sound_factory.sounds_list[5]
+					  ]
 			textures := a_context.image_factory.get_player_texture_tuple
 			arc_textures := a_context.image_factory.get_arcs_texture_tuple
-			current_texture := textures.red
+			current_texture := textures.white
 			current_color := colors.white
-			current_arc := arc_textures.red
+			current_arc := arc_textures.white
+			current_sound := sounds.white
 			radius := current_texture.width / 2
 			bounding_radius := radius
 			normal_angle := a_context.image_factory.player_arc_angle
@@ -70,19 +78,22 @@ feature {NONE} -- Implementation
 	acceleration: TUPLE[x, y: REAL_64]
 			-- Acceleration of `Current'
 
-	current_color: GAME_COLOR
-			-- Temporary color until it is changed from the `color_index'
-
 feature -- Access
 
 	controller: CONTROLLER
 			-- Controller controlling the player
 
+	current_color: GAME_COLOR
+			-- {GAME_COLOR} of `Current'
+
 	current_texture:GAME_TEXTURE
-			-- Active texture of `Current'
+			-- Active {GAME_TEXTURE} of `Current'
 
 	current_arc:GAME_TEXTURE
-			-- Active arc texture of `Current'
+			-- Active arc {GAME_TEXTURE} of `Current'
+
+	current_sound: SOUND
+			-- Active {SOUND} of `Current'
 
 	speed: TUPLE[x, y: REAL_64]
 			-- Speed of `Current'
@@ -104,6 +115,9 @@ feature -- Access
 
 	color_index: INTEGER assign set_color_index
 			-- Color index of `Current's color
+
+	sounds: TUPLE[black, red, green, blue, white: SOUND]
+			-- Possible sounds of the waves
 
 	launch_wave_event: ACTION_SEQUENCE[TUPLE[WAVE]]
 			-- Called when `Current' creates a new wave
@@ -132,7 +146,7 @@ feature -- Access
 					l_speed.x := speed.x
 					l_speed.y := speed.y
 					if attached {GAME_COLOR} colors.at(color_index + 1) as la_color then
-						create l_wave.make(x_real, y_real, l_direction, normal_angle, l_speed, la_color, Current, current_arc, create{SOUND}.make_from_other (sound_factory.sounds_list[1]))
+						create l_wave.make(x_real, y_real, l_direction, normal_angle, l_speed, la_color, Current, current_arc, create{SOUND}.make_from_other (current_sound))
 						launch_wave_event.call(l_wave)
 					end
 				end
@@ -201,6 +215,10 @@ feature -- Access
 
 			if attached {GAME_TEXTURE} arc_textures.at(color_index + 1) as la_arc_texture then
 				current_arc := la_arc_texture
+			end
+
+			if attached {SOUND} sounds.at(color_index + 1) as la_sound then
+				current_sound := la_sound
 			end
 		end
 

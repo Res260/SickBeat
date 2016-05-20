@@ -11,6 +11,7 @@ class
 inherit
 	MATH_UTILITY
 	GAME_LIBRARY_SHARED
+	SOUND_FACTORY_SHARED
 
 create
 	make
@@ -24,6 +25,7 @@ feature {NONE} -- Initialization
 			ennemy_textures := a_ennemy_textures
 			arc_textures := a_arc_textures
 			size := a_size
+			create sounds
 			side_boxes := [
 					create {BOUNDING_PLANE}.make_plane([1.0, 0.0], 0),
 					create {BOUNDING_PLANE}.make_plane([-1.0, 0.0], a_size.width),
@@ -36,6 +38,13 @@ feature {NONE} -- Initialization
 						create {GAME_COLOR}.make(0, 255, 0, 255),	-- Green
 						create {GAME_COLOR}.make(0, 0, 255, 255),	-- Blue
 						create {GAME_COLOR}.make(255, 255, 255, 255)-- White
+					  ]
+			sounds := [
+						sound_factory.sounds_list[1],
+						sound_factory.sounds_list[2],
+						sound_factory.sounds_list[3],
+						sound_factory.sounds_list[4],
+						sound_factory.sounds_list[5]
 					  ]
 			spawn_enemy_cooldown := 0
 			create spawn_enemies_actions
@@ -72,6 +81,9 @@ feature {NONE} -- Implementation
 
 	arc_textures: TUPLE[black, red, green, blue, white:GAME_TEXTURE]
 			-- Textures of the waves
+
+	sounds: TUPLE[black, red, green, blue, white: SOUND]
+			-- Possible sounds of the waves
 
 feature -- Access
 
@@ -125,14 +137,12 @@ feature -- Access
 				l_new_ennemy_texture_index := (random_generator.item \\ ennemy_textures.count) + 1
 				if attached {GAME_TEXTURE} ennemy_textures[l_new_ennemy_texture_index] as la_texture
 				and attached {GAME_COLOR} ennemy_colors[l_new_ennemy_texture_index] as la_color
-				and attached {GAME_TEXTURE} arc_textures[l_new_ennemy_texture_index] as la_arc then
-					print(la_texture.width)
+				and attached {GAME_TEXTURE} arc_textures[l_new_ennemy_texture_index] as la_arc
+				and attached {SOUND} sounds[l_new_ennemy_texture_index] as la_sound then
 					spawn_enemies_actions.call(
 							create {ENNEMY}.make(
-									[l_new_ennemy_x, l_new_ennemy_y],
-									la_texture,
-									la_color,
-									la_arc
+									[l_new_ennemy_x, l_new_ennemy_y], la_texture,
+									la_color, la_arc, la_sound
 									)
 							)
 					should_spawn_enemy := False

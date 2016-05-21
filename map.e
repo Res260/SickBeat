@@ -46,7 +46,7 @@ feature {NONE} -- Initialization
 						sound_factory.sounds_list[4],
 						sound_factory.sounds_list[5]
 					  ]
-			spawn_enemy_cooldown := 0
+			spawn_enemy_cooldown := 0.0
 			create spawn_enemies_actions
 			create random_generator.set_seed(game_library.time_since_create.as_integer_32)
 			spawn_enemies_actions.extend(agent (a_enemy: ENEMY)
@@ -61,7 +61,7 @@ feature {NONE} -- Implementation
 	side_boxes: TUPLE[left, right, top, down: BOUNDING_PLANE]
 			-- Bounding boxes preventing the entitites from moving outside of `Current'
 
-	spawn_enemy_cooldown_interval: REAL_64 = 4.5
+	spawn_enemy_cooldown_interval: REAL_64 = 500.5
 			-- Time between spawning an {ENEMY} in seconds
 
 	spawn_enemy_cooldown: REAL_64
@@ -123,7 +123,7 @@ feature -- Access
 		do
 			if spawn_enemy_cooldown > 0.0 then
 				spawn_enemy_cooldown := (0.0).max(spawn_enemy_cooldown - a_timediff)
-				if spawn_enemy_cooldown ~ 0.0 then
+				if spawn_enemy_cooldown <= 0.0 then
 					should_spawn_enemy := True
 					spawn_enemy_cooldown := spawn_enemy_cooldown_interval
 				end

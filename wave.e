@@ -28,7 +28,7 @@ create
 
 feature {NONE} -- Initialization
 
-	make(a_x, a_y, a_direction, a_angle: REAL_64; a_center_speed: TUPLE[x, y: REAL_64];
+	make(a_x, a_y, a_player_x, a_player_y, a_direction, a_angle: REAL_64; a_center_speed: TUPLE[x, y: REAL_64];
 			a_color: GAME_COLOR; a_source: ENTITY; a_texture:GAME_TEXTURE; a_sound: SOUND)
 			-- Initialize `Current' with a direction, angle, maximum radius, color and a sound
 		do
@@ -48,10 +48,6 @@ feature {NONE} -- Initialization
 			make_bounding_arc(a_x, a_y, a_direction, a_angle, radius)
 			audio_source := sound_manager.get_audio_source
 			sound := a_sound
-			if attached audio_source as la_audio_source then
-				la_audio_source.queue_sound (sound)
-				la_audio_source.play
-			end
 			collision_actions.extend(agent (a_physic_object: PHYSIC_OBJECT)
 										do
 											if not attached {WAVE} a_physic_object then
@@ -59,6 +55,16 @@ feature {NONE} -- Initialization
 											end
 										end
 								    )
+			if attached audio_source as la_audio_source then
+				la_audio_source.set_position (
+								(x_real - a_player_x).truncated_to_real,
+								(y_real - a_player_y).truncated_to_real, 0)
+				if la_audio_source.x = 0 then
+					la_audio_source.set_position (cosine(a_direction).truncated_to_real, sine(a_direction).truncated_to_real, 0)
+				end
+				la_audio_source.queue_sound (sound)
+				la_audio_source.play
+			end
 
 		end
 

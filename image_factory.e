@@ -41,6 +41,7 @@ feature{NONE}
 		-- The player's textures
 
 	enemy_texture_dimension: INTEGER_32 = 20
+		-- Dimension of the ennemies
 
 	enemy_textures:TUPLE[black, red, green, blue, white:GAME_TEXTURE]
 		-- The ennemies' textures

@@ -180,6 +180,21 @@ feature {NONE} -- Implementation
 
 			on_redraw(a_timestamp)
 
+			across drawables as la_drawables
+			loop
+				if attached {WAVE} la_drawables.item as la_wave then
+					if attached la_wave.audio_source as la_audio_source then
+						la_audio_source.set_position (
+								((la_wave.as_box.box_center.x - current_player.x_real) / 1500).truncated_to_real,
+								((la_wave.as_box.box_center.y - current_player.y_real) / 1500).truncated_to_real, 0)
+--						print("x: " + la_audio_source.position.x.out)
+--						io.put_new_line
+--						print("y: " + la_audio_source.position.y.out)
+--						io.put_new_line
+					end
+				end
+			end
+
 			game_update_mutex.unlock
 		end
 
@@ -203,6 +218,11 @@ feature {NONE} -- Implementation
 			if attached game_update_thread as la_game_update_thread then
 				if la_game_update_thread.is_launchable then
 					la_game_update_thread.launch
+				else
+					create game_update_thread.make(game_update_mutex, Current)
+					if attached game_update_thread as la_game_update_thread_new then
+						la_game_update_thread_new.launch
+					end
 				end
 			end
 		ensure then

@@ -142,7 +142,7 @@ feature -- Access
 			end
 			l_speed.x := speed.x
 			l_speed.y := speed.y
-			create l_wave.make(x_real, y_real, l_direction, Pi_2, l_speed, color, Current, arc, create{SOUND}.make_from_other (sound))
+			create l_wave.make(x_real, y_real, a_player.x_real, a_player.y_real, l_direction, Pi_2, l_speed, color, Current, arc, create{SOUND}.make_from_other (sound))
 			launch_wave_event.call(l_wave)
 			shoot_wave_cooldown := shoot_wave_cooldown_interval
 		end

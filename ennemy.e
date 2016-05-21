@@ -63,7 +63,7 @@ feature {NONE} -- Implementation
 	color: GAME_COLOR
 			-- Color of `Current'
 
-	shoot_wave_cooldown_interval: REAL_64 = 4.0
+	shoot_wave_cooldown_interval: REAL_64 = 5.5
 			-- Time between shooting a {WAVE} in seconds
 
 	shoot_wave_cooldown: REAL_64
@@ -124,7 +124,11 @@ feature -- Access
 			create l_speed
 			l_x := a_player.x - x
 			l_y := a_player.y - y
-			l_direction := atan2(l_x, l_y)
+			if l_x /= 0 and l_y /= 0 then
+				l_direction := atan2(l_x, l_y)
+			else
+				l_direction := 0
+			end
 			l_speed.x := speed.x
 			l_speed.y := speed.y
 			create l_wave.make(x_real, y_real, l_direction, Pi_2, l_speed, color, Current, arc, create{SOUND}.make_from_other (sound))

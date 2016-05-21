@@ -1,8 +1,8 @@
 note
 	description: "{MENU} implementing game specific mechanics and rendering. This needs to be a {MENU} so the menus can naviguate to it."
 	author: "Guillaume Jean and Émilio G!"
-	date: "2016-05-17"
-	revision: "16w15a"
+	date: "2016-05-20"
+	revision: "16w16a"
 	legal: "See notice at end of class."
 
 class

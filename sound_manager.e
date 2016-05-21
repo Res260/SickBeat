@@ -1,8 +1,8 @@
 note
 	description: "Class that manages sounds/musics for the game."
 	author: "Émilio G!"
-	date: "16-05-17"
-	revision: "16w15a"
+	date: "16-05-21"
+	revision: "16w16a"
 	legal: "See notice at end of class."
 
 class

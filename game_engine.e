@@ -185,12 +185,12 @@ feature {NONE} -- Implementation
 				if attached {WAVE} la_drawables.item as la_wave then
 					if attached la_wave.audio_source as la_audio_source then
 						la_audio_source.set_position (
-								((la_wave.as_box.box_center.x - current_player.x_real) / 1500).truncated_to_real,
-								((la_wave.as_box.box_center.y - current_player.y_real) / 1500).truncated_to_real, 0)
---						print("x: " + la_audio_source.position.x.out)
---						io.put_new_line
---						print("y: " + la_audio_source.position.y.out)
---						io.put_new_line
+								((la_wave.as_box.box_center.x - current_player.x_real) / 550000).truncated_to_real,
+								((la_wave.as_box.box_center.y - current_player.y_real) / 2500).truncated_to_real, 0)
+						print("x: " + la_audio_source.position.x.out)
+						io.put_new_line
+						print("y: " + la_audio_source.position.y.out)
+						io.put_new_line
 					end
 				end
 			end

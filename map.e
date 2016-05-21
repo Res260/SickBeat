@@ -18,11 +18,11 @@ create
 
 feature {NONE} -- Initialization
 
-	make(a_size: TUPLE[width, height: REAL_64]; a_ENEMY_textures, a_arc_textures: TUPLE[black, red, green, blue, white:GAME_TEXTURE])
+	make(a_size: TUPLE[width, height: REAL_64]; a_enemy_textures, a_arc_textures: TUPLE[black, red, green, blue, white:GAME_TEXTURE])
 			-- Initialize `Current' with `a_size' used to create the map boundaries
-			-- Also sets `ENEMY_textures' with `a_ENEMY_textures'
+			-- Also sets `enemy_textures' with `a_enemy_textures'
 		do
-			ENEMY_textures := a_ENEMY_textures
+			enemy_textures := a_enemy_textures
 			arc_textures := a_arc_textures
 			size := a_size
 			create sounds
@@ -32,7 +32,7 @@ feature {NONE} -- Initialization
 					create {BOUNDING_PLANE}.make_plane([0.0, 1.0], 0),
 					create {BOUNDING_PLANE}.make_plane([0.0, -1.0], a_size.height)
 				]
-			ENEMY_colors := [
+			enemy_colors := [
 						create {GAME_COLOR}.make(0, 0, 0, 255),		-- Black
 						create {GAME_COLOR}.make(255, 0, 0, 255),	-- Red
 						create {GAME_COLOR}.make(0, 255, 0, 255),	-- Green
@@ -61,7 +61,7 @@ feature {NONE} -- Implementation
 	side_boxes: TUPLE[left, right, top, down: BOUNDING_PLANE]
 			-- Bounding boxes preventing the entitites from moving outside of `Current'
 
-	spawn_enemy_cooldown_interval: REAL_64 = 500.5
+	spawn_enemy_cooldown_interval: REAL_64 = 4.5
 			-- Time between spawning an {ENEMY} in seconds
 
 	spawn_enemy_cooldown: REAL_64
@@ -73,11 +73,11 @@ feature {NONE} -- Implementation
 	random_generator: RANDOM
 			-- Random number generator to generate the positions of the enemies
 
-	ENEMY_textures: TUPLE[black, red, green, blue, white:GAME_TEXTURE]
-			-- Textures of the ennemies
+	enemy_textures: TUPLE[black, red, green, blue, white:GAME_TEXTURE]
+			-- Textures of the enemies
 
-	ENEMY_colors: TUPLE[black, red, green, blue, white:GAME_COLOR]
-			-- Possible  colors of the ennemies
+	enemy_colors: TUPLE[black, red, green, blue, white:GAME_COLOR]
+			-- Possible  colors of the enemies
 
 	arc_textures: TUPLE[black, red, green, blue, white:GAME_TEXTURE]
 			-- Textures of the waves
@@ -118,30 +118,30 @@ feature -- Access
 			-- Updates `Current's state
 			-- Spawns new {ENEMY}s every `spawn_enemy_cooldown_interval' seconds
 		local
-			l_new_ENEMY_x, l_new_ENEMY_y: REAL_64
-			l_new_ENEMY_texture_index: INTEGER
+			l_new_enemy_x, l_new_enemy_y: REAL_64
+			l_new_enemy_texture_index: INTEGER
 		do
 			if spawn_enemy_cooldown > 0.0 then
 				spawn_enemy_cooldown := (0.0).max(spawn_enemy_cooldown - a_timediff)
-				if spawn_enemy_cooldown <= 0.0 then
+				if spawn_enemy_cooldown ~ 0.0 then
 					should_spawn_enemy := True
 					spawn_enemy_cooldown := spawn_enemy_cooldown_interval
 				end
 			end
 			if should_spawn_enemy then
 				random_generator.forth
-				l_new_ENEMY_x := random_generator.double_item * size.width
+				l_new_enemy_x := random_generator.double_item * size.width
 				random_generator.forth
-				l_new_ENEMY_y := random_generator.double_item * size.height
+				l_new_enemy_y := random_generator.double_item * size.height
 				random_generator.forth
-				l_new_ENEMY_texture_index := (random_generator.item \\ ENEMY_textures.count) + 1
-				if attached {GAME_TEXTURE} ENEMY_textures[l_new_ENEMY_texture_index] as la_texture
-				and attached {GAME_COLOR} ENEMY_colors[l_new_ENEMY_texture_index] as la_color
-				and attached {GAME_TEXTURE} arc_textures[l_new_ENEMY_texture_index] as la_arc
-				and attached {SOUND} sounds[l_new_ENEMY_texture_index] as la_sound then
+				l_new_enemy_texture_index := (random_generator.item \\ enemy_textures.count) + 1
+				if attached {GAME_TEXTURE} enemy_textures[l_new_enemy_texture_index] as la_texture
+				and attached {GAME_COLOR} enemy_colors[l_new_enemy_texture_index] as la_color
+				and attached {GAME_TEXTURE} arc_textures[l_new_enemy_texture_index] as la_arc
+				and attached {SOUND} sounds[l_new_enemy_texture_index] as la_sound then
 					spawn_enemies_actions.call(
 							create {ENEMY}.make(
-									[l_new_ENEMY_x, l_new_ENEMY_y], la_texture,
+									[l_new_enemy_x, l_new_enemy_y], la_texture,
 									la_color, la_arc, la_sound
 									)
 							)

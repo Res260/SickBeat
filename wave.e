@@ -57,8 +57,8 @@ feature {NONE} -- Initialization
 								    )
 			if attached audio_source as la_audio_source then
 				la_audio_source.set_position (
-								(x_real - a_player_x).truncated_to_real,
-								(y_real - a_player_y).truncated_to_real, 0)
+								((x_real - a_player_x) / 550000).truncated_to_real,
+								((y_real - a_player_y) / 2500).truncated_to_real, 0)
 				if la_audio_source.x = 0 then
 					la_audio_source.set_position (cosine(a_direction).truncated_to_real, sine(a_direction).truncated_to_real, 0)
 				end

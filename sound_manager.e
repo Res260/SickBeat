@@ -25,6 +25,10 @@ feature {NONE}
 			audio_library.enable_sound
 			audio_library.launch_in_thread
 			audio_library.disable_print_on_error
+			audio_library.listener.initialize
+			audio_library.listener.set_position (0, 0, 0)
+			audio_library.listener.set_orientation (0, 1, 0, 0, 0, 1)
+			audio_library.listener.set_velocity (0, 0, 0)
 			create {LINKED_QUEUE[AUDIO_SOURCE]}sources_queue.make
 			create audio_sources_mutex.make
 			from

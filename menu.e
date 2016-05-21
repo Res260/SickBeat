@@ -31,8 +31,7 @@ feature {NONE} -- Initialization
 			create {LINKED_LIST[BUTTON]} buttons.make
 			create {LINKED_LIST[TEXTBOX]} textboxes.make
 			update_buttons_dimension
-			sound_manager.create_audio_source
-			menu_audio_source := sound_manager.last_audio_source
+			menu_audio_source := sound_manager.get_audio_source
 			menu_sound := sound_factory.create_sound_menu_click
 		ensure
 			context = a_context
@@ -51,7 +50,7 @@ feature {NONE} -- Implementation
 			-- Whether or not `Current' has started
 			-- Used for on_start
 
-	menu_audio_source: AUDIO_SOURCE
+	menu_audio_source: detachable AUDIO_SOURCE
 			-- Source for the audio sounds of the buttons in `Current'
 
 	menu_sound: SOUND
@@ -60,11 +59,13 @@ feature {NONE} -- Implementation
 	play_menu_sound_click
 			-- Plays the menu sound click
 		do
-			if(menu_audio_source.is_playing) then
-				menu_audio_source.stop
+			if attached menu_audio_source as la_menu_audio_source then
+				if(la_menu_audio_source.is_playing) then
+					la_menu_audio_source.stop
+				end
+				la_menu_audio_source.queue_sound(menu_sound)
+				la_menu_audio_source.play
 			end
-			menu_audio_source.queue_sound(menu_sound)
-			menu_audio_source.play
 		end
 
 	set_events
@@ -80,10 +81,19 @@ feature {NONE} -- Implementation
 			context.window.mouse_button_released_actions.extend(agent on_released)
 			context.window.mouse_motion_actions.extend(agent on_mouse_motion)
 			context.window.key_pressed_actions.extend(
-					agent (a_timestamp: NATURAL_32; a_game_key: GAME_KEY_STATE)
+					agent (a_timestamp: NATURAL_32; a_key_state: GAME_KEY_STATE)
 						do
 							across textboxes as la_textbox loop
-								la_textbox.item.on_key_pressed(a_game_key)
+								la_textbox.item.on_key_pressed(a_key_state)
+							end
+							on_redraw(a_timestamp)
+						end
+				)
+			context.window.text_input_actions.extend(
+					agent (a_timestamp: NATURAL_32; a_text: STRING_32)
+						do
+							across textboxes as la_textbox loop
+								la_textbox.item.on_text_input(a_text)
 							end
 							on_redraw(a_timestamp)
 						end
@@ -254,6 +264,12 @@ feature -- Access
 
 	next_menu: detachable MENU
 			-- Menu ran when `Current' stops
+
+	useless_action(a_string: READABLE_STRING_GENERAL)
+			-- Action played when the user clicks the useless button
+		do
+			play_menu_sound_click
+		end
 
 	start
 			-- Start the execution of `Current's loop

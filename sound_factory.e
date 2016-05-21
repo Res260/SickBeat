@@ -89,7 +89,7 @@ feature --Access
 			l_amplitude, l_amplitude_decay: REAL_64
 			l_sound_duration, l_sound_duration_decay: REAL_64
 		do
-			l_amplitude := 60
+			l_amplitude := 55
 			l_amplitude_decay := 5
 			l_sound_duration := 3.5
 			l_sound_duration_decay := 0.3
@@ -105,8 +105,8 @@ feature --Access
 				until
 					j > 5
 				loop
-					l_temp_wave := sound_generator.create_sine_wave (l_amplitude - (l_amplitude_decay * j), (i - (i / 10) * j).rounded)
-					sound_generator.add_silence_from_samples (l_temp_wave, l_temp_wave.count * 2)
+					l_temp_wave := sound_generator.create_sine_wave (l_amplitude - (l_amplitude_decay * j), (i - (i / 6) * j).rounded)
+					sound_generator.add_silence_from_samples (l_temp_wave, l_temp_wave.count)
 					sound_generator.repeat_wave_from_duration (l_temp_wave, l_sound_duration - (l_sound_duration_decay * j))
 					sound_generator.mix (l_wave, l_temp_wave, 0)
 					j := j + 1

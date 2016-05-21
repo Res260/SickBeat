@@ -35,7 +35,7 @@ feature {NONE} -- Initialization
 			make_core
 			create controller.make(mouse)
 			create background.make_movable(context.ressource_factory.game_background, [3840, 2160])
-			create current_map.make([3840.0, 2160.0], a_context.image_factory.get_ennemy_texture_tuple, a_context.image_factory.get_arcs_texture_tuple)
+			create current_map.make([3840.0, 2160.0], a_context.image_factory.get_enemy_texture_tuple, a_context.image_factory.get_arcs_texture_tuple)
 			current_map.start_spawning
 			create {ARRAYED_LIST[HUD_ITEM]}hud_items.make(2)
 			score := 0
@@ -52,7 +52,7 @@ feature {NONE} -- Initialization
 			time_since_last_frame := 0
 			last_frame := 0
 			create game_update_mutex.make
-			create {LINKED_LIST[ENNEMY]} ennemies.make
+			create {LINKED_LIST[ENEMY]} ennemies.make
 			create game_update_thread.make(game_update_mutex, Current)
 			controller.mouse_button_update_actions.extend(agent current_player.on_click)
 			controller.mouse_wheel_actions.extend(agent current_player.on_mouse_wheel)
@@ -67,9 +67,9 @@ feature {NONE} -- Initialization
 															add_entity_to_world(a_wave)
 														end
 												   )
-			current_map.spawn_enemies_actions.extend(agent (a_ennemy: ENNEMY)
+			current_map.spawn_enemies_actions.extend(agent (a_enemy: ENEMY)
 														do
-															add_ennemy_to_world(a_ennemy)
+															add_enemy_to_world(a_enemy)
 														end
 													)
 		end
@@ -180,6 +180,17 @@ feature {NONE} -- Implementation
 
 			on_redraw(a_timestamp)
 
+			across drawables as la_drawables
+			loop
+				if attached {WAVE} la_drawables.item as la_wave then
+					if attached la_wave.audio_source as la_audio_source then
+						la_audio_source.set_position (
+								((la_wave.as_box.box_center.x - current_player.x_real) / 550000).truncated_to_real,
+								((la_wave.as_box.box_center.y - current_player.y_real) / 2500).truncated_to_real, 0)
+					end
+				end
+			end
+
 			game_update_mutex.unlock
 		end
 
@@ -203,6 +214,11 @@ feature {NONE} -- Implementation
 			if attached game_update_thread as la_game_update_thread then
 				if la_game_update_thread.is_launchable then
 					la_game_update_thread.launch
+				else
+					create game_update_thread.make(game_update_mutex, Current)
+					if attached game_update_thread as la_game_update_thread_new then
+						la_game_update_thread_new.launch
+					end
 				end
 			end
 		ensure then

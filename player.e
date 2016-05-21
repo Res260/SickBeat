@@ -33,8 +33,6 @@ feature {NONE} -- Initialization
 			controller := a_controller
 			x_real := a_position.x
 			y_real := a_position.y
-			make_entity(x_real, y_real)
-			make_sphere(x_real, y_real, radius)
 			create max_speed
 			create acceleration
 			create speed
@@ -63,6 +61,8 @@ feature {NONE} -- Initialization
 			current_arc := arc_textures.white
 			current_sound := sounds.white
 			radius := current_texture.width / 2
+			make_entity(x_real, y_real)
+			make_sphere(x_real, y_real, radius)
 			bounding_radius := radius
 			normal_angle := a_context.image_factory.player_arc_angle
 		end
@@ -146,7 +146,7 @@ feature -- Access
 					l_speed.x := speed.x
 					l_speed.y := speed.y
 					if attached {GAME_COLOR} colors.at(color_index + 1) as la_color then
-						create l_wave.make(x_real, y_real, l_direction, normal_angle, l_speed, la_color, Current, current_arc, create{SOUND}.make_from_other (current_sound))
+						create l_wave.make(x_real, y_real, x_real, y_real, l_direction, normal_angle, l_speed, la_color, Current, current_arc, create{SOUND}.make_from_other (current_sound))
 						launch_wave_event.call(l_wave)
 					end
 				end
@@ -156,7 +156,6 @@ feature -- Access
 	draw(a_context: CONTEXT)
 			-- Draw `Current' using `a_context's renderer and offsetting by `a_context.camera's position
 		do
-			a_context.renderer.set_drawing_color(current_color)
 			a_context.renderer.draw_texture(current_texture, x - (current_texture.width // 2) - a_context.camera.position.x, y - (current_texture.height // 2) - a_context.camera.position.y)
 			draw_collision(a_context)
 		end

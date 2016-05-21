@@ -1,12 +1,12 @@
 note
-	description: "Summary description for {ENNEMY}."
-	author: ""
-	date: "$Date$"
-	revision: "$Revision$"
+	description: "Class representing an enemy in the game. It shoots wave and dies."
+	author: "Émilio G!"
+	date: "2016-05-20"
+	revision: "16w16a"
 	legal: "See notice at end of class."
 
 class
-	ENNEMY
+	ENEMY
 
 inherit
 	ENTITY
@@ -17,7 +17,10 @@ inherit
 			draw,
 			update
 		end
-	BOUNDING_BOX
+	BOUNDING_SPHERE
+		rename
+			radius as bounding_radius
+		end
 	MATH_UTILITY
 	SOUND_FACTORY_SHARED
 
@@ -29,6 +32,10 @@ feature {NONE} -- Initialization
 	make(a_position: TUPLE[x, y: REAL_64]; a_texture: GAME_TEXTURE; a_color: GAME_COLOR; a_arc: GAME_TEXTURE; a_sound: SOUND)
 			-- Initializes `Current' at `a_position', with `a_texture', with `a_arc', with `a_color' and with `a_sound'
 		do
+			make_entity(a_position.x, a_position.y)
+			radius := a_texture.width / 2
+			make_sphere(x_real, y_real, radius)
+			bounding_radius := radius
 			sound := a_sound
 			create speed
 			create max_speed
@@ -39,10 +46,8 @@ feature {NONE} -- Initialization
 			max_speed.y := max_speed.x
 			create launch_wave_event
 			color := a_color
-			make_box(a_position.x - width / 2, a_position.y - height / 2, a_position.x + width / 2, a_position.y + height / 2)
 			x := a_position.x.rounded
 			y := a_position.y.rounded
-			make_entity(a_position.x, a_position.y)
 			texture := a_texture
 		end
 
@@ -59,6 +64,9 @@ feature {NONE} -- Implementation
 
 	max_speed: TUPLE[x, y: REAL_64]
 			-- Max speed of `Current'
+
+	radius: REAL_64
+			-- `Current's radius
 
 	color: GAME_COLOR
 			-- Color of `Current'
@@ -86,6 +94,7 @@ feature -- Access
 			if attached texture as la_texture then
 				a_context.renderer.draw_texture(la_texture, x - (la_texture.width // 2) - a_context.camera.position.x, y - (la_texture.height // 2) - a_context.camera.position.y)
 			end
+			draw_collision(a_context)
 		end
 
 	update(a_timediff: REAL_64)
@@ -96,6 +105,8 @@ feature -- Access
 			y_real := y_real + a_timediff * speed.y
 			x := x_real.floor
 			y := y_real.floor
+			center.x := x_real
+			center.y := y_real
 		end
 
 	update_state(a_player: PLAYER)
@@ -131,7 +142,7 @@ feature -- Access
 			end
 			l_speed.x := speed.x
 			l_speed.y := speed.y
-			create l_wave.make(x_real, y_real, l_direction, Pi_2, l_speed, color, Current, arc, create{SOUND}.make_from_other (sound))
+			create l_wave.make(x_real, y_real, a_player.x_real, a_player.y_real, l_direction, Pi_2, l_speed, color, Current, arc, create{SOUND}.make_from_other (sound))
 			launch_wave_event.call(l_wave)
 			shoot_wave_cooldown := shoot_wave_cooldown_interval
 		end

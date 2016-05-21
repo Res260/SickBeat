@@ -58,7 +58,7 @@ feature -- Access
 	entities: LIST[ENTITY]
 			-- List of all entities to update every tick
 
-	ennemies: LIST[ENNEMY]
+	ennemies: LIST[ENEMY]
 			-- List of ennemies
 
 	physics: PHYSICS_ENGINE
@@ -127,19 +127,19 @@ feature -- Basic Operations
 			a_entity.death_actions.extend(agent remove_entity_from_world)
 		end
 
-	add_ennemy_to_world(a_ennemy: ENNEMY)
-			-- Adds a `a_ennemy' to the `ennemies'
+	add_enemy_to_world(a_enemy: ENEMY)
+			-- Adds a `a_enemy' to the `ennemies'
 		do
-			a_ennemy.launch_wave_event.extend(agent (a_wave:WAVE)
+			a_enemy.launch_wave_event.extend(agent (a_wave:WAVE)
 				do
 					add_entity_to_world(a_wave)
 				end
 			   )
-			ennemies.extend (a_ennemy)
-			entities.extend(a_ennemy)
-			drawables.extend(a_ennemy)
-			physics.physic_objects.extend(a_ennemy)
-			a_ennemy.death_actions.extend(agent remove_ennemy_from_world)
+			ennemies.extend (a_enemy)
+			entities.extend(a_enemy)
+			drawables.extend(a_enemy)
+			physics.physic_objects.extend(a_enemy)
+			a_enemy.death_actions.extend(agent remove_enemy_from_world)
 		end
 
 	remove_entity_from_world(a_entity: ENTITY)
@@ -148,10 +148,10 @@ feature -- Basic Operations
 			dead_entities.extend(a_entity)
 		end
 
-	remove_ennemy_from_world(a_ennemy: ENNEMY)
-			-- Removes `a_ennemy' on the next update
+	remove_enemy_from_world(a_enemy: ENEMY)
+			-- Removes `a_enemy' on the next update
 		do
-			dead_entities.extend(a_ennemy)
-			ennemies.prune(a_ennemy)
+			dead_entities.extend(a_enemy)
+			ennemies.prune(a_enemy)
 		end
 end

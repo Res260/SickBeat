@@ -13,7 +13,8 @@ inherit
 		redefine
 			update,
 			draw,
-			kill
+			kill,
+			deal_damage
 		end
 	BOUNDING_ARC
 		rename
@@ -169,6 +170,8 @@ feature -- Access
 			-- Reduces `Current's energy based off the damage it dealt to something
 		do
 			energy := (0.0).max(energy - a_damage)
+		ensure then
+			Damage_Dealt: energy = old energy - a_damage or energy = 0.0
 		end
 
 	kill

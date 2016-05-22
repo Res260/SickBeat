@@ -88,7 +88,7 @@ feature --Access
 			l_temp_wave: CHAIN[INTEGER_16]
 			l_amplitude, l_amplitude_decay: REAL_64
 			l_sound_duration, l_sound_duration_decay: REAL_64
-		do
+		once("PROCESS")
 			l_amplitude := 55
 			l_amplitude_decay := 5
 			l_sound_duration := 3.5

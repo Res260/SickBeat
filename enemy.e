@@ -15,7 +15,8 @@ inherit
 			height as drawable_height
 		redefine
 			draw,
-			update
+			update,
+			deal_damage
 		end
 	BOUNDING_SPHERE
 		rename
@@ -49,6 +50,7 @@ feature {NONE} -- Initialization
 			x := a_position.x.rounded
 			y := a_position.y.rounded
 			texture := a_texture
+			health := health_max
 		end
 
 feature {NONE} -- Implementation
@@ -68,9 +70,6 @@ feature {NONE} -- Implementation
 	radius: REAL_64
 			-- `Current's radius
 
-	color: GAME_COLOR
-			-- Color of `Current'
-
 	shoot_wave_cooldown_interval: REAL_64 = 5.5
 			-- Time between shooting a {WAVE} in seconds
 
@@ -85,6 +84,15 @@ feature {NONE} -- Implementation
 
 feature -- Access
 
+	health: REAL_64
+			-- `Current's health
+
+	health_max: REAL_64 = 100.0
+			-- `Current's maximum amount of `health'
+
+	color: GAME_COLOR
+			-- Color of `Current'
+
 	launch_wave_event: ACTION_SEQUENCE[TUPLE[WAVE]]
 			-- Called when `Current' creates a new wave
 
@@ -92,6 +100,7 @@ feature -- Access
 			-- Draws `Current' on the screen
 		do
 			if attached texture as la_texture then
+				la_texture.set_additionnal_alpha(((128 * health / health_max) + 127).rounded.as_natural_8)
 				a_context.renderer.draw_texture(la_texture, x - (la_texture.width // 2) - a_context.camera.position.x, y - (la_texture.height // 2) - a_context.camera.position.y)
 			end
 			draw_collision(a_context)
@@ -107,6 +116,11 @@ feature -- Access
 			y := y_real.floor
 			center.x := x_real
 			center.y := y_real
+			update_minimal_bounding_box
+			if not dead and health <= 0.0 then
+				dead := True
+				death_actions.call(Current)
+			end
 		end
 
 	update_state(a_player: PLAYER)
@@ -145,6 +159,34 @@ feature -- Access
 			create l_wave.make(x_real, y_real, a_player.x_real, a_player.y_real, l_direction, Pi_2, l_speed, color, Current, arc, create{SOUND}.make_from_other (sound))
 			launch_wave_event.call(l_wave)
 			shoot_wave_cooldown := shoot_wave_cooldown_interval
+		end
+
+	deal_damage(a_damage: REAL_64)
+			-- Deals `a_damage' damage to `Current'
+		do
+			health := (0.0).max(health - a_damage)
+		ensure then
+			Damage_Dealt: health = old health - a_damage or health ~ 0.0
+		end
+
+	do_collision(a_physic_object: PHYSIC_OBJECT)
+			-- Determines what to do with `Current's collision with `a_physic_object'
+		local
+			l_damage: REAL_64
+		do
+			if attached {WAVE} a_physic_object as la_wave then
+				if attached {PLAYER} la_wave.source then
+					l_damage := la_wave.energy / 1000
+					if la_wave.color.to_rgb_hex_string ~ color.to_rgb_hex_string then
+						l_damage := l_damage * 0.0
+					end
+					deal_damage(l_damage)
+					la_wave.deal_damage(l_damage * 200)
+				end
+			elseif attached {PLAYER} a_physic_object as la_player then
+				deal_damage(health_max)
+				la_player.deal_damage(la_player.health_max * 0.25)
+			end
 		end
 
 note

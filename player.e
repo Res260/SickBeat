@@ -12,7 +12,8 @@ inherit
 	ENTITY
 		redefine
 			draw,
-			update
+			update,
+			deal_damage
 		end
 	BOUNDING_SPHERE
 		rename
@@ -203,7 +204,8 @@ feature -- Access
 			y := y_real.floor
 			center.x := x_real
 			center.y := y_real
-			if not dead and health ~ 0.0 then
+			update_minimal_bounding_box
+			if not dead and health <= 0.0 then
 				dead := True
 				death_actions.call(Current)
 			end
@@ -236,6 +238,8 @@ feature -- Access
 			-- Deals `a_damage' damage to `Current'
 		do
 			health := (0.0).max(health - a_damage)
+		ensure then
+			Damage_Dealt: health = old health - a_damage or health ~ 0.0
 		end
 
 	set_acceleration(a_x_accel, a_y_accel: REAL_64)

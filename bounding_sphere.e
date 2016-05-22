@@ -71,19 +71,16 @@ feature -- Implementation
 	collides_with_arc(a_arc: BOUNDING_ARC): BOOLEAN
 			-- Check if `Current' collides with `a_arc'
 		local
-			l_min_radius_distance, l_max_radius_distance: REAL_64
 			l_center_distance: REAL_64
 			l_difference_x, l_difference_y: REAL_64
 			l_collision_angle: REAL_64
 			l_do_borders_touch: BOOLEAN
 			l_is_angle_in_range: BOOLEAN
 		do
-			l_min_radius_distance := radius + a_arc.radius - a_arc.thickness
-			l_max_radius_distance := radius + a_arc.radius
-			l_difference_x := a_arc.center.x - center.x
-			l_difference_y := a_arc.center.y - center.y
-			l_center_distance := l_difference_x ^ 2 + l_difference_y ^ 2
-			l_do_borders_touch := l_min_radius_distance ^ 2 <= l_center_distance and l_center_distance <= l_max_radius_distance ^ 2
+			l_difference_x := center.x - a_arc.center.x
+			l_difference_y := center.y - a_arc.center.y
+			l_center_distance := sqrt((l_difference_x ^ 2) + (l_difference_y ^ 2))
+			l_do_borders_touch := l_center_distance - radius <= a_arc.radius + a_arc.thickness and a_arc.radius - a_arc.thickness <= l_center_distance + radius
 			if l_difference_x ~ 0 and l_difference_y ~ 0 then
 				Result := l_do_borders_touch
 			else
@@ -122,7 +119,6 @@ feature -- Access
 			-- Draws `Current's minimal bounding box and a sphere
 		do
 			if a_context.debugging then
-				update_minimal_bounding_box
 				minimal_bounding_box.draw_box(a_context)
 				a_context.renderer.draw_line(center.x.rounded - a_context.camera.position.x, center.y.rounded - a_context.camera.position.y, (center.x + radius).rounded - a_context.camera.position.x, center.y.rounded - a_context.camera.position.y)
 				draw_circle(a_context, center.x - a_context.camera.position.x, center.y - a_context.camera.position.y)

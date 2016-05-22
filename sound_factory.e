@@ -1,8 +1,8 @@
 note
 	description: "Class that creates sounds for the game."
 	author: "Émilio G!"
-	date: "16-4-25"
-	revision: "16w12a"
+	date: "16-5-20"
+	revision: "16w16a"
 	legal: "See notice at end of class."
 
 class
@@ -88,7 +88,7 @@ feature --Access
 			l_temp_wave: CHAIN[INTEGER_16]
 			l_amplitude, l_amplitude_decay: REAL_64
 			l_sound_duration, l_sound_duration_decay: REAL_64
-		do
+		ONCE("PROCESS")
 			l_amplitude := 55
 			l_amplitude_decay := 5
 			l_sound_duration := 3.5

@@ -11,6 +11,7 @@ class
 inherit
 	GAME_LIBRARY_SHARED
 	TEXT_LIBRARY_SHARED
+	SOUND_MANAGER_SHARED
 
 create
 	make
@@ -24,6 +25,7 @@ feature {NONE} -- Initialization
 			text_library.enable_text
 			start_game
 			game_library.clear_all_events
+			sound_manager.clear_ressources
 			text_library.quit_library
 			game_library.quit_library
 		end

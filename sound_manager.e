@@ -1,8 +1,8 @@
 note
 	description: "Class that manages sounds/musics for the game."
 	author: "Émilio G!"
-	date: "16-05-17"
-	revision: "16w15a"
+	date: "16-05-21"
+	revision: "16w16a"
 	legal: "See notice at end of class."
 
 class
@@ -123,6 +123,7 @@ feature -- Access
 			audio_library.stop_thread
 			audio_library.quit_library
 		end
+		
 note
 	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007 | Copyright (c) 2016 Émilio Gonzalez and Guillaume Jean"
 	source: "[file: LICENSE]"

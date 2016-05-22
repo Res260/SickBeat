@@ -1,8 +1,8 @@
 note
 	description: "Defines and generates the environment of the player ingame."
-	author: "Guillaume Jean"
-	date: "29 March 2016"
-	revision: "16w08a"
+	author: "Guillaume Jean and Émilio G!"
+	date: "2016-05-21"
+	revision: "16w16a"
 	legal: "See notice at end of class."
 
 class

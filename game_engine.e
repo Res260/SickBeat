@@ -1,8 +1,8 @@
 note
 	description: "{MENU} implementing game specific mechanics and rendering. This needs to be a {MENU} so the menus can naviguate to it."
 	author: "Guillaume Jean and Émilio G!"
-	date: "2016-05-17"
-	revision: "16w15a"
+	date: "2016-05-20"
+	revision: "16w16a"
 	legal: "See notice at end of class."
 
 class
@@ -187,10 +187,6 @@ feature {NONE} -- Implementation
 						la_audio_source.set_position (
 								((la_wave.as_box.box_center.x - current_player.x_real) / 550000).truncated_to_real,
 								((la_wave.as_box.box_center.y - current_player.y_real) / 2500).truncated_to_real, 0)
-						print("x: " + la_audio_source.position.x.out)
-						io.put_new_line
-						print("y: " + la_audio_source.position.y.out)
-						io.put_new_line
 					end
 				end
 			end

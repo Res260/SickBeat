@@ -1,8 +1,8 @@
 note
 	description: "{ENTITY} that damages other entities and augments in size."
 	author: "Guillaume Jean and Émilio G!"
-	date: "2016-04-26"
-	revision: "16w12a"
+	date: "2016-05-20"
+	revision: "16w16a"
 	legal: "See notice at end of class."
 
 class

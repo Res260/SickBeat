@@ -59,9 +59,17 @@ feature {NONE} -- Initialization
 
 	make(a_renderer: GAME_RENDERER; a_format: GAME_PIXEL_FORMAT_READABLE)
 			-- Initialization of `Current' using `a_renderer' and `a_format' to initialize images and sounds.
+		local
+			l_rescue: BOOLEAN
 		do
-			menu_background := load_image(a_renderer, "main_menu", "background")
-			game_background := load_image(a_renderer, "game", "background")
+			if not l_rescue then
+				menu_background := load_image(a_renderer, "main_menu", "background")
+				game_background := load_image(a_renderer, "game", "background")
+			end
+		rescue
+			print("Cannot load ressources.")
+			io.read_integer
+			retry
 		end
 
 feature -- Access

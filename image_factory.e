@@ -1,5 +1,5 @@
 note
-	description: "Class to make images. In progress."
+	description: "Class to make images."
 	author: "Émilio G!"
 	date: "2016-05-17"
 	revision: "16w15b"

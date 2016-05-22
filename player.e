@@ -65,6 +65,7 @@ feature {NONE} -- Initialization
 			make_sphere(x_real, y_real, radius)
 			bounding_radius := radius
 			normal_angle := a_context.image_factory.player_arc_angle
+			health := health_max
 		end
 
 feature {NONE} -- Implementation
@@ -79,6 +80,12 @@ feature {NONE} -- Implementation
 			-- Acceleration of `Current'
 
 feature -- Access
+
+	health: REAL_64
+			-- Remaining health of `Current'
+
+	health_max: REAL_64 = 100.0
+			-- Maximum amount of `health' `Current' can have
 
 	controller: CONTROLLER
 			-- Controller controlling the player
@@ -196,6 +203,10 @@ feature -- Access
 			y := y_real.floor
 			center.x := x_real
 			center.y := y_real
+			if not dead and health ~ 0.0 then
+				dead := True
+				death_actions.call(Current)
+			end
 		ensure then
 			X_Speed_Is_Bounded: max_speed.x.opposite <= speed.x and speed.x <= max_speed.x
 			Y_Speed_Is_Bounded: max_speed.y.opposite <= speed.y and speed.y <= max_speed.y
@@ -219,6 +230,12 @@ feature -- Access
 			if attached {SOUND} sounds.at(color_index + 1) as la_sound then
 				current_sound := la_sound
 			end
+		end
+
+	deal_damage(a_damage: REAL_64)
+			-- Deals `a_damage' damage to `Current'
+		do
+			health := (0.0).max(health - a_damage)
 		end
 
 	set_acceleration(a_x_accel, a_y_accel: REAL_64)

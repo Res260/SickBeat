@@ -57,19 +57,21 @@ feature {NONE} -- Initialization
 			controller.mouse_button_update_actions.extend(agent current_player.on_click)
 			controller.mouse_wheel_actions.extend(agent current_player.on_mouse_wheel)
 			controller.number_actions.extend(agent current_player.set_color_index)
-			current_player.collision_actions.extend(agent (a_physic_object: PHYSIC_OBJECT)
-														do
-															--io.put_string("BOOM!")
-														end
-												   )
+			current_player.collision_actions.extend(agent do_player_collision)
 			current_player.launch_wave_event.extend(agent (a_wave:WAVE)
 														do
 															add_entity_to_world(a_wave)
 														end
-												   )
+													)
+			current_player.death_actions.extend(agent (a_entity: ENTITY)
+														do
+															return_to_main
+														end
+													)
 			current_map.spawn_enemies_actions.extend(agent (a_enemy: ENEMY)
 														do
 															add_enemy_to_world(a_enemy)
+															a_enemy.death_actions.extend(agent (a_entity: ENTITY) do add_score(10) end)
 														end
 													)
 		end
@@ -173,24 +175,23 @@ feature {NONE} -- Implementation
 				tick_display := tick_counter
 				frame_counter := 0
 				tick_counter := 0
-				io.put_string("Frames: " + frame_display.out + " Ticks: " + tick_display.out + " Entities: " + entities.count.out + "     %R")
+				io.put_string("Frames: " + frame_display.out + " Ticks: " + tick_display.out + " Entities: " + entities.count.out + " HP: " + current_player.health.rounded.out + "     %R")
 			end
 
 			update_camera
 
 			on_redraw(a_timestamp)
 
-			across drawables as la_drawables
-			loop
+			across drawables as la_drawables loop
 				if attached {WAVE} la_drawables.item as la_wave then
 					if attached la_wave.audio_source as la_audio_source then
 						la_audio_source.set_position (
 								((la_wave.as_box.box_center.x - current_player.x_real) / 550000).truncated_to_real,
 								((la_wave.as_box.box_center.y - current_player.y_real) / 2500).truncated_to_real, 0)
-						print("x: " + la_audio_source.position.x.out)
-						io.put_new_line
-						print("y: " + la_audio_source.position.y.out)
-						io.put_new_line
+						--print("x: " + la_audio_source.position.x.out)
+						--io.put_new_line
+						--print("y: " + la_audio_source.position.y.out)
+						--io.put_new_line
 					end
 				end
 			end
@@ -258,6 +259,23 @@ feature {NONE} -- Implementation
 			-- Update `context.camera's position
 		do
 			context.camera.move_at_entity(current_player, context.window)
+		end
+
+	do_player_collision(a_physic_object: PHYSIC_OBJECT)
+			-- Determines what to do with `current_player's collision with `a_physic_object'
+		local
+			l_damage: REAL_64
+		do
+			if attached {WAVE} a_physic_object as la_wave then
+				if la_wave.source /= current_player then
+					l_damage := la_wave.energy / 1000
+					if la_wave.color ~ current_player.current_color then
+						l_damage := l_damage * 0.5
+					end
+					current_player.deal_damage(l_damage)
+					la_wave.deal_damage(l_damage)
+				end
+			end
 		end
 
 feature -- Access

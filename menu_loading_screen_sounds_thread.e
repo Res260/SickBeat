@@ -26,6 +26,7 @@ feature {NONE} -- Initialization
 			-- Initializes `Current'
 		do
 			create stop_actions
+			completed := False
 			make_thread
 		end
 
@@ -33,17 +34,17 @@ feature {NONE} -- Implementation
 
 feature -- Implementation
 
+	completed: BOOLEAN
+			-- Whether or not `Current' has completed it's task
+
 	stop_actions: ACTION_SEQUENCE[TUPLE]
-		--procedure to call to start the game.
+			-- Called when `Current' has completed it's task
 
 	execute
 			-- Executed when the thread is launched
-		local
-
 		do
-			io.put_string ("Thread son launché")
 			sound_factory.populate_sounds_list
-			io.put_string ("Sons faits%N")
+			completed := True
 			stop_actions.call
 		end
 note

@@ -113,6 +113,14 @@ feature -- Access
 			Tick_Counter_Incremented: tick_counter = old tick_counter + 1
 		end
 
+	add_score(a_score: INTEGER)
+			-- Augments `score' by `a_score'
+		do
+			score := score + a_score
+		ensure
+			Score_Added: score = old score + a_score
+		end
+
 feature -- Basic Operations
 
 	add_entity_to_world(a_entity: ENTITY)

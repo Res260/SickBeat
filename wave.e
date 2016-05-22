@@ -165,8 +165,14 @@ feature -- Access
 			Energy_Loss_Over_Time: (energy = old energy + (energy_loss * a_timediff)) or (energy = 0)
 		end
 
+	deal_damage(a_damage: REAL_64)
+			-- Reduces `Current's energy based off the damage it dealt to something
+		do
+			energy := (0.0).max(energy - a_damage)
+		end
+
 	kill
-			-- Replaces `Current's audio_source to allow other waves to play a sound.
+			-- Replaces `Current's audio_source to allow other waves to play a sound
 		do
 			if attached audio_source as la_audio_source then
 				sound_manager.replace_source(la_audio_source)

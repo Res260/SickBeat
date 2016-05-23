@@ -114,7 +114,6 @@ feature -- Access
 			across audio_library.sources as la_source loop
 				la_source.item.set_gain (a_new_volume.truncated_to_real)
 			end
-			print("%NNEW MASTER VOLUME: " + master_volume.out + "%N")
 		end
 
 	clear_ressources
@@ -123,7 +122,7 @@ feature -- Access
 			audio_library.stop_thread
 			audio_library.quit_library
 		end
-		
+
 note
 	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007 | Copyright (c) 2016 Émilio Gonzalez and Guillaume Jean"
 	source: "[file: LICENSE]"

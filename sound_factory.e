@@ -34,6 +34,26 @@ feature --Access
 	sounds_list:CHAIN[SOUND]
 		--List of sounds to play.
 
+	create_sound_hit_player: SOUND
+			--Method that creates a sound for when a collision happen for a {PLAYER}.
+		local
+			l_wave: CHAIN[INTEGER_16]
+		once("PROCESS")
+		l_wave := sound_generator.create_sine_wave (50, 4000)
+		sound_generator.repeat_wave_from_duration (l_wave, 0.05)
+			create Result.make (l_wave)
+		end
+
+	create_sound_hit_enemy: SOUND
+			--Method that creates a sound for when a collision happen for an {ENEMY}.
+		local
+			l_wave: CHAIN[INTEGER_16]
+		once("PROCESS")
+		l_wave := sound_generator.create_sine_wave (50, 500)
+		sound_generator.repeat_wave_from_duration (l_wave, 0.03)
+			create Result.make (l_wave)
+		end
+
 	create_sound_menu_click:SOUND
 			--Method that creates a sound for a menu button click.
 		local

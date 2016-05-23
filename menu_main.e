@@ -54,7 +54,6 @@ feature {NONE} -- Implementation
 	play_action(a_string: READABLE_STRING_GENERAL)
 			-- Action played when the user clicks the Play button
 		do
-			io.put_string("Play clicked!%N")
 			play_menu_sound_click
 			create {MENU_PLAY} next_menu.make(context)
 			continue_to_next
@@ -64,7 +63,6 @@ feature {NONE} -- Implementation
 			-- Action played when the user clicks the Options button
 		do
 			play_menu_sound_click
-			io.put_string("Options clicked!%N")
 			create {MENU_OPTIONS} next_menu.make(context)
 			continue_to_next
 		end
@@ -73,7 +71,6 @@ feature {NONE} -- Implementation
 			-- Action played when the user clicks the Exit button
 		do
 			play_menu_sound_click
-			io.put_string("Exit clicked!%N")
 			close_program
 		end
 

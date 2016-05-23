@@ -40,7 +40,6 @@ feature {NONE}
 			-- Action played when the user clicks the Host button.
 		do
 			play_menu_sound_click
-			io.put_string("Host clicked!%N")
 			create {MENU_LOADING_SCREEN} next_menu.make_multiplayer_host(context, network_engine)
 			continue_to_next
 		end
@@ -51,7 +50,6 @@ feature {NONE}
 			l_ip: STRING
 		do
 			play_menu_sound_click
-			io.put_string("Join clicked!%N")
 			l_ip := textboxes[1].text.text.to_string_8
 			l_ip.right_adjust
 			l_ip.left_adjust
@@ -63,7 +61,6 @@ feature {NONE}
 			-- Action played when the user clicks the Return button.
 		do
 			play_menu_sound_click
-			io.put_string("Return clicked!%N")
 			return_menu
 		end
 end

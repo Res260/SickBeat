@@ -12,6 +12,7 @@ inherit
 	MATH_UTILITY
 	GAME_LIBRARY_SHARED
 	SOUND_FACTORY_SHARED
+	SOUND_MANAGER_SHARED
 
 create
 	make
@@ -46,14 +47,18 @@ feature {NONE} -- Initialization
 						sound_factory.sounds_list[4],
 						sound_factory.sounds_list[5]
 					  ]
+			audio_source_enemy_hit := sound_manager.get_audio_source
 			spawn_enemy_cooldown := 0.0
 			create spawn_enemies_actions
 			create random_generator.set_seed(game_library.time_since_create.as_integer_32)
 			spawn_enemies_actions.extend(agent (a_enemy: ENEMY)
-								do print("Spawning enemy at (" + a_enemy.x_real.out + ", " + a_enemy.y_real.out + ")%N") end)
+								do end)
 		end
 
 feature {NONE} -- Implementation
+
+	audio_source_enemy_hit: detachable AUDIO_SOURCE
+			-- Audio_source for when any {ENEMY} is hit.
 
 	size: TUPLE[width, height: REAL_64]
 			-- Size of `Current'
@@ -142,7 +147,7 @@ feature -- Access
 					spawn_enemies_actions.call(
 							create {ENEMY}.make(
 									[l_new_enemy_x, l_new_enemy_y], la_texture,
-									la_color, la_arc, la_sound
+									la_color, la_arc, la_sound, audio_source_enemy_hit
 									)
 							)
 					should_spawn_enemy := False

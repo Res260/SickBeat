@@ -100,7 +100,6 @@ feature -- Implementation
 			play_menu_sound_click
 			thread_sounds.launch
 			thread_images.launch
-			io.put_string("Useless button clicked! Bravo champion%N")
 		end
 
 	on_stop

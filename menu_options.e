@@ -45,7 +45,6 @@ feature {NONE}
 			l_volume: INTEGER
 		do
 			play_menu_sound_click
-			io.put_string("Save Changes clicked!%N")
 			l_text := textboxes[1].text.text.as_string_8
 			l_text.adjust
 			if l_text.is_integer then

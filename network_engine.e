@@ -97,7 +97,6 @@ feature -- Access
 			l_rescue:BOOLEAN
 		do
 			if not l_rescue then
-				print("%NDÉBUT RUN%N")
 				if attached client_socket as la_client_socket then
 					if attached la_client_socket.peer_address as la_address then
 						from
@@ -108,8 +107,6 @@ feature -- Access
 							la_client_socket.put_string (self_score + "%N")
 							la_client_socket.read_line
 							friend_score := la_client_socket.last_string
-							print("%NMON SCORE: " + self_score)
-							print("%NSON SCORE: " + friend_score)
 							if attached thread_connexion as la_thread then
 								la_thread.sleep (100000000)
 							end
@@ -162,7 +159,6 @@ feature -- Access
 							io.put_string ("Can't connect to " + a_host + ":" + server_port.to_hex_string +".%N")
 						else
 							client_socket := l_socket
-							print("%NCONNECTED!!%N")
 							create thread_connexion.make (agent run)
 							if attached thread_connexion as la_thread then
 								la_thread.launch

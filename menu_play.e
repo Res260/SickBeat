@@ -36,7 +36,6 @@ feature {NONE} -- Implementation
 			-- Action played when the user clicks the Singleplayer button
 		do
 			play_menu_sound_click
-			io.put_string("Singleplayer clicked!%N")
 			create {MENU_LOADING_SCREEN} next_menu.make(context)
 			continue_to_next
 		end
@@ -45,7 +44,6 @@ feature {NONE} -- Implementation
 			-- Action played when the user clicks the Multiplayer button
 		do
 			play_menu_sound_click
-			io.put_string("Multiplayer clicked!%N")
 			create {MENU_MULTIPLAYER} next_menu.make(context)
 			continue_to_next
 		end
@@ -54,7 +52,6 @@ feature {NONE} -- Implementation
 			-- Action played when the user clicks the Return button
 		do
 			play_menu_sound_click
-			io.put_string("Return clicked!%N")
 			return_menu
 		end
 note

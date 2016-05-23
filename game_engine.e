@@ -19,6 +19,8 @@ inherit
 		end
 	GAME_CORE
 	MATH_UTILITY
+	SOUND_MANAGER_SHARED
+	SOUND_FACTORY_SHARED
 
 create
 	make,
@@ -53,6 +55,10 @@ feature {NONE} -- Initialization
 			last_frame := 0
 			create game_update_mutex.make
 			create {LINKED_LIST[ENEMY]} ennemies.make
+			audio_source_hit := sound_manager.get_audio_source
+			if attached audio_source_hit as la_audio_source then
+				la_audio_source.queue_sound (sound_factory.create_sound_hit_player)
+			end
 			create game_update_thread.make(game_update_mutex, Current)
 			controller.mouse_button_update_actions.extend(agent current_player.on_click)
 			controller.mouse_wheel_actions.extend(agent current_player.on_mouse_wheel)
@@ -109,6 +115,9 @@ feature {NONE} -- Implementation
 
 	game_update_thread: detachable GAME_UPDATE_THREAD
 			-- Thread used for the game updates
+
+	audio_source_hit: detachable AUDIO_SOURCE
+			-- Audio source for when `Current' is hit by something
 
 	set_events
 			-- Sets the event handlers for `Current'
@@ -180,7 +189,7 @@ feature {NONE} -- Implementation
 				tick_display := tick_counter
 				frame_counter := 0
 				tick_counter := 0
-				io.put_string("Frames: " + frame_display.out + " Ticks: " + tick_display.out + " Entities: " + entities.count.out + " HP: " + current_player.health.rounded.out + "     %R")
+--				io.put_string("Frames: " + frame_display.out + " Ticks: " + tick_display.out + " Entities: " + entities.count.out + " HP: " + current_player.health.rounded.out + "     %R")
 			end
 
 			update_camera
@@ -203,7 +212,7 @@ feature {NONE} -- Implementation
 	on_stop
 			-- Close the game_update_thread
 		do
-			io.put_string("%N")
+--			io.put_string("%N")
 			if attached network_engine as la_network_engine then
 				la_network_engine.stop_connexion
 			end
@@ -273,6 +282,13 @@ feature {NONE} -- Implementation
 						l_damage := l_damage * 0.0
 					end
 					current_player.deal_damage(l_damage)
+					if attached audio_source_hit as la_audio_source and l_damage > 0 then
+						if not la_audio_source.is_playing then
+							la_audio_source.set_gain ((l_damage.truncated_to_real / 4).min(1) * sound_manager.master_volume)
+							la_audio_source.play
+							la_audio_source.queue_sound (sound_factory.create_sound_hit_player)
+						end
+					end
 					la_wave.deal_damage(l_damage * 200)
 				end
 			end

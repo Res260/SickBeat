@@ -24,14 +24,16 @@ inherit
 		end
 	MATH_UTILITY
 	SOUND_FACTORY_SHARED
+	SOUND_MANAGER_SHARED
 
 create
 	make
 
 feature {NONE} -- Initialization
 
-	make(a_position: TUPLE[x, y: REAL_64]; a_texture: GAME_TEXTURE; a_color: GAME_COLOR; a_arc: GAME_TEXTURE; a_sound: SOUND)
-			-- Initializes `Current' at `a_position', with `a_texture', with `a_arc', with `a_color' and with `a_sound'
+	make(a_position: TUPLE[x, y: REAL_64]; a_texture: GAME_TEXTURE; a_color: GAME_COLOR; a_arc: GAME_TEXTURE; a_sound: SOUND; a_audio_source_hit: detachable AUDIO_SOURCE)
+			-- Initializes `Current' at `a_position', with `a_texture', with `a_arc', with `a_color',
+			--			   `a_sound' (sound for the waves) and `a_audio_source_hit'
 		do
 			make_entity(a_position.x, a_position.y)
 			radius := a_texture.width / 2
@@ -41,6 +43,10 @@ feature {NONE} -- Initialization
 			create speed
 			create max_speed
 			arc := a_arc
+			audio_source_hit := a_audio_source_hit
+			if attached audio_source_hit as la_source then
+				la_source.queue_sound(sound_factory.create_sound_hit_enemy)
+			end
 			speed.x := 0
 			speed.y := speed.x
 			max_speed.x := 70
@@ -54,6 +60,9 @@ feature {NONE} -- Initialization
 		end
 
 feature {NONE} -- Implementation
+
+	audio_source_hit: detachable AUDIO_SOURCE
+			-- audio source for when `Current' is hit by something
 
 	width: REAL_64 = 40.0
 			-- Width of `Current'
@@ -181,6 +190,13 @@ feature -- Access
 						l_damage := l_damage * 0.0
 					end
 					deal_damage(l_damage)
+					if attached audio_source_hit as la_audio_source and l_damage > 0 then
+						if not la_audio_source.is_playing then
+							la_audio_source.set_gain ((l_damage.truncated_to_real / 3).min(1) * sound_manager.master_volume)
+							la_audio_source.play
+							la_audio_source.queue_sound (sound_factory.create_sound_hit_enemy)
+						end
+					end
 					la_wave.deal_damage(l_damage * 200)
 				end
 			elseif attached {PLAYER} a_physic_object as la_player then

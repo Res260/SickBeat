@@ -69,6 +69,7 @@ feature {NONE} -- Initialization
 				)
 			current_player.death_actions.extend(agent (a_entity: ENTITY)
 					do
+						create {MENU_DEATH} next_menu.make_with_score(score, attached network_engine, context)
 						return_to_main
 					end
 				)

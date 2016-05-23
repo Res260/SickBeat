@@ -280,6 +280,9 @@ feature {NONE} -- Implementation
 					current_player.deal_damage(l_damage)
 					la_wave.deal_damage(l_damage * 200)
 				end
+			elseif attached {ENEMY} a_physic_object as la_enemy then
+				la_enemy.deal_damage(la_enemy.health_max)
+				current_player.deal_damage(current_player.health_max * 0.25)
 			end
 		end
 

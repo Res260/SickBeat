@@ -39,6 +39,10 @@ feature -- Access
 				Result := collides_with_box(la_box)
 			elseif attached {BOUNDING_ARC} a_other as la_arc then
 				Result := collides_with_arc(la_arc)
+			elseif attached {BOUNDING_SPHERE} a_other as la_sphere then
+				Result := collides_with_sphere(la_sphere)
+			elseif attached {BOUNDING_PLANE} a_other as la_plane then
+				Result := collides_with_plane(la_plane)
 			end
 		end
 

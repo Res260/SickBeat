@@ -32,11 +32,18 @@ feature {NONE} -- Implementation
 	hud_items: LIST[HUD_ITEM]
 			-- HUD items to render after everything else
 
+	absolute_background: GAME_COLOR
+			-- Background color behind the background image
+		once("PROCESS")
+			create Result.make(255, 255, 255, 255)
+		end
+
 feature -- Access
 
 	render(a_drawables: LIST[DRAWABLE])
 			-- Draws `background' with the `a_drawables' on top of it
 		do
+			context.renderer.set_drawing_color(absolute_background)
 			context.renderer.clear
 
 			current_background.draw(context)

@@ -28,9 +28,9 @@ feature {NONE} -- Initialization
 			create sounds
 			side_boxes := [
 					create {BOUNDING_PLANE}.make_plane([1.0, 0.0], 0),
-					create {BOUNDING_PLANE}.make_plane([-1.0, 0.0], a_size.width),
+					create {BOUNDING_PLANE}.make_plane([-1.0, 0.0], -a_size.width),
 					create {BOUNDING_PLANE}.make_plane([0.0, 1.0], 0),
-					create {BOUNDING_PLANE}.make_plane([0.0, -1.0], a_size.height)
+					create {BOUNDING_PLANE}.make_plane([0.0, -1.0], -a_size.height)
 				]
 			enemy_colors := [
 						create {GAME_COLOR}.make(0, 0, 0, 255),		-- Black
@@ -103,15 +103,16 @@ feature -- Access
 			should_spawn_enemy := False
 		end
 
-	is_entity_in_boundaries(a_entity: ENTITY): BOOLEAN
+	is_entity_outside_boundaries(a_entity: ENTITY): BOOLEAN
 			-- Checks if `a_entity' is inside the side_boxes
+		local
+			l_collides_left, l_collides_right, l_collides_top, l_collides_down: BOOLEAN
 		do
-			Result := not (
-					a_entity.collides_with_plane(side_boxes.left) or
-					a_entity.collides_with_plane(side_boxes.right) or
-					a_entity.collides_with_plane(side_boxes.top) or
-					a_entity.collides_with_plane(side_boxes.down)
-				)
+			l_collides_left := a_entity.collides_with_plane(side_boxes.left)
+			l_collides_right := a_entity.collides_with_plane(side_boxes.right)
+			l_collides_top := a_entity.collides_with_plane(side_boxes.top)
+			l_collides_down := a_entity.collides_with_plane(side_boxes.down)
+			Result := l_collides_left or l_collides_right or l_collides_top or l_collides_down
 		end
 
 	update(a_timediff: REAL_64)

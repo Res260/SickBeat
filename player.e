@@ -27,8 +27,9 @@ create
 
 feature {NONE} -- Initialization
 
-	make(a_position: TUPLE[x, y: REAL_64]; a_controller: CONTROLLER; a_context: CONTEXT)
+	make(a_position: TUPLE[x, y: REAL_64]; a_controller: CONTROLLER; a_map: MAP; a_context: CONTEXT)
 			-- Initialize `Current' at position `a_position' to move following `a_controller's controls
+			-- Cannot move outside of `a_map's boundaries
 			-- Gathers textures and the waves' angle from `a_context'
 		do
 			controller := a_controller
@@ -67,6 +68,7 @@ feature {NONE} -- Initialization
 			bounding_radius := radius
 			normal_angle := a_context.image_factory.player_arc_angle
 			health := health_max
+			map := a_map
 		end
 
 feature {NONE} -- Implementation
@@ -81,6 +83,9 @@ feature {NONE} -- Implementation
 			-- Acceleration of `Current'
 
 feature -- Access
+
+	map: MAP
+			-- `Current's map boundaries
 
 	health: REAL_64
 			-- Remaining health of `Current'
@@ -194,7 +199,11 @@ feature -- Access
 
 	update(a_timediff: REAL_64)
 			-- Update `Current's `speed' and position from it's `acceleration'
+		local
+			l_prev_x, l_prev_y: REAL_64
 		do
+			l_prev_x := x_real
+			l_prev_y := y_real
 			update_acceleration
 			speed.x := max_speed.x.opposite.max(max_speed.x.min(speed.x + acceleration.x * a_timediff))
 			speed.y := max_speed.y.opposite.max(max_speed.y.min(speed.y + acceleration.y * a_timediff))
@@ -205,6 +214,17 @@ feature -- Access
 			center.x := x_real
 			center.y := y_real
 			update_minimal_bounding_box
+			if map.is_entity_outside_boundaries(Current) then
+				speed.x := 0
+				speed.y := 0
+				x_real := l_prev_x
+				y_real := l_prev_y
+				x := x_real.floor
+				y := y_real.floor
+				center.x := x_real
+				center.y := y_real
+				update_minimal_bounding_box
+			end
 			if not dead and health <= 0.0 then
 				dead := True
 				death_actions.call(Current)

@@ -43,7 +43,7 @@ feature {NONE} -- Initialization
 			hud_items.extend (create {HUD_SCORE}.make(-1, 20, 40, "", context))
 			create renderer.make(background, hud_items, context)
 			create physics.make
-			create current_player.make([context.window.width / 2, context.window.height / 2], controller, context)
+			create current_player.make([context.window.width / 2, context.window.height / 2], controller, current_map, context)
 			create {LINKED_LIST[ENTITY]} entities.make
 			create {ARRAYED_LIST[DRAWABLE]} drawables.make(0)
 			entities.extend(current_player)

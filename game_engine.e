@@ -45,7 +45,8 @@ feature {NONE} -- Initialization
 			hud_items.extend (create {HUD_SCORE}.make(-1, 20, 40, "", context))
 			create renderer.make(background, hud_items, context)
 			create physics.make
-			create current_player.make([context.window.width / 2, context.window.height / 2], controller, context)
+			create current_player.make([context.window.width / 2, context.window.height / 2], controller, current_map, context)
+			hud_items.extend(create {HUD_HEALTH}.make(current_player.health_max, current_player.health, 20, 60))
 			create {LINKED_LIST[ENTITY]} entities.make
 			create {ARRAYED_LIST[DRAWABLE]} drawables.make(0)
 			entities.extend(current_player)
@@ -75,6 +76,7 @@ feature {NONE} -- Initialization
 				)
 			current_player.death_actions.extend(agent (a_entity: ENTITY)
 					do
+						create {MENU_DEATH} next_menu.make_with_score(score, attached network_engine, context)
 						return_to_main
 					end
 				)
@@ -164,7 +166,6 @@ feature {NONE} -- Implementation
 	on_tick(a_timestamp: NATURAL_32)
 			-- Method run on every iteration (should be 60 times per second)
 		do
-
 			if attached {HUD_SCORE} hud_items.at(2) as la_other_score then
 				if attached network_engine as la_network_engine then
 					la_network_engine.set_self_score(score.out)
@@ -198,8 +199,10 @@ feature {NONE} -- Implementation
 --				io.put_string("Frames: " + frame_display.out + " Ticks: " + tick_display.out + " Entities: " + entities.count.out + " HP: " + current_player.health.rounded.out + "     %R")
 			end
 
+			if attached {HUD_HEALTH} hud_items.last as la_hud_health then
+				la_hud_health.update_value(current_player.health)
+			end
 			update_camera
-
 			on_redraw(a_timestamp)
 
 			across drawables as la_drawables loop
@@ -297,6 +300,9 @@ feature {NONE} -- Implementation
 					end
 					la_wave.deal_damage(l_damage * 200)
 				end
+			elseif attached {ENEMY} a_physic_object as la_enemy then
+				la_enemy.deal_damage(la_enemy.health_max)
+				current_player.deal_damage(current_player.health_max * 0.25)
 			end
 		end
 

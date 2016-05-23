@@ -17,10 +17,14 @@ create
 feature {NONE} -- Initialization
 
 	make_plane(a_normal: TUPLE[x, y: REAL_64]; a_offset: REAL_64)
-			-- Initalizes `Current' point towards `a_direction' from center (0, 0) with `a_offset' on the axis
+			-- Initalizes `Current' point towards `a_normal' from center (0, 0) with `a_offset' on the axis
+			-- Note: `a_normal' is normalized
+		require
+			Normal_Not_Null: not (a_normal.x ~ 0 and a_normal.y ~ 0)
 		do
 			make_physic_object
 			normal := a_normal
+			length := normalize_vector(normal)
 			offset := a_offset
 			create minimum_bounding_box.make_box(0, 0, 0, 0)
 			update_minimum_bounding_box
@@ -50,6 +54,9 @@ feature {NONE} -- Implementation
 		end
 
 feature -- Access
+
+	length: REAL_64
+			-- Length of `Current's normal
 
 	normal: TUPLE[x, y: REAL_64]
 			-- Direction from (0, 0) where `Current' points
@@ -87,13 +94,16 @@ feature -- Implementation
 	collides_with_arc(a_other: BOUNDING_ARC): BOOLEAN
 			-- Whether or not `Current' collides with a {BOUNDING_ARC}
 		do
-
+			Result := False
 		end
 
 	collides_with_sphere(a_other: BOUNDING_SPHERE): BOOLEAN
 			-- Whether or not `Current' collides with a {BOUNDING_SPHERE}
+		local
+			l_distance_plane: REAL_64
 		do
-
+			l_distance_plane := (dot_product(normal, a_other.center) - offset) / length
+			Result := l_distance_plane.abs - a_other.radius <= 0
 		end
 
 	collides_with_plane(a_other: BOUNDING_PLANE): BOOLEAN

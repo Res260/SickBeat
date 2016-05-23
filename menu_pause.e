@@ -32,11 +32,11 @@ feature {NONE} -- Initialization
 
 feature {NONE} -- Implementation
 
-	leave_action(a_string: READABLE_STRING_GENERAL)
-			-- Action played when the user clicks the Play button
+	return_action(a_string: READABLE_STRING_GENERAL)
+			-- Action played when the user clicks the Return button
 		do
 			play_menu_sound_click
-			return_to_main
+			return_menu
 		end
 
 	options_action(a_string: READABLE_STRING_GENERAL)
@@ -47,11 +47,11 @@ feature {NONE} -- Implementation
 			continue_to_next
 		end
 
-	return_action(a_string: READABLE_STRING_GENERAL)
-			-- Action played when the user clicks the Exit button
+	leave_action(a_string: READABLE_STRING_GENERAL)
+			-- Action played when the user clicks the Leave button
 		do
 			play_menu_sound_click
-			return_menu
+			return_to_main
 		end
 note
 	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007 | Copyright (c) 2016 Émilio Gonzalez and Guillaume Jean"

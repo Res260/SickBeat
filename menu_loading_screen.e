@@ -32,11 +32,12 @@ feature {NONE} -- Initialization
 			create thread_images.make(context.image_factory)
 			thread_sounds.stop_actions.extend (agent stop_menu_from_thread)
 			thread_images.stop_actions.extend (agent stop_menu_from_thread)
-			add_button("Génération des sons en cours", agent useless_action)
-			add_button("Génération des images en cours", agent useless_action)
+			add_button("Generating sounds...", agent useless_action)
+			add_button("Generating images...", agent useless_action)
 		end
 
 	make_multiplayer(a_context: CONTEXT; a_host: STRING)
+			--Initialization for `Current'. Connects to `a_host' for the multiplayer.
 		do
 			make(a_context)
 			create network_engine.make
@@ -49,6 +50,7 @@ feature {NONE} -- Initialization
 		end
 
 	make_multiplayer_host(a_context: CONTEXT; a_network_engine: NETWORK_ENGINE)
+			--Initialization for `Current'. Listen for incoming connections for the multiplayer.
 		do
 			make(a_context)
 			network_engine := a_network_engine
@@ -80,13 +82,13 @@ feature -- Implementation
 		do
 			Precursor(a_timestamp)
 			if thread_sounds.completed and not sounds_text_updated then
-				buttons[1].set_text("Génération de sons terminée")
+				buttons[1].set_text("Done generating sounds")
 				update_buttons_dimension
 				on_redraw(a_timestamp)
 				sounds_text_updated := True
 			end
 			if thread_images.completed and not images_text_updated then
-				buttons[2].set_text("Génération d'images terminée")
+				buttons[2].set_text("Done generating images")
 				update_buttons_dimension
 				on_redraw(a_timestamp)
 				images_text_updated := True

@@ -122,7 +122,13 @@ feature {NONE} -- Implementation
 	set_events
 			-- Sets the event handlers for `Current'
 		do
-			Precursor
+			game_library.quit_signal_actions.extend(agent on_quit_signal)
+			game_library.iteration_actions.extend(agent on_iteration)
+			context.window.expose_actions.extend(agent on_redraw)
+			context.window.size_change_actions.extend(agent on_size_change)
+			context.window.mouse_button_pressed_actions.extend(agent on_pressed)
+			context.window.mouse_button_released_actions.extend(agent on_released)
+			context.window.mouse_motion_actions.extend(agent on_mouse_motion)
 			context.window.key_pressed_actions.extend(agent on_key_press)
 			context.window.key_pressed_actions.extend(
 					agent (a_timestamp: NATURAL_32; a_game_key: GAME_KEY_STATE)

@@ -77,8 +77,6 @@ feature --Access
 			l_length:= get_wave_length_from_frequency(a_frequency)
 			create l_wave.make (l_length)
 			l_highest_number:= get_max_number_from_amplitude(a_amplitude)
-			io.put_integer_16(l_highest_number)
-			io.put_new_line
 			from
 				i:= 0
 			until

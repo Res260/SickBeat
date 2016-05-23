@@ -26,25 +26,26 @@ feature {NONE} -- Initialization
 		do
 			create stop_actions
 			image_factory := a_image_factory
+			completed := False
 			make_thread
 		end
 
 feature -- Implementation
 
+	completed: BOOLEAN
+			-- Whether or not `Current' has completed it's task
+
 	stop_actions: ACTION_SEQUENCE[TUPLE]
-		--procedure to call to start the game.
+			-- Called when `Current's execution is completed
 
 	image_factory:IMAGE_FACTORY
-		-- The game's image factory
+			-- The game's image factory
 
 	execute
 			-- Executed when the thread is launched
-		local
-
 		do
-			io.put_string ("Thread textures launché")
 			image_factory.make_all_textures
-			io.put_string ("Textures faites")
+			completed := True
 			stop_actions.call
 		end
 note

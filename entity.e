@@ -47,6 +47,11 @@ feature -- Access
 			end
 		end
 
+	deal_damage(a_damage: REAL_64)
+			-- Deals `a_damage' to `Current'
+		deferred
+		end
+
 	kill
 			-- Do stuff when `Current' is removed from the world to cleanup
 		do

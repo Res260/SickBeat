@@ -58,20 +58,27 @@ feature {NONE} -- Initialization
 			controller.mouse_wheel_actions.extend(agent current_player.on_mouse_wheel)
 			controller.number_actions.extend(agent current_player.set_color_index)
 			current_player.collision_actions.extend(agent (a_physic_object: PHYSIC_OBJECT)
-														do
-															--io.put_string("BOOM!")
-														end
-												   )
+					do
+						do_player_collision(a_physic_object)
+					end
+				)
 			current_player.launch_wave_event.extend(agent (a_wave:WAVE)
-														do
-															add_entity_to_world(a_wave)
-														end
-												   )
+					do
+						add_entity_to_world(a_wave)
+					end
+				)
+			current_player.death_actions.extend(agent (a_entity: ENTITY)
+					do
+						return_to_main
+					end
+				)
 			current_map.spawn_enemies_actions.extend(agent (a_enemy: ENEMY)
-														do
-															add_enemy_to_world(a_enemy)
-														end
-													)
+					do
+						add_enemy_to_world(a_enemy)
+						a_enemy.collision_actions.extend(agent a_enemy.do_collision)
+						a_enemy.death_actions.extend(agent (a_entity: ENTITY) do add_score(10) end)
+					end
+				)
 		end
 
 	make_multiplayer(a_context: CONTEXT; a_network_engine: NETWORK_ENGINE)
@@ -173,15 +180,14 @@ feature {NONE} -- Implementation
 				tick_display := tick_counter
 				frame_counter := 0
 				tick_counter := 0
-				io.put_string("Frames: " + frame_display.out + " Ticks: " + tick_display.out + " Entities: " + entities.count.out + "     %R")
+				io.put_string("Frames: " + frame_display.out + " Ticks: " + tick_display.out + " Entities: " + entities.count.out + " HP: " + current_player.health.rounded.out + "     %R")
 			end
 
 			update_camera
 
 			on_redraw(a_timestamp)
 
-			across drawables as la_drawables
-			loop
+			across drawables as la_drawables loop
 				if attached {WAVE} la_drawables.item as la_wave then
 					if attached la_wave.audio_source as la_audio_source then
 						la_audio_source.set_position (
@@ -236,7 +242,6 @@ feature {NONE} -- Implementation
 			-- Pauses the game when pressing the Escape key
 			-- Toggles debugging mode whem pressing F3
 		do
-			score := score + 1
 			if attached {HUD_INFORMATION} hud_items[1] as la_hud_score then
 				la_hud_score.update_value (score)
 			end
@@ -254,6 +259,23 @@ feature {NONE} -- Implementation
 			-- Update `context.camera's position
 		do
 			context.camera.move_at_entity(current_player, context.window)
+		end
+
+	do_player_collision(a_physic_object: PHYSIC_OBJECT)
+			-- Determines what to do with `current_player's collision with `a_physic_object'
+		local
+			l_damage: REAL_64
+		do
+			if attached {WAVE} a_physic_object as la_wave then
+				if la_wave.source /= current_player then
+					l_damage := la_wave.energy / 1000
+					if la_wave.color.to_rgb_hex_string ~ current_player.current_color.to_rgb_hex_string then
+						l_damage := l_damage * 0.0
+					end
+					current_player.deal_damage(l_damage)
+					la_wave.deal_damage(l_damage * 200)
+				end
+			end
 		end
 
 feature -- Access

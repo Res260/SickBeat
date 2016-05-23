@@ -1,6 +1,6 @@
 note
 	description: "The loading screen while textures and sounds are loading."
-	author: "Émilio G!"
+	author: "Guillaume Jean and Émilio G!"
 	date: "2016-05-16"
 	revision: "16w15a"
 
@@ -11,7 +11,8 @@ inherit
 		redefine
 			make,
 			on_start,
-			on_stop
+			on_stop,
+			on_iteration
 		end
 create
 	make,
@@ -54,22 +55,46 @@ feature {NONE} -- Initialization
 			is_host := True
 		end
 
-feature --Implementation
+feature -- Implementation
 
 	is_host:BOOLEAN
-		--True if the client hosts a server.
+			--True if the client hosts a server.
 
 	network_engine: detachable NETWORK_ENGINE
-		--The game's network engine.
+			--The game's network engine.
 
 	thread_sounds:MENU_LOADING_SCREEN_SOUNDS_THREAD
-		--Thread that generates sounds for the game.
+			--Thread that generates sounds for the game.
 
 	thread_images:MENU_LOADING_SCREEN_IMAGES_THREAD
-		--Thread that generates textures for the game.
+			--Thread that generates textures for the game.
+
+	sounds_text_updated: BOOLEAN
+			-- Whether or not `thread_sounds' was completed last time `Current' checked
+
+	images_text_updated: BOOLEAN
+			-- Whether or not `thread_images' was completed last time `Current' checked
+
+	on_iteration(a_timestamp: NATURAL_32)
+			-- Updates the loading texts if a thread is completed
+		do
+			Precursor(a_timestamp)
+			if thread_sounds.completed and not sounds_text_updated then
+				buttons[1].set_text("Génération de sons terminée")
+				update_buttons_dimension
+				on_redraw(a_timestamp)
+				sounds_text_updated := True
+			end
+			if thread_images.completed and not images_text_updated then
+				buttons[2].set_text("Génération d'images terminée")
+				update_buttons_dimension
+				on_redraw(a_timestamp)
+				images_text_updated := True
+			end
+		end
 
 	on_start
-		--Launches threads
+			-- Launches threads
 		do
 			Precursor
 			play_menu_sound_click
@@ -79,13 +104,11 @@ feature --Implementation
 		end
 
 	on_stop
-			--Join threads and enters the game.
+			-- Joins threads and enters the game.
 		do
 			Precursor
 			thread_sounds.join
-			buttons[1].set_text ("Génération des sons terminée")
 			thread_images.join
-			buttons[2].set_text ("Génération des images terminée")
 			if(attached network_engine as la_network_engine) then
 				if(is_host) then
 					create {GAME_ENGINE} next_menu.make_multiplayer_host(context, la_network_engine)
@@ -100,7 +123,9 @@ feature --Implementation
 	stop_menu_from_thread
 			-- Might change
 		do
-			return_menu
+			if thread_sounds.completed and thread_images.completed then
+				return_menu
+			end
 		end
 note
 	license: "GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007 | Copyright (c) 2016 Émilio Gonzalez and Guillaume Jean"

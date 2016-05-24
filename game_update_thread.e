@@ -28,6 +28,7 @@ feature {NONE} -- Initialization
 		do
 			make_thread
 			must_stop := False
+			must_run := True
 			game_update_mutex := a_mutex
 			game_core := a_game_core
 		end
@@ -47,6 +48,9 @@ feature {NONE} -- Implementation
 
 	must_stop: BOOLEAN
 			-- Whether or not `Current' should stop running
+
+	must_run: BOOLEAN
+			-- Whether or not `Current' should yield it's execution until it is resumed
 
 	game_update_mutex: MUTEX
 			-- Mutex used to share ressources
@@ -85,6 +89,12 @@ feature -- Implementation
 			until
 				must_stop
 			loop
+				from
+				until
+					must_run
+				loop
+					yield
+				end
 				on_tick_singleplayer
 			end
 		end
@@ -126,6 +136,12 @@ feature -- Implementation
 				until
 					must_stop
 				loop
+					from
+					until
+						must_run
+					loop
+						yield
+					end
 					on_tick_singleplayer
 					on_tick_multiplayer(la_network_engine)
 				end
@@ -146,6 +162,18 @@ feature -- Access
 			-- Stop the thread
 		do
 			must_stop := True
+		end
+
+	pause_thread
+			-- Pause the thread
+		do
+			must_run := False
+		end
+
+	resume_thread
+			-- Resume the thread
+		do
+			must_run := True
 		end
 
 note

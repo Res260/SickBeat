@@ -164,6 +164,11 @@ feature {NONE} -- Implementation
 			context.camera.move_to_position(context.window.width // 2, context.window.height // 2, context.window)
 		end
 
+	on_cleanup
+			-- Called when `Current' isn't used anymore
+		do
+		end
+
 	on_mouse_motion(a_timestamp: NATURAL_32; a_mouse_state: GAME_MOUSE_MOTION_STATE; a_delta_x, a_delta_y: INTEGER)
 			-- Handles the mouse_motion (`a_mouse_state') event
 			-- Updates `mouse''s position
@@ -299,6 +304,7 @@ feature -- Access
 					end
 				end
 			end
+			on_cleanup
 		end
 
 	continue_to_next

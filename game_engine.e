@@ -15,7 +15,8 @@ inherit
 			on_redraw,
 			set_events,
 			on_restart,
-			on_stop
+			on_stop,
+			on_cleanup
 		end
 	GAME_CORE
 	MATH_UTILITY
@@ -113,7 +114,7 @@ feature {NONE} -- Implementation
 	game_update_mutex: MUTEX
 			-- Mutex used to lock the rendered objects
 
-	game_update_thread: detachable GAME_UPDATE_THREAD
+	game_update_thread: GAME_UPDATE_THREAD
 			-- Thread used for the game updates
 
 	audio_source_hit: detachable AUDIO_SOURCE
@@ -223,28 +224,27 @@ feature {NONE} -- Implementation
 			if attached network_engine as la_network_engine then
 				la_network_engine.stop_connexion
 			end
-			if attached game_update_thread as la_game_update_thread then
-				la_game_update_thread.stop_thread
-				la_game_update_thread.join
-			end
+			game_update_thread.pause_thread
 		end
 
 	on_restart
 			-- Reset the tick counter in order to prevent the game to continue playing when pausing
 		do
 			last_frame := 0
-			if attached game_update_thread as la_game_update_thread then
-				if la_game_update_thread.is_launchable then
-					la_game_update_thread.launch
-				else
-					create game_update_thread.make(game_update_mutex, Current)
-					if attached game_update_thread as la_game_update_thread_new then
-						la_game_update_thread_new.launch
-					end
-				end
+			if game_update_thread.is_launchable then
+				game_update_thread.launch
 			end
+			game_update_thread.resume_thread
 		ensure then
 			Tick_Reset: last_frame = 0
+		end
+
+	on_cleanup
+			-- Destroy `game_update_thread'
+		do
+			game_update_thread.resume_thread
+			game_update_thread.stop_thread
+			game_update_thread.join
 		end
 
 	on_redraw(a_timestamp: NATURAL_32)

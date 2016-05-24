@@ -74,28 +74,9 @@ feature --Access
 			l_wave_bass2: CHAIN[INTEGER_16]
 			l_wave_silence: CHAIN[INTEGER_16]
 		once("PROCESS")
-			l_wave_silence := sound_generator.create_square_wave (0, 500)
-			sound_generator.add_silence_from_seconds (l_wave_silence, 0.8)
-
-			l_wave_bass := sound_generator.create_sine_wave (0, 60)
-			sound_generator.repeat_wave_from_duration (l_wave_bass, 0.2)
-			sound_generator.fade (l_wave_bass, 0, 0.40, 0, 1)
-			sound_generator.fade (l_wave_bass, 0.6, 1, 1, 0)
-			sound_generator.add_silence_from_seconds (l_wave_bass, 0.3)
-			sound_generator.repeat_wave_from_repetitions (l_wave_bass, 3)
-			sound_generator.add_silence_from_seconds (l_wave_bass, 0.3)
-			sound_generator.repeat_wave_from_duration (l_wave_bass, 20)
-
-			l_wave_bass2 := sound_generator.create_sine_wave (0, 100)
-			sound_generator.repeat_wave_from_duration (l_wave_bass2, 0.2)
-			sound_generator.fade (l_wave_bass2, 0, 0.40, 0, 1)
-			sound_generator.fade (l_wave_bass2, 0.6, 1, 1, 0)
-			sound_generator.add_silence_from_seconds (l_wave_bass2, 0.8)
-			sound_generator.repeat_wave_from_repetitions (l_wave_bass2, 3)
-			sound_generator.add_silence_from_seconds (l_wave_bass2, 0.3)
-			sound_generator.repeat_wave_from_duration (l_wave_bass2, 20)
-
-			sound_generator.mix (l_wave_bass, l_wave_bass2, 0)
+			l_wave_bass := sound_generator.create_sine_wave (50, 120)
+			sound_generator.repeat_wave_from_duration (l_wave_bass, 0.25)
+			sound_generator.add_silence_from_seconds (l_wave_bass, 0.25)
 			create Result.make (l_wave_bass)
 		end
 

@@ -104,6 +104,7 @@ feature -- Access
 						until
 							not continue_network
 						loop
+							update_connected
 							la_client_socket.put_string (self_score + "%N")
 							la_client_socket.read_line
 							friend_score := la_client_socket.last_string
@@ -111,6 +112,7 @@ feature -- Access
 								la_thread.sleep (100000000)
 							end
 						end
+						is_connected := False
 					end
 				end
 			else
@@ -173,18 +175,21 @@ feature -- Access
 		end
 
 	is_connected: BOOLEAN
-			-- Checks whether or not `client_socket' is connected
+			-- True if the connection is still active with `client_socket'.
+
+	update_connected
+			-- Checks whether or not `client_socket' is connected and updates `is_connected'
 		local
 			l_retry: BOOLEAN
 		do
 			if not l_retry then
 				if attached client_socket as la_client then
-					Result := attached la_client.receive(1, la_client.c_peekmsg) as la_packet and then la_packet.count > 0
+					is_connected := attached la_client.receive(1, la_client.c_peekmsg) as la_packet and then la_packet.count > 0
 				else
-					Result := False
+					is_connected := False
 				end
 			else
-				Result := False
+				is_connected := False
 			end
 		rescue
 			l_retry := True

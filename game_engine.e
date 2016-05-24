@@ -93,7 +93,6 @@ feature {NONE} -- Initialization
 			-- Initialize all the attributes for a multiplayer game (sets `network_engine' to `a_network_engine') where you join a game.
 		do
 			make(a_context)
-			current_map.stop_spawning
 			network_engine := a_network_engine
 			if attached network_engine as la_network_engine then
 				create game_update_thread.make_multiplayer(game_update_mutex, Current, la_network_engine)
@@ -107,7 +106,6 @@ feature {NONE} -- Initialization
 			a_network_engine.initiate_server
 			network_engine := a_network_engine
 			make(a_context)
-			current_map.stop_spawning
 		end
 
 feature {NONE} -- Implementation

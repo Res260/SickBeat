@@ -79,7 +79,6 @@ feature {NONE}
 			-- Action played when the user clicks the Return button.
 		do
 			play_menu_sound_click
-			io.put_string("Return clicked!%N")
 			return_menu
 		end
 end

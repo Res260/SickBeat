@@ -126,9 +126,6 @@ feature -- Basic Operations
 	add_entity_to_world(a_entity: ENTITY)
 			-- Adds an `a_entity' to the world
 		do
---			if attached {TOURELLE} a_entity as la_tourelle then
---				la_tourelle.launch_wave_event(agent add_entity_to_world)
---			end
 			entities.extend(a_entity)
 			drawables.extend(a_entity)
 			physics.physic_objects.extend(a_entity)

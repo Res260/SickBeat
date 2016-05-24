@@ -38,8 +38,8 @@ feature {NONE} -- Initialization
 			create max_speed
 			create acceleration
 			create speed
-			max_speed.x := 750
-			max_speed.y := 750
+			max_speed.x := 150
+			max_speed.y := 150
 			create launch_wave_event
 			color_index := 4
 			colors := [
@@ -73,7 +73,7 @@ feature {NONE} -- Initialization
 
 feature {NONE} -- Implementation
 
-	acceleration_input: REAL_64 = 1000.0
+	acceleration_input: REAL_64 = 350.0
 			-- Acceleration of the player given by the inputs
 
 	max_speed: TUPLE[x, y: REAL_64]
@@ -156,8 +156,8 @@ feature -- Access
 				if l_x /= 0 or l_y /= 0 then
 					l_direction := atan2(l_x, l_y)
 					create l_speed
-					l_speed.x := speed.x
-					l_speed.y := speed.y
+					l_speed.x := speed.x * 0.75
+					l_speed.y := speed.y * 0.75
 					if attached {GAME_COLOR} colors.at(color_index + 1) as la_color then
 						create l_wave.make(x_real, y_real, x_real, y_real, l_direction, normal_angle, l_speed, la_color, Current, current_arc, create{SOUND}.make_from_other (current_sound))
 						launch_wave_event.call(l_wave)

@@ -34,13 +34,13 @@ feature{NONE}
 	pixel_format:GAME_PIXEL_FORMAT
 		-- The pixel format used for the textures
 
-	player_texture_dimension:INTEGER_32 = 30
+	player_texture_dimension:INTEGER_32 = 60
 		-- The player's texture's width and height.
 
 	player_textures:TUPLE[black, red, green, blue, white:GAME_TEXTURE]
 		-- The player's textures
 
-	enemy_texture_dimension: INTEGER_32 = 20
+	enemy_texture_dimension: INTEGER_32 = 40
 		-- Dimension of the ennemies
 
 	enemy_textures:TUPLE[black, red, green, blue, white:GAME_TEXTURE]
@@ -162,7 +162,7 @@ feature -- Access
 		local
 			l_pixels:GAME_PIXEL_READER_WRITER
 		do
-			l_pixels := make_transparent_texture(50,50)
+			l_pixels := make_transparent_texture(500,500)
 			image_generator.make_arc(l_pixels, a_color,
 						[(l_pixels.height / 2), (l_pixels.width / 2)], 0, player_arc_angle, l_pixels.height // 2, 75)
 			Result := make_texture_from_pixels(l_pixels)

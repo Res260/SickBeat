@@ -97,8 +97,9 @@ feature -- Methods
 		do
 			if is_selected then
 				create l_position
-				if a_factory.menu_font (30).text_dimension (text.text).width + info.padding < info.width then
-					l_position.x := info.x + info.padding + a_factory.menu_font (30).text_dimension (text.text).width
+				a_factory.generate_font (30)
+				if attached a_factory.last_font as la_font and then la_font.text_dimension (text.text).width + info.padding < info.width then
+					l_position.x := info.x + info.padding + la_font.text_dimension (text.text).width
 				else
 					l_position.x := info.x + info.width - info.padding
 				end

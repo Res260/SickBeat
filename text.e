@@ -40,18 +40,20 @@ feature -- Access
 		require
 			Positif_Non_Null_Font_Size: a_font_size > 0
 		local
-			l_font: TEXT_FONT
 			l_text_surface: TEXT_SURFACE_BLENDED
 		do
 			x := a_x
 			y := a_y
-			l_font := a_context.ressource_factory.menu_font(a_font_size)
-			create l_text_surface.make(text, l_font, text_color)
-			if l_text_surface.is_open then
-				create texture.make_from_surface(a_context.renderer, l_text_surface)
+			a_context.ressource_factory.generate_font(a_font_size)
+			if attached a_context.ressource_factory.last_font as la_font then
+				create l_text_surface.make(text, la_font, text_color)
+				if l_text_surface.is_open then
+					create texture.make_from_surface(a_context.renderer, l_text_surface)
+				end
 			end
+
 		ensure
-			Texture_Set: attached texture as la_texture and then la_texture.height = a_context.ressource_factory.menu_font(a_font_size).text_dimension(text).height
+			Texture_Set: attached texture
 			Text_Moved: x = a_x and y = a_y
 		end
 

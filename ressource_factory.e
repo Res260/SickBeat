@@ -62,6 +62,7 @@ feature {NONE} -- Initialization
 		local
 			l_rescue: BOOLEAN
 		do
+			create fonts.make (5)
 			if not l_rescue then
 				menu_background := load_image(a_renderer, "main_menu", "background")
 				game_background := load_image(a_renderer, "game", "background")
@@ -83,26 +84,46 @@ feature -- Access
 	game_background: detachable GAME_TEXTURE
 			-- Texture used for the game's background
 
-	menu_font(a_size: INTEGER): TEXT_FONT
+	fonts: HASH_TABLE[TEXT_FONT, INTEGER]
+			-- The fonts loaded in memory
+
+	generate_font(a_size: INTEGER)
+			-- Get the font of a_size if it exists, else create it and return it
+		do
+			if attached fonts.at (a_size) as la_font then
+				last_font := la_font
+			else
+				if attached load_menu_font (a_size) as la_font and then la_font.is_open then
+					fonts.extend (la_font, a_size)
+					last_font := la_font
+				else
+					has_error := True
+				end
+			end
+		end
+
+	last_font:detachable TEXT_FONT
+			-- The last font put by `generate_font'
+
+
+feature {NONE} -- Implementation
+
+	load_menu_font(a_size: INTEGER):detachable TEXT_FONT
 			-- Generate a {TEXT_FONT} of size `a_size' in pixels for the menus
 		local
 			l_path: PATH
+			l_font: TEXT_FONT
 		do
 			create l_path.make_from_string(ressources_directory)
 			l_path := l_path.extended(fonts_directory)
 			l_path := l_path.extended("ubuntu")
 			l_path := l_path.appended_with_extension(fonts_extension)
-			create Result.make(l_path.name, a_size)
-			if Result.is_openable then
-				Result.open
-			else
-				has_error := True
+			create l_font.make(l_path.name, a_size)
+			if l_font.is_openable then
+				l_font.open
+				Result := l_font
 			end
-		ensure
-			Font_Is_Open: Result.is_open
 		end
-
-feature {NONE} -- Implementation
 
 	load_image(a_renderer: GAME_RENDERER; a_sub_folder, a_image_name: READABLE_STRING_GENERAL): detachable GAME_TEXTURE
 			-- Loading the {GAME_TEXTURE} named `a_image_name' from `a_sub_folder' into RAM.

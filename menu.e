@@ -363,24 +363,27 @@ feature -- Access
 			l_y: INTEGER
 			l_button_font_size: INTEGER
 			l_title_font_size: INTEGER
-			l_title_font: TEXT_FONT
 		do
 			l_title_font_size := context.window.height // 15
-			l_title_font := context.ressource_factory.menu_font(l_title_font_size)
-			l_button_font_size := context.window.height // 30
-			l_height_between := context.window.height // 100
-			l_left_margin := context.window.width // 15
-			l_left_margin_title := context.window.width // 30
-			l_y := context.window.height // 2
-			if attached title as la_title then
-				la_title.change(l_left_margin_title, l_y - l_title_font.text_dimension(la_title.text).height - l_height_between, l_title_font_size, context)
-			end
-			across buttons as la_buttons loop
-				la_buttons.item.change(l_left_margin, l_y, l_button_font_size, context)
-				if attached la_buttons.item.texture as la_texture then
-					l_y := l_y + la_texture.height + l_height_between
+			context.ressource_factory.generate_font(l_title_font_size)
+			if attached context.ressource_factory.last_font as la_font then
+				l_button_font_size := context.window.height // 30
+				l_height_between := context.window.height // 100
+				l_left_margin := context.window.width // 15
+				l_left_margin_title := context.window.width // 30
+				l_y := context.window.height // 2
+				if attached title as la_title then
+					la_title.change(l_left_margin_title, l_y - la_font.text_dimension(la_title.text).height - l_height_between, l_title_font_size, context)
+				end
+				across buttons as la_buttons loop
+					la_buttons.item.change(l_left_margin, l_y, l_button_font_size, context)
+					if attached la_buttons.item.texture as la_texture then
+						l_y := l_y + la_texture.height + l_height_between
+					end
 				end
 			end
+
+
 		end
 
 	add_textbox(a_button_reference: BUTTON)

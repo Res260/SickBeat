@@ -101,7 +101,7 @@ feature -- Implementation
 			Precursor
 			play_menu_sound_click
 			thread_sounds.launch
-			thread_images.launch
+			thread_images.execute
 		end
 
 	on_stop
@@ -109,7 +109,7 @@ feature -- Implementation
 		do
 			Precursor
 			thread_sounds.join
-			thread_images.join
+--			thread_images.join
 			if(attached network_engine as la_network_engine) then
 				if(is_host) then
 					create {GAME_ENGINE} next_menu.make_multiplayer_host(context, la_network_engine)

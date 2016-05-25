@@ -96,7 +96,7 @@ feature -- Access
 	health: REAL_64
 			-- `Current's health
 
-	health_max: REAL_64 = 100.0
+	health_max: REAL_64 = 70.0
 			-- `Current's maximum amount of `health'
 
 	color: GAME_COLOR

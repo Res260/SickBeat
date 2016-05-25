@@ -66,7 +66,7 @@ feature {NONE} -- Implementation
 	side_boxes: TUPLE[left, right, top, down: BOUNDING_PLANE]
 			-- Bounding boxes preventing the entitites from moving outside of `Current'
 
-	spawn_enemy_cooldown_interval: REAL_64 = 4.5
+	spawn_enemy_cooldown_interval: REAL_64 = 3.5
 			-- Time between spawning an {ENEMY} in seconds
 
 	spawn_enemy_cooldown: REAL_64

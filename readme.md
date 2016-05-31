@@ -1,7 +1,7 @@
-..Software: SICKBEAT
-..Authors: Émilio G! & Guillaume Jean
-..Link: https://github.com/Res260/SickBeat
-..Date: from 2016-01-25 to 2016-05-26
+..*Software: SICKBEAT
+..*Authors: Émilio G! & Guillaume Jean
+..*Link: https://github.com/Res260/SickBeat
+..*Date: from 2016-01-25 to 2016-05-26
 
 About the game
 --------------
